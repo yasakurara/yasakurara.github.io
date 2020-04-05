@@ -92,11 +92,11 @@ $$ a_1\boldsymbol{e_1}+a_2\boldsymbol{e_2}+\dots+a_n\boldsymbol{e_n}　\tag{1} $
       <pubDate>Wed, 01 Apr 2020 00:00:00 +0900</pubDate>
       
       <guid>https://yasakura.me/post/generate-static-site-with-hugo/</guid>
-      <description> モチベーション  ブログを書きたい CMSで管理するほどでもない Hugoがよさそう  プレビューしながら執筆or開発する hugo server --watch -D --port &amp;lt;port&amp;gt; --bind 0.0.0.0 --baseURL=&amp;lt;local machine&#39;s IP address&amp;gt;   コードを変更するごとに自動でリロードさせるためには，--watchをつける．
+      <description>モチベーション  ブログを書きたい CMSで管理するほどでもない Hugoがよさそう  プレビューしながら執筆or開発する hugo server --watch -D --port &amp;lt;port&amp;gt; --bind 0.0.0.0 --baseURL=&amp;lt;local machine&#39;s IP address&amp;gt;   コードを変更するごとに自動でリロードさせるためには，--watchをつける．
  Draft記事を表示させるためには，-Dをつける．
  --bindを指定しない場合は，127.0.0.1にbindされる．127.0.0.1へのbindだと，hugo serverを実行しているローカルマシンからのアクセスhttp://localhost:&amp;lt;port&amp;gt;のみに制限されてしまう．0.0.0.0にbindすることで，LAN内にあるローカルマシン以外からはhttp://&amp;lt;local machine&#39;s IP address&amp;gt;:&amp;lt;port&amp;gt;でアクセスできるようになる．  記事を新規作成する hugo new post/&amp;lt;article name&amp;gt;.md  Themeカスタマイズ .Params.xxxはarticleのfront-matterから参照される
 .Site.Params.xxxはconfig.tomlから参照される
-静的サイトをジェネる </description>
+静的サイトをジェネる hugoでpublic/に静的サイトが生成される</description>
     </item>
     
     <item>

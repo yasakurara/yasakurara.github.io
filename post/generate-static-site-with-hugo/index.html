@@ -7,11 +7,11 @@
   
   <title>Hugoで静的サイトをジェネる - yasakura</title>
   
-  <meta name="description" content=" モチベーション  ブログを書きたい CMSで管理するほどでもない Hugoがよさそう  プレビューしながら執筆or開発する hugo server --watch -D --port &lt;port&gt; --bind 0.0.0.0 --baseURL=&lt;local machine&#39;s IP address&gt;   コードを変更するごとに自動でリロードさせるためには，--watchをつける．
+  <meta name="description" content="モチベーション  ブログを書きたい CMSで管理するほどでもない Hugoがよさそう  プレビューしながら執筆or開発する hugo server --watch -D --port &lt;port&gt; --bind 0.0.0.0 --baseURL=&lt;local machine&#39;s IP address&gt;   コードを変更するごとに自動でリロードさせるためには，--watchをつける．
  Draft記事を表示させるためには，-Dをつける．
  --bindを指定しない場合は，127.0.0.1にbindされる．127.0.0.1へのbindだと，hugo serverを実行しているローカルマシンからのアクセスhttp://localhost:&lt;port&gt;のみに制限されてしまう．0.0.0.0にbindすることで，LAN内にあるローカルマシン以外からはhttp://&lt;local machine&#39;s IP address&gt;:&lt;port&gt;でアクセスできるようになる．  記事を新規作成する hugo new post/&lt;article name&gt;.md  Themeカスタマイズ .Params.xxxはarticleのfront-matterから参照される
 .Site.Params.xxxはconfig.tomlから参照される
-静的サイトをジェネる ">
+静的サイトをジェネる hugoでpublic/に静的サイトが生成される">
   
   <link href=/css/style.css rel="stylesheet">
   
@@ -27,7 +27,7 @@
     <div class="title"><a href="https://yasakura.me">yasakura</a></div>
     <nav id="navigation">
       <ul class="menu">
-        <li><a href="https://yasakura.meabout/">ABOUT</a></li>
+        <li><a href="https://yasakura.me/about/">ABOUT</a></li>
       </ul>
     </nav>
   </header>
@@ -75,6 +75,8 @@
 <code>.Site.Params.xxx</code>はconfig.tomlから参照される</p>
 
 <h1 id="静的サイトをジェネる">静的サイトをジェネる</h1>
+
+<p><code>hugo</code>で<code>public/</code>に静的サイトが生成される</p>
 
     <div class="share">
     <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fgenerate-static-site-with-hugo%2f&text=Hugo%e3%81%a7%e9%9d%99%e7%9a%84%e3%82%b5%e3%82%a4%e3%83%88%e3%82%92%e3%82%b8%e3%82%a7%e3%83%8d%e3%82%8b - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
