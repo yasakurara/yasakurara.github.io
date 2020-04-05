@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  
+  <title>線形モデルでデータを表現する - yasakura</title>
+  
+  <meta name="description" content="モチベーション 散布図から関数を予測したい
+scikit-learnのLinearRegressionで単回帰する -3 &lt; x &lt; 3 の範囲でxをランダムに50点生成し，$y=0.1x&#43;0.3$に入力した後，yにσ=0.1のガウシアンノイズを加えたtを教師データとした．青線(original)が直線y，散布図(training data)がtである．
+scikit-learnのLinearRegressionを用いて$y=0.1x&#43;0.3$を予測したものが赤線(predictive)である．
+coefficientは0.09くらい，interceptは0.30くらいとなり，$y=0.09x&#43;0.30$と予測できた．
+import numpy as np from matplotlib import pyplot as plt from sklearn.linear_model import LinearRegression from sklearn.model_selection import train_test_split from matplotlib.colors import ListedColormap colors = [&#39;#e74c3c&#39;, &#39;#3498db&#39;, &#39;#1abc9c&#39;, &#39;#9b59b6&#39;, &#39;#f1c40f&#39;] # red, blue, green, purple, yellow cmap = ListedColormap(colors) plt.style.use(&#39;seaborn&#39;) def f(x): return 0.1*x &#43; 0.3 N = 50 X = np.zeros((N,1)) np.random.seed(seed=10) X[:,0] = np.random.uniform(-3, 3, N) noise = 0.">
+  
+  <link href=/css/style.css rel="stylesheet">
+  
+  <link href=/css/font.css rel="stylesheet">
+  
+  <link rel="icon" href="https://yasakura.meimg/favicon.ico">
+  
+  <link rel="alternate" type="application/atom+xml" href="https://yasakura.meindex.xml" title="yasakura">
+  
+</head>
+<body>
+  <header class="header">
+    <div class="title"><a href="https://yasakura.me">yasakura</a></div>
+    <nav id="navigation">
+      <ul class="menu">
+        <li><a href="https://yasakura.meabout/">ABOUT</a></li>
+      </ul>
+    </nav>
+  </header>
+<article class="post post-view">
+  <header class="post-header">
+    <p class="post-meta">2020.4.1</p>
+    <h1 class="post-title">線形モデルでデータを表現する</h1>
+    
+  </header>
+  <div class="post-content">
+    <div class="share">
+    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2flinear-model%2f&text=%e7%b7%9a%e5%bd%a2%e3%83%a2%e3%83%87%e3%83%ab%e3%81%a7%e3%83%87%e3%83%bc%e3%82%bf%e3%82%92%e8%a1%a8%e7%8f%be%e3%81%99%e3%82%8b - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
+    <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2flinear-model%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
+    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2flinear-model%2f&title=%e7%b7%9a%e5%bd%a2%e3%83%a2%e3%83%87%e3%83%ab%e3%81%a7%e3%83%87%e3%83%bc%e3%82%bf%e3%82%92%e8%a1%a8%e7%8f%be%e3%81%99%e3%82%8b - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
+</div>
+    
+
+<h1 id="モチベーション">モチベーション</h1>
+
+<p>散布図から関数を予測したい</p>
+
+<h1 id="scikit-learnのlinearregressionで単回帰する">scikit-learnのLinearRegressionで単回帰する</h1>
+
+<p>-3 &lt; x &lt; 3 の範囲でxをランダムに50点生成し，$y=0.1x+0.3$に入力した後，yにσ=0.1のガウシアンノイズを加えたtを教師データとした．青線(original)が直線y，散布図(training data)がtである．</p>
+
+<p>scikit-learnのLinearRegressionを用いて$y=0.1x+0.3$を予測したものが赤線(predictive)である．</p>
+
+<p>coefficientは0.09くらい，interceptは0.30くらいとなり，$y=0.09x+0.30$と予測できた．</p>
+
+<p><img src="/img/single_linear_regression.png" alt="single_linear_regression" /></p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> <span style="color:#111">numpy</span> <span style="color:#f92672">as</span> <span style="color:#111">np</span>
+<span style="color:#f92672">from</span> <span style="color:#111">matplotlib</span> <span style="color:#f92672">import</span> <span style="color:#111">pyplot</span> <span style="color:#00a8c8">as</span> <span style="color:#111">plt</span>
+<span style="color:#f92672">from</span> <span style="color:#111">sklearn.linear_model</span> <span style="color:#f92672">import</span> <span style="color:#111">LinearRegression</span>
+<span style="color:#f92672">from</span> <span style="color:#111">sklearn.model_selection</span> <span style="color:#f92672">import</span> <span style="color:#111">train_test_split</span>
+<span style="color:#f92672">from</span> <span style="color:#111">matplotlib.colors</span> <span style="color:#f92672">import</span> <span style="color:#111">ListedColormap</span>
+
+<span style="color:#111">colors</span> <span style="color:#f92672">=</span> <span style="color:#111">[</span><span style="color:#d88200">&#39;#e74c3c&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#3498db&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#1abc9c&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#9b59b6&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#f1c40f&#39;</span><span style="color:#111">]</span> <span style="color:#75715e"># red, blue, green, purple, yellow</span>
+<span style="color:#111">cmap</span> <span style="color:#f92672">=</span> <span style="color:#111">ListedColormap</span><span style="color:#111">(</span><span style="color:#111">colors</span><span style="color:#111">)</span>
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">style</span><span style="color:#f92672">.</span><span style="color:#111">use</span><span style="color:#111">(</span><span style="color:#d88200">&#39;seaborn&#39;</span><span style="color:#111">)</span>
+
+<span style="color:#00a8c8">def</span> <span style="color:#75af00">f</span><span style="color:#111">(</span><span style="color:#111">x</span><span style="color:#111">):</span>
+    <span style="color:#00a8c8">return</span>  <span style="color:#ae81ff">0.1</span><span style="color:#f92672">*</span><span style="color:#111">x</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">0.3</span>
+
+<span style="color:#111">N</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span>
+<span style="color:#111">X</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">zeros</span><span style="color:#111">((</span><span style="color:#111">N</span><span style="color:#111">,</span><span style="color:#ae81ff">1</span><span style="color:#111">))</span>
+<span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">random</span><span style="color:#f92672">.</span><span style="color:#111">seed</span><span style="color:#111">(</span><span style="color:#111">seed</span><span style="color:#f92672">=</span><span style="color:#ae81ff">10</span><span style="color:#111">)</span>
+<span style="color:#111">X</span><span style="color:#111">[:,</span><span style="color:#ae81ff">0</span><span style="color:#111">]</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">random</span><span style="color:#f92672">.</span><span style="color:#111">uniform</span><span style="color:#111">(</span><span style="color:#f92672">-</span><span style="color:#ae81ff">3</span><span style="color:#111">,</span> <span style="color:#ae81ff">3</span><span style="color:#111">,</span> <span style="color:#111">N</span><span style="color:#111">)</span>
+<span style="color:#111">noise</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.1</span><span style="color:#f92672">*</span><span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">random</span><span style="color:#f92672">.</span><span style="color:#111">randn</span><span style="color:#111">(</span><span style="color:#111">N</span><span style="color:#111">)</span> <span style="color:#75715e"># σ=0.1</span>
+<span style="color:#111">t</span> <span style="color:#f92672">=</span> <span style="color:#111">f</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">[:,</span><span style="color:#ae81ff">0</span><span style="color:#111">])</span><span style="color:#f92672">+</span> <span style="color:#111">noise</span>
+
+<span style="color:#111">X_train</span><span style="color:#111">,</span> <span style="color:#111">X_test</span><span style="color:#111">,</span> <span style="color:#111">t_train</span><span style="color:#111">,</span> <span style="color:#111">t_test</span> <span style="color:#f92672">=</span> <span style="color:#111">train_test_split</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">,</span> <span style="color:#111">t</span><span style="color:#111">,</span> <span style="color:#111">random_state</span><span style="color:#f92672">=</span><span style="color:#ae81ff">0</span><span style="color:#111">)</span>
+
+<span style="color:#111">lr</span> <span style="color:#f92672">=</span> <span style="color:#111">LinearRegression</span><span style="color:#111">()</span><span style="color:#f92672">.</span><span style="color:#111">fit</span><span style="color:#111">(</span><span style="color:#111">X_train</span><span style="color:#111">,</span> <span style="color:#111">t_train</span><span style="color:#111">)</span>
+<span style="color:#00a8c8">print</span><span style="color:#111">(</span><span style="color:#d88200">&#34;train R^2:&#34;</span><span style="color:#111">,</span> <span style="color:#111">lr</span><span style="color:#f92672">.</span><span style="color:#111">score</span><span style="color:#111">(</span><span style="color:#111">X_train</span><span style="color:#111">,</span> <span style="color:#111">t_train</span><span style="color:#111">))</span>
+<span style="color:#00a8c8">print</span><span style="color:#111">(</span><span style="color:#d88200">&#34;test R^2:&#34;</span><span style="color:#111">,</span> <span style="color:#111">lr</span><span style="color:#f92672">.</span><span style="color:#111">score</span><span style="color:#111">(</span><span style="color:#111">X_test</span><span style="color:#111">,</span> <span style="color:#111">t_test</span><span style="color:#111">))</span>
+<span style="color:#00a8c8">print</span><span style="color:#111">(</span><span style="color:#111">f</span><span style="color:#d88200">&#34;coefficient:{lr.coef_} intercept:{lr.intercept_}&#34;</span><span style="color:#111">)</span>
+
+<span style="color:#111">fig</span> <span style="color:#f92672">=</span> <span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">figure</span><span style="color:#111">(</span><span style="color:#111">figsize</span><span style="color:#f92672">=</span><span style="color:#111">(</span><span style="color:#ae81ff">5</span><span style="color:#111">,</span><span style="color:#ae81ff">5</span><span style="color:#111">))</span>
+
+
+<span style="color:#111">Xcont</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">linspace</span><span style="color:#111">(</span><span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">min</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">),</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">max</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">),</span> <span style="color:#ae81ff">200</span><span style="color:#111">)</span>
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">plot</span><span style="color:#111">(</span><span style="color:#111">Xcont</span><span style="color:#111">,</span> <span style="color:#111">f</span><span style="color:#111">(</span><span style="color:#111">Xcont</span><span style="color:#111">),</span> <span style="color:#111">label</span><span style="color:#f92672">=</span><span style="color:#d88200">&#39;original&#39;</span><span style="color:#111">)</span>
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">plot</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">,</span> <span style="color:#111">t</span><span style="color:#111">,</span><span style="color:#d88200">&#39;.&#39;</span><span style="color:#111">,</span> <span style="color:#111">label</span><span style="color:#f92672">=</span><span style="color:#d88200">&#39;training data&#39;</span><span style="color:#111">)</span>
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">plot</span><span style="color:#111">(</span><span style="color:#111">Xcont</span><span style="color:#111">,</span> <span style="color:#111">lr</span><span style="color:#f92672">.</span><span style="color:#111">coef_</span><span style="color:#111">[</span><span style="color:#ae81ff">0</span><span style="color:#111">]</span><span style="color:#f92672">*</span><span style="color:#111">Xcont</span><span style="color:#f92672">+</span><span style="color:#111">lr</span><span style="color:#f92672">.</span><span style="color:#111">intercept_</span><span style="color:#111">,</span> <span style="color:#111">label</span><span style="color:#f92672">=</span><span style="color:#d88200">&#39;predictive&#39;</span><span style="color:#111">)</span>
+
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">xlabel</span><span style="color:#111">(</span><span style="color:#d88200">r</span><span style="color:#d88200">&#39;$x$&#39;</span><span style="color:#111">)</span>
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">ylabel</span><span style="color:#111">(</span><span style="color:#d88200">r</span><span style="color:#d88200">&#39;$t$&#39;</span><span style="color:#111">)</span>
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">legend</span><span style="color:#111">()</span>
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">show</span><span style="color:#111">()</span></code></pre></div>
+<h1 id="二乗和誤差を小さくするような係数を探す">二乗和誤差を小さくするような係数を探す</h1>
+
+<p>$x_n$を入力すると予測値$y(x_n, \boldsymbol{w})$が得られるような関数をつくりたい．そのためには，係数$w_0, w_1$を求める必要がある．
+<div class="mathjax">
+$$
+y(x_n, \boldsymbol{w})= w_0 + w_1 x_n
+$$
+</div></p>
+
+<p>以下の二乗和誤差が小さくなるような係数$w$を探す．</p>
+
+<div class="mathjax">
+$$
+E(\boldsymbol{w}) = \sum_{n=1}^{N} \{y(x_n, \boldsymbol{w}) - t_n\}^2
+$$
+</div>
+
+<p>$C^2$級（2階連続微分可能）な関数$z=f(x,y)$が$(a,b)$で極値を持つとき，$f_x(a,b)=f_y(a,b)=0$が成り立つが，極小か極大か鞍点であるかは断言できないことに注意する．断言したいなら，以下のヘッセ行列$H$について</p>
+
+<div class="mathjax">
+$$
+H = \begin{pmatrix} f_{xx}(a,b) & f_{xy}(a,b) \\ f_{yx}(a,b) & f_{yy}(a,b) \end{pmatrix}
+$$
+</div>
+
+<ol>
+<li>$f_{xx}(a,b) &gt; 0$かつ$|H| &gt; 0$（正定値）であるなら，$z$は$(a,b)$で極小値をとる．</li>
+<li>$f_{xx}(a,b) &lt; 0$かつ$|H| &lt; 0$（負定値）であるなら，$z$は$(a,b)$で極大値をとる．</li>
+<li>$|H| &lt; 0$であるなら，$z$は$(a,b)$で極小をとらない．</li>
+</ol>
+
+<p>を評価する必要がある．</p>
+
+<p>結局のところ，$E(\boldsymbol{w})$は極小値を持つので，$\frac{ \partial E(\boldsymbol{w}) }{ \partial w_0 }=0$と$\frac{ \partial E(\boldsymbol{w}) }{ \partial w_1 }=0$を求めると以下のように整理できる．$(x_n,t_n)$は教師データセットであり，Nは教師データ数である．</p>
+
+<div class="mathjax">
+$$
+\begin{pmatrix} 
+    N & \sum_{n} x_n \\
+    \sum_{n} x_n & \sum_{n} x_n^2
+\end{pmatrix}
+\begin{pmatrix}
+    w_0 \\
+    w_1
+\end{pmatrix}
+=
+\begin{pmatrix} 
+    \sum_{n} t_n \\
+    \sum_{n} x_nt_n
+\end{pmatrix}
+$$
+</div>
+
+<h1 id="scikit-learnのlinearregressionで重回帰する">scikit-learnのLinearRegressionで重回帰する</h1>
+
+<p>$-3 &lt; x_1 &lt; 3, -3 &lt; x_2 &lt; 3$の範囲で$x_1,x_2$をそれぞれランダムに50点生成し，$y=0.1x_1+0.2x_2+0.3$に入力した後，yにσ=0.3のガウシアンノイズを加えたtを教師データとした．青面がy平面，散布図がtである．<br />
+scikit-learnのLinearRegressionを用いて$y=0.1x_1+0.2x_2+0.3$を予測したものが緑面である．</p>
+
+<p>coefficientは0.15, 0.21くらい，interceptは0.35くらいとなり，$y=0.15x+0.21x+0.35$と予測できた．</p>
+
+<p><img src="/img/multiple_linear_regression.png" alt="multiple_linear_regression" /></p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> <span style="color:#111">numpy</span> <span style="color:#f92672">as</span> <span style="color:#111">np</span>
+<span style="color:#f92672">from</span> <span style="color:#111">matplotlib</span> <span style="color:#f92672">import</span> <span style="color:#111">pyplot</span> <span style="color:#00a8c8">as</span> <span style="color:#111">plt</span>
+<span style="color:#f92672">from</span> <span style="color:#111">sklearn.linear_model</span> <span style="color:#f92672">import</span> <span style="color:#111">LinearRegression</span>
+<span style="color:#f92672">from</span> <span style="color:#111">sklearn.model_selection</span> <span style="color:#f92672">import</span> <span style="color:#111">train_test_split</span>
+<span style="color:#f92672">from</span> <span style="color:#111">mpl_toolkits.mplot3d</span> <span style="color:#f92672">import</span> <span style="color:#111">Axes3D</span>
+<span style="color:#f92672">from</span> <span style="color:#111">matplotlib.colors</span> <span style="color:#f92672">import</span> <span style="color:#111">ListedColormap</span>
+
+<span style="color:#111">colors</span> <span style="color:#f92672">=</span> <span style="color:#111">[</span><span style="color:#d88200">&#39;#e74c3c&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#3498db&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#1abc9c&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#9b59b6&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#f1c40f&#39;</span><span style="color:#111">]</span> <span style="color:#75715e"># red, blue, green, purple, yellow</span>
+<span style="color:#111">cmap</span> <span style="color:#f92672">=</span> <span style="color:#111">ListedColormap</span><span style="color:#111">(</span><span style="color:#111">colors</span><span style="color:#111">)</span>
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">style</span><span style="color:#f92672">.</span><span style="color:#111">use</span><span style="color:#111">(</span><span style="color:#d88200">&#39;seaborn&#39;</span><span style="color:#111">)</span>
+
+<span style="color:#00a8c8">def</span> <span style="color:#75af00">f</span><span style="color:#111">(</span><span style="color:#111">x1</span><span style="color:#111">,</span><span style="color:#111">x2</span><span style="color:#111">):</span>
+    <span style="color:#00a8c8">return</span>  <span style="color:#ae81ff">0.1</span><span style="color:#f92672">*</span><span style="color:#111">x1</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">0.2</span><span style="color:#f92672">*</span><span style="color:#111">x2</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">0.3</span>
+
+<span style="color:#111">N</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span>
+<span style="color:#111">X</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">zeros</span><span style="color:#111">((</span><span style="color:#111">N</span><span style="color:#111">,</span><span style="color:#ae81ff">2</span><span style="color:#111">))</span>
+<span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">random</span><span style="color:#f92672">.</span><span style="color:#111">seed</span><span style="color:#111">(</span><span style="color:#111">seed</span><span style="color:#f92672">=</span><span style="color:#ae81ff">2</span><span style="color:#111">)</span>
+<span style="color:#111">X</span><span style="color:#111">[:,</span><span style="color:#ae81ff">0</span><span style="color:#111">]</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">random</span><span style="color:#f92672">.</span><span style="color:#111">uniform</span><span style="color:#111">(</span><span style="color:#f92672">-</span><span style="color:#ae81ff">3</span><span style="color:#111">,</span> <span style="color:#ae81ff">3</span><span style="color:#111">,</span> <span style="color:#111">N</span><span style="color:#111">)</span>
+<span style="color:#111">X</span><span style="color:#111">[:,</span><span style="color:#ae81ff">1</span><span style="color:#111">]</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">random</span><span style="color:#f92672">.</span><span style="color:#111">uniform</span><span style="color:#111">(</span><span style="color:#f92672">-</span><span style="color:#ae81ff">3</span><span style="color:#111">,</span> <span style="color:#ae81ff">3</span><span style="color:#111">,</span> <span style="color:#111">N</span><span style="color:#111">)</span>
+<span style="color:#111">noise</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.3</span><span style="color:#f92672">*</span><span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">random</span><span style="color:#f92672">.</span><span style="color:#111">randn</span><span style="color:#111">(</span><span style="color:#111">N</span><span style="color:#111">)</span> <span style="color:#75715e"># σ=0.3</span>
+<span style="color:#111">t</span> <span style="color:#f92672">=</span> <span style="color:#111">f</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">[:,</span><span style="color:#ae81ff">0</span><span style="color:#111">],</span><span style="color:#111">X</span><span style="color:#111">[:,</span><span style="color:#ae81ff">1</span><span style="color:#111">])</span><span style="color:#f92672">+</span> <span style="color:#111">noise</span>
+
+<span style="color:#111">X_train</span><span style="color:#111">,</span> <span style="color:#111">X_test</span><span style="color:#111">,</span> <span style="color:#111">t_train</span><span style="color:#111">,</span> <span style="color:#111">t_test</span> <span style="color:#f92672">=</span> <span style="color:#111">train_test_split</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">,</span> <span style="color:#111">t</span><span style="color:#111">,</span> <span style="color:#111">random_state</span><span style="color:#f92672">=</span><span style="color:#ae81ff">0</span><span style="color:#111">)</span>
+
+<span style="color:#111">fig</span> <span style="color:#f92672">=</span> <span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">figure</span><span style="color:#111">(</span><span style="color:#111">figsize</span><span style="color:#f92672">=</span><span style="color:#111">(</span><span style="color:#ae81ff">8</span><span style="color:#111">,</span><span style="color:#ae81ff">8</span><span style="color:#111">))</span>
+<span style="color:#111">ax</span> <span style="color:#f92672">=</span> <span style="color:#111">fig</span><span style="color:#f92672">.</span><span style="color:#111">add_subplot</span><span style="color:#111">(</span><span style="color:#ae81ff">1</span><span style="color:#111">,</span><span style="color:#ae81ff">1</span><span style="color:#111">,</span><span style="color:#ae81ff">1</span><span style="color:#111">,</span> <span style="color:#111">projection</span><span style="color:#f92672">=</span><span style="color:#d88200">&#39;3d&#39;</span><span style="color:#111">)</span>
+<span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">scatter</span><span style="color:#111">(</span><span style="color:#111">X_train</span><span style="color:#111">[:,</span><span style="color:#ae81ff">0</span><span style="color:#111">],</span> <span style="color:#111">X_train</span><span style="color:#111">[:,</span><span style="color:#ae81ff">1</span><span style="color:#111">],</span> <span style="color:#111">t_train</span><span style="color:#111">)</span>
+
+<span style="color:#111">lr</span> <span style="color:#f92672">=</span> <span style="color:#111">LinearRegression</span><span style="color:#111">()</span><span style="color:#f92672">.</span><span style="color:#111">fit</span><span style="color:#111">(</span><span style="color:#111">X_train</span><span style="color:#111">,</span> <span style="color:#111">t_train</span><span style="color:#111">)</span>
+
+<span style="color:#111">coef</span> <span style="color:#f92672">=</span> <span style="color:#111">lr</span><span style="color:#f92672">.</span><span style="color:#111">coef_</span>
+<span style="color:#111">line</span> <span style="color:#f92672">=</span> <span style="color:#00a8c8">lambda</span> <span style="color:#111">x1</span><span style="color:#111">,</span> <span style="color:#111">x2</span><span style="color:#111">:</span> <span style="color:#111">f</span><span style="color:#111">(</span><span style="color:#111">x1</span><span style="color:#111">,</span><span style="color:#111">x2</span><span style="color:#111">)</span>
+<span style="color:#111">grid_x1</span><span style="color:#111">,</span> <span style="color:#111">grid_x2</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">mgrid</span><span style="color:#111">[</span><span style="color:#f92672">-</span><span style="color:#ae81ff">3</span><span style="color:#111">:</span><span style="color:#ae81ff">3</span><span style="color:#111">:</span><span style="color:#ae81ff">10j</span><span style="color:#111">,</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">3</span><span style="color:#111">:</span><span style="color:#ae81ff">3</span><span style="color:#111">:</span><span style="color:#ae81ff">10j</span><span style="color:#111">]</span>
+<span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">plot_surface</span><span style="color:#111">(</span><span style="color:#111">grid_x1</span><span style="color:#111">,</span> <span style="color:#111">grid_x2</span><span style="color:#111">,</span> <span style="color:#111">line</span><span style="color:#111">(</span><span style="color:#111">grid_x1</span><span style="color:#111">,</span> <span style="color:#111">grid_x2</span><span style="color:#111">),</span> <span style="color:#111">alpha</span><span style="color:#f92672">=</span><span style="color:#ae81ff">0.1</span><span style="color:#111">,</span> <span style="color:#111">color</span><span style="color:#f92672">=</span><span style="color:#d88200">&#39;b&#39;</span><span style="color:#111">)</span>
+
+<span style="color:#111">coef</span> <span style="color:#f92672">=</span> <span style="color:#111">lr</span><span style="color:#f92672">.</span><span style="color:#111">coef_</span>
+<span style="color:#111">line</span> <span style="color:#f92672">=</span> <span style="color:#00a8c8">lambda</span> <span style="color:#111">x1</span><span style="color:#111">,</span> <span style="color:#111">x2</span><span style="color:#111">:</span> <span style="color:#111">coef</span><span style="color:#111">[</span><span style="color:#ae81ff">0</span><span style="color:#111">]</span> <span style="color:#f92672">*</span> <span style="color:#111">x1</span> <span style="color:#f92672">+</span> <span style="color:#111">coef</span><span style="color:#111">[</span><span style="color:#ae81ff">1</span><span style="color:#111">]</span> <span style="color:#f92672">*</span> <span style="color:#111">x2</span> <span style="color:#f92672">+</span> <span style="color:#111">lr</span><span style="color:#f92672">.</span><span style="color:#111">intercept_</span>
+<span style="color:#111">grid_x1</span><span style="color:#111">,</span> <span style="color:#111">grid_x2</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">mgrid</span><span style="color:#111">[</span><span style="color:#f92672">-</span><span style="color:#ae81ff">3</span><span style="color:#111">:</span><span style="color:#ae81ff">3</span><span style="color:#111">:</span><span style="color:#ae81ff">10j</span><span style="color:#111">,</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">3</span><span style="color:#111">:</span><span style="color:#ae81ff">3</span><span style="color:#111">:</span><span style="color:#ae81ff">10j</span><span style="color:#111">]</span>
+<span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">plot_surface</span><span style="color:#111">(</span><span style="color:#111">grid_x1</span><span style="color:#111">,</span> <span style="color:#111">grid_x2</span><span style="color:#111">,</span> <span style="color:#111">line</span><span style="color:#111">(</span><span style="color:#111">grid_x1</span><span style="color:#111">,</span> <span style="color:#111">grid_x2</span><span style="color:#111">),</span> <span style="color:#111">alpha</span><span style="color:#f92672">=</span><span style="color:#ae81ff">0.1</span><span style="color:#111">,</span> <span style="color:#111">color</span><span style="color:#f92672">=</span><span style="color:#d88200">&#39;g&#39;</span><span style="color:#111">)</span>
+
+<span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">set_xlabel</span><span style="color:#111">(</span><span style="color:#d88200">&#34;x_1&#34;</span><span style="color:#111">)</span>
+<span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">set_ylabel</span><span style="color:#111">(</span><span style="color:#d88200">&#34;x_2&#34;</span><span style="color:#111">)</span>
+<span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">set_zlabel</span><span style="color:#111">(</span><span style="color:#d88200">&#34;y&#34;</span><span style="color:#111">)</span>
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">show</span><span style="color:#111">()</span>
+
+<span style="color:#00a8c8">print</span><span style="color:#111">(</span><span style="color:#d88200">&#34;train R^2:&#34;</span><span style="color:#111">,</span> <span style="color:#111">lr</span><span style="color:#f92672">.</span><span style="color:#111">score</span><span style="color:#111">(</span><span style="color:#111">X_train</span><span style="color:#111">,</span><span style="color:#111">t_train</span><span style="color:#111">))</span>
+<span style="color:#00a8c8">print</span><span style="color:#111">(</span><span style="color:#d88200">&#34;test R^2:&#34;</span><span style="color:#111">,</span> <span style="color:#111">lr</span><span style="color:#f92672">.</span><span style="color:#111">score</span><span style="color:#111">(</span><span style="color:#111">X_test</span><span style="color:#111">,</span><span style="color:#111">t_test</span><span style="color:#111">))</span>
+<span style="color:#00a8c8">print</span><span style="color:#111">(</span><span style="color:#111">f</span><span style="color:#d88200">&#34;coefficient:{lr.coef_} intercept:{lr.intercept_}&#34;</span><span style="color:#111">)</span></code></pre></div>
+<h1 id="単回帰と同様-二乗和誤差を小さくするような係数を探す">単回帰と同様，二乗和誤差を小さくするような係数を探す</h1>
+
+<p>単回帰では1種類の$x$からyを予想したのに対し，重回帰では複数種類の$x$から$y$を予想する．</p>
+
+<p>$\boldsymbol{x_n}^{\mathrm{T}} = (1, x_{n1} , x_{n2}, &hellip;, x_{nD})$を入力すると予測値$y(\boldsymbol{x_n}, \boldsymbol{w})$が得られるような関数をつくりたい．そのためには，係数$\boldsymbol{w}^{\mathrm{T}} = (w_0, w_1, &hellip;, w_D)$を求める必要がある．</p>
+
+<div class="mathjax">
+$$
+y(\boldsymbol{x_n}, \boldsymbol{w})= w_0 + w_1 x_{n1} + w_2 x_{n2} + ... + w_D x_{nD} = \boldsymbol{w}^{\mathrm{T}} \boldsymbol{x_n}
+$$
+</div>
+
+<p>複数の教師データセット$(\boldsymbol{x_n}, t_n)$を入力し，以下の二乗和誤差が小さくなるような係数$\boldsymbol{w}$を探す．Nは教師データ数である．</p>
+
+<div class="mathjax">
+$$
+E(\boldsymbol{w}) = \sum_{n=1}^{N} \{y(\boldsymbol{x_n}, \boldsymbol{w}) - t_n\}^2 = \sum_{n=1}^{N} \{\boldsymbol{w}^{\mathrm{T}} \boldsymbol{x_n} - t_n\}^2
+$$
+</div>
+
+<p>今回はベクトルを含んだ計算が必要なので，少々トリッキーになる．</p>
+
+<p>一般に，ベクトル$\boldsymbol{b}^{\mathrm{T}} = (a_1, a_2, \ldots, a_N)$の各スカラーの二乗和$\sum_{i=1}^{N} a_i^2$は，</p>
+
+<div class="mathjax">
+$$
+\sum_{i=1}^{N} a_i^2
+=
+a_1^2 + a_2^2 + \ldots + a_N^2
+=
+(a_1, a_2, \ldots, a_N) 
+\left(
+  \begin{array}{c}
+    a_1 \\
+    a_2 \\
+    \vdots \\
+    a_N
+  \end{array}
+\right)
+=
+\boldsymbol{b}^{\mathrm{T}} \boldsymbol{b}
+$$
+</div>
+
+<p>である．また，$\boldsymbol{w}^{\mathrm{T}} \boldsymbol{x_n} = \boldsymbol{x_n}^{\mathrm{T}} \boldsymbol{w}$の性質と計画行列$\boldsymbol{X}$を用いると以下のように変形できる．</p>
+
+<div class="mathjax">
+$$
+\left(
+    \begin{array}{c}
+        \boldsymbol{w}^{\mathrm{T}} \boldsymbol{x_1} - t_1 \\ 
+        \boldsymbol{w}^{\mathrm{T}} \boldsymbol{x_2} - t_2 \\
+        \vdots \\
+        \boldsymbol{w}^{\mathrm{T}} \boldsymbol{x_N} - t_N
+    \end{array}
+\right)
+=
+\left(
+  \begin{array}{c}
+    \boldsymbol{x_1}^{\mathrm{T}} \\
+    \boldsymbol{x_2}^{\mathrm{T}} \\
+    \vdots \\
+    \boldsymbol{x_N}^{\mathrm{T}}
+  \end{array}
+\right)
+\boldsymbol{w}
+-
+\left(
+  \begin{array}{c}
+    t_1 \\
+    t_2 \\
+    \vdots \\
+    t_N
+  \end{array}
+\right)
+=
+\underbrace{
+\begin{eqnarray}
+\left(
+  \begin{array}{cccc}
+    1 & a_{ 11 } & \ldots & a_{ 1D } \\
+    1 & a_{ 21 } & \ldots & a_{ 2D } \\
+    \vdots & \vdots & \ddots & \vdots \\
+    1 & a_{ N1 } & \ldots & a_{ ND }
+  \end{array}
+\right)
+\end{eqnarray}
+}_{ \boldsymbol{X} }
+\boldsymbol{w}
+-
+\left(
+  \begin{array}{c}
+    t_1 \\
+    t_2 \\
+    \vdots \\
+    t_N
+  \end{array}
+\right)
+=
+\boldsymbol{Xw-t}
+$$
+</div>
+
+<p>これにより，</p>
+
+<div class="mathjax">
+$$
+E(\boldsymbol{w})
+=
+\sum_{n=1}^{N} \{\boldsymbol{w}^{\mathrm{T}} \boldsymbol{x_n} - t_n\}^2
+=
+(\boldsymbol{Xw-t}) ^{\mathrm{T}} (\boldsymbol{Xw-t})
+$$
+</div>
+
+<p>と変形できる．$(\boldsymbol{AB})^{\mathrm{T}} = \boldsymbol{B}^{\mathrm{T}} \boldsymbol{A}^{\mathrm{T}}$の性質を用いると，</p>
+
+<div class="mathjax">
+$$
+\begin{align}
+E(\boldsymbol{w})
+&=
+(\boldsymbol{Xw-t}) ^{\mathrm{T}} (\boldsymbol{Xw-t}) \\
+&=
+\boldsymbol{w^{\mathrm{T}} X^{\mathrm{T}} X w -2 w^{\mathrm{T}} (X^{\mathrm{T}} t) + t t^{\mathrm{T}}}
+\end{align}
+$$
+</div>
+
+<p>と展開できる．これを$\boldsymbol{w}$に関して偏微分することで最小値を求める．まずは第二項目について考える．</p>
+
+<p>$\boldsymbol{a}^{\mathrm{T}} = (a_0, a_1, \ldots, a_D)$と$\boldsymbol{w}^{\mathrm{T}} = (w_0, w_1, \ldots, w_D)$とおくと，</p>
+
+<div class="mathjax">
+$$
+\begin{align}
+\frac{ \partial }{ \partial \boldsymbol{w} } \boldsymbol{w^{\mathrm{T}}a}
+&=
+\frac{ \partial }{ \partial \boldsymbol{w} } (w_0 a_0 + w_1 a_1 + \ldots + w_D a_D) \\
+&=
+\left(
+  \begin{array}{c}
+    a_0 \\
+    a_1 \\
+    \vdots \\
+    a_D
+  \end{array}
+\right) \\
+&=
+\boldsymbol{a}
+\end{align}
+$$
+</div>
+
+<p>という性質があるので，</p>
+
+<div class="mathjax">
+$$
+\frac{ \partial }{ \partial \boldsymbol{w} } E(\boldsymbol{w})
+=
+\frac{ \partial }{ \partial \boldsymbol{w} } \boldsymbol{w^{\mathrm{T}} X^{\mathrm{T}} X w -2 (X^{\mathrm{T}} t)}
+$$
+</div>
+
+<p>と求まる．次に，第一項目に関して考える．</p>
+
+<p>一般的な$\boldsymbol{w}$の二次形式$\boldsymbol{w}^{\mathrm{T}} A \boldsymbol{w}$について，$N \times N$の行列$A_{行,列}$を用いて級数で表す．</p>
+
+<div class="mathjax">
+$$
+\begin{align}
+\boldsymbol{w}^{\mathrm{T}} A \boldsymbol{w}
+&=
+\boldsymbol{w}^{\mathrm{T}} (\sum_{i=0}^{N} A_{1i} w_i, \sum_{i=0}^{N} A_{2i} w_i, \ldots, \sum_{i=0}^{N} A_{Ni} w_i)^{\mathrm{T}} \\
+&=
+\sum_{j=0}^{N} \sum_{i=0}^{N} A_{ji} w_i w_j
+\end{align}
+$$
+</div>
+
+<p>これを$w_k$で微分してみる．$w_k$かけるなんちゃらが2ペアできることがミソ．</p>
+
+<div class="mathjax">
+$$
+\begin{align}
+\frac{ \partial }{ \partial w_k } \boldsymbol{w}^{\mathrm{T}} A \boldsymbol{w}
+&=
+\frac{ \partial }{ \partial w_k } \sum_{j=0}^{N} \sum_{i=0}^{N} A_{ji} w_i w_j \\
+&=
+\sum_{i=0}^{N} A_{ki} w_i + \sum_{j=0}^{N} A_{jk} w_j \\
+&=
+A(k,:)\boldsymbol{w} + A(:,k)\boldsymbol{w} \\
+&=
+A(k,:)\boldsymbol{w} + A^{\mathrm{T}}(k,:)\boldsymbol{w} \\
+\end{align}
+$$
+</div>
+
+<p>(k,:)はnumpyのスライスと同義であり，k行の全列を抜き出した行ベクトルを表す．$\boldsymbol{w}$で偏微分するように拡張すると，</p>
+
+<div class="mathjax">
+$$
+\begin{align}
+\frac{ \partial }{ \partial \boldsymbol{w}} \boldsymbol{w}^{\mathrm{T}} A \boldsymbol{w}
+&=
+\left(
+  \begin{array}{c}
+    A(1,:)\boldsymbol{w} + A^{\mathrm{T}}(1,:)\boldsymbol{w} \\
+    A(2,:)\boldsymbol{w} + A^{\mathrm{T}}(2,:)\boldsymbol{w} \\
+    \vdots \\
+    A(D,:)\boldsymbol{w} + A^{\mathrm{T}}(D,:)\boldsymbol{w}
+  \end{array}
+\right) \\
+&=
+A\boldsymbol{w} + A^{\mathrm{T}}\boldsymbol{w} \\
+&=
+(A+A^{\mathrm{T}})\boldsymbol{w}
+\end{align}
+$$
+</div>
+
+<p>これでやっと，二乗和誤差の$\boldsymbol{w}$に関する偏微分が完了する．</p>
+
+<div class="mathjax">
+$$
+\begin{align}
+\frac{ \partial }{ \partial \boldsymbol{w} } E(\boldsymbol{w}) 
+&=
+\frac{ \partial }{ \partial \boldsymbol{w} } \boldsymbol{w^{\mathrm{T}} X^{\mathrm{T}} X w -2 (X^{\mathrm{T}} t)} \\
+&=
+\boldsymbol{2X^{\mathrm{T}} X w -2 (X^{\mathrm{T}} t)}
+\end{align}
+$$
+</div>
+
+<p>$X^{\mathrm{T}} X$が逆行列をもつとして，$\frac{ \partial }{ \partial \boldsymbol{w} } E(\boldsymbol{w}) = 0$を解くと，係数ベクトル$\boldsymbol{w}$が求まる．</p>
+
+<div class="mathjax">
+$$
+\boldsymbol{w} = (X^{\mathrm{T}} X)^{-1} X^{\mathrm{T}} \boldsymbol{t}
+$$
+</div>
+
+<h1 id="線形モデルで非線形を表現する">線形モデルで非線形を表現する</h1>
+
+<p>ここまでは，入力$x_n$を定数倍することで予測関数をつくっていたため，以下のような二次関数を予測するにはなにか別の手段を考える必要がある．</p>
+
+<p><img src="/img/linear_regression_with_linear_function.png" alt="linear_regression_with_linear_function" /></p>
+
+<p>結論から言うと，以下のようなモデルについて考えれば良い．</p>
+
+<div class="mathjax">
+$$
+y(x_n, \boldsymbol{w})= w_0 + w_1 x_n + w_2 x_n^2
+$$
+</div>
+
+<p>より一般化すると，$\boldsymbol{x_n}^{\mathrm{T}} = (1, x_{n1} , x_{n2}, &hellip;, x_{nD})$を入力すると予測値$y(\phi(\boldsymbol{x_n}), \boldsymbol{w})$が得られるような関数を$\boldsymbol{w}^{\mathrm{T}} = (w_0, w_1, &hellip;, w_D)$を用いてつくればよい．</p>
+
+<p>$\boldsymbol{x_n} =x_n$，$\boldsymbol{\phi(x)} = (1, x, x^2)$とすると，前述した二次関数を表現することができる．</p>
+
+<div class="mathjax">
+$$
+y(\phi(\boldsymbol{x_n}), \boldsymbol{w})= w_0 + w_1 \phi_1(\boldsymbol{x_n}) + w_2 \phi_2(\boldsymbol{x_n}) + ... + w_D \phi_D(\boldsymbol{x_n}) = \boldsymbol{w}^{\mathrm{T}} \phi(\boldsymbol{x_n})
+$$
+</div>
+
+<p>教師データを複数入力する際は，以下のような計画行列$\Phi$を用いるとよい．</p>
+
+<div class="mathjax">
+$$
+\left(
+    \begin{array}{c}
+        \boldsymbol{w}^{\mathrm{T}} \phi(\boldsymbol{x_n}) - t_1 \\ 
+        \boldsymbol{w}^{\mathrm{T}} \phi(\boldsymbol{x_n}) - t_2 \\
+        \vdots \\
+        \boldsymbol{w}^{\mathrm{T}} \phi(\boldsymbol{x_n}) - t_N
+    \end{array}
+\right)
+=
+\underbrace{
+\begin{eqnarray}
+\left(
+  \begin{array}{cccc}
+    1 & \phi_1(\boldsymbol{x_1}) & \ldots & \phi_1(\boldsymbol{x_1}) \\
+    1 & \phi_1(\boldsymbol{x_2}) & \ldots & \phi_1(\boldsymbol{x_2}) \\
+    \vdots & \vdots & \ddots & \vdots \\
+    1 & \phi_1(\boldsymbol{x_N}) & \ldots & \phi_1(\boldsymbol{x_N})
+  \end{array}
+\right)
+\end{eqnarray}
+}_{ \boldsymbol{\Phi} }
+\boldsymbol{w}
+-
+\left(
+  \begin{array}{c}
+    t_1 \\
+    t_2 \\
+    \vdots \\
+    t_N
+  \end{array}
+\right)
+$$
+</div>
+
+<p>$\boldsymbol{w}$の求め方は，これまでと同様である．</p>
+
+<div class="mathjax">
+$$
+\boldsymbol{w} = (\Phi^{\mathrm{T}} \Phi)^{-1} \Phi^{\mathrm{T}} \boldsymbol{t}
+$$
+</div>
+
+<p>scikit-learnのPolynomialFeaturesを用いることで，モデルの次数を自由に変えることができる．以下は1次，2次，9次の3つのモデルの結果である．</p>
+
+<p><img src="/img/linear_regression_with_polynominal_features.png" alt="linear_regression_with_polynominal_features" /></p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> <span style="color:#111">numpy</span> <span style="color:#f92672">as</span> <span style="color:#111">np</span>
+<span style="color:#f92672">from</span> <span style="color:#111">matplotlib</span> <span style="color:#f92672">import</span> <span style="color:#111">pyplot</span> <span style="color:#00a8c8">as</span> <span style="color:#111">plt</span>
+<span style="color:#f92672">from</span> <span style="color:#111">sklearn.linear_model</span> <span style="color:#f92672">import</span> <span style="color:#111">LinearRegression</span>
+<span style="color:#f92672">from</span> <span style="color:#111">matplotlib.colors</span> <span style="color:#f92672">import</span> <span style="color:#111">ListedColormap</span>
+<span style="color:#f92672">from</span> <span style="color:#111">sklearn.pipeline</span> <span style="color:#f92672">import</span> <span style="color:#111">Pipeline</span>
+<span style="color:#f92672">from</span> <span style="color:#111">sklearn.preprocessing</span> <span style="color:#f92672">import</span> <span style="color:#111">PolynomialFeatures</span>
+<span style="color:#f92672">from</span> <span style="color:#111">sklearn.model_selection</span> <span style="color:#f92672">import</span> <span style="color:#111">train_test_split</span>
+
+<span style="color:#111">colors</span> <span style="color:#f92672">=</span> <span style="color:#111">[</span><span style="color:#d88200">&#39;#e74c3c&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#3498db&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#1abc9c&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#9b59b6&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#f1c40f&#39;</span><span style="color:#111">]</span> <span style="color:#75715e"># red, blue, green, purple, yellow</span>
+<span style="color:#111">cmap</span> <span style="color:#f92672">=</span> <span style="color:#111">ListedColormap</span><span style="color:#111">(</span><span style="color:#111">colors</span><span style="color:#111">)</span>
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">style</span><span style="color:#f92672">.</span><span style="color:#111">use</span><span style="color:#111">(</span><span style="color:#d88200">&#39;seaborn&#39;</span><span style="color:#111">)</span>
+
+<span style="color:#00a8c8">def</span> <span style="color:#75af00">f</span><span style="color:#111">(</span><span style="color:#111">x</span><span style="color:#111">):</span>
+    <span style="color:#00a8c8">return</span>  <span style="color:#ae81ff">0.1</span><span style="color:#f92672">*</span><span style="color:#111">x</span><span style="color:#f92672">**</span><span style="color:#ae81ff">2</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">0.3</span>
+
+<span style="color:#111">N</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span>
+<span style="color:#111">X</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">zeros</span><span style="color:#111">((</span><span style="color:#111">N</span><span style="color:#111">,</span><span style="color:#ae81ff">1</span><span style="color:#111">))</span>
+<span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">random</span><span style="color:#f92672">.</span><span style="color:#111">seed</span><span style="color:#111">(</span><span style="color:#111">seed</span><span style="color:#f92672">=</span><span style="color:#ae81ff">2</span><span style="color:#111">)</span>
+<span style="color:#111">X</span><span style="color:#111">[:,</span><span style="color:#ae81ff">0</span><span style="color:#111">]</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">random</span><span style="color:#f92672">.</span><span style="color:#111">uniform</span><span style="color:#111">(</span><span style="color:#f92672">-</span><span style="color:#ae81ff">3</span><span style="color:#111">,</span> <span style="color:#ae81ff">3</span><span style="color:#111">,</span> <span style="color:#111">N</span><span style="color:#111">)</span>
+<span style="color:#111">noise</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.1</span><span style="color:#f92672">*</span><span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">random</span><span style="color:#f92672">.</span><span style="color:#111">randn</span><span style="color:#111">(</span><span style="color:#111">N</span><span style="color:#111">)</span> <span style="color:#75715e"># σ=0.1</span>
+<span style="color:#111">t</span> <span style="color:#f92672">=</span> <span style="color:#111">f</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">[:,</span><span style="color:#ae81ff">0</span><span style="color:#111">])</span><span style="color:#f92672">+</span> <span style="color:#111">noise</span>
+
+<span style="color:#111">X_train</span><span style="color:#111">,</span> <span style="color:#111">X_test</span><span style="color:#111">,</span> <span style="color:#111">t_train</span><span style="color:#111">,</span> <span style="color:#111">t_test</span> <span style="color:#f92672">=</span> <span style="color:#111">train_test_split</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">,</span> <span style="color:#111">t</span><span style="color:#111">,</span> <span style="color:#111">random_state</span><span style="color:#f92672">=</span><span style="color:#ae81ff">0</span><span style="color:#111">)</span>
+
+<span style="color:#111">fig</span><span style="color:#111">,</span> <span style="color:#111">ax</span> <span style="color:#f92672">=</span> <span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">subplots</span><span style="color:#111">(</span><span style="color:#ae81ff">1</span><span style="color:#111">,</span> <span style="color:#ae81ff">3</span><span style="color:#111">,</span> <span style="color:#111">figsize</span> <span style="color:#f92672">=</span> <span style="color:#111">(</span><span style="color:#ae81ff">15</span><span style="color:#111">,</span> <span style="color:#ae81ff">5</span><span style="color:#111">))</span>
+
+<span style="color:#00a8c8">for</span> <span style="color:#111">degree</span><span style="color:#111">,</span> <span style="color:#111">ax</span> <span style="color:#f92672">in</span> <span style="color:#111">zip</span><span style="color:#111">([</span><span style="color:#ae81ff">1</span><span style="color:#111">,</span><span style="color:#ae81ff">2</span><span style="color:#111">,</span><span style="color:#ae81ff">9</span><span style="color:#111">],</span> <span style="color:#111">ax</span><span style="color:#111">):</span>
+    <span style="color:#111">pipeline</span> <span style="color:#f92672">=</span> <span style="color:#111">Pipeline</span><span style="color:#111">([</span>
+        <span style="color:#111">(</span><span style="color:#d88200">&#39;polynominal_features&#39;</span><span style="color:#111">,</span> <span style="color:#111">PolynomialFeatures</span><span style="color:#111">(</span><span style="color:#111">degree</span><span style="color:#f92672">=</span><span style="color:#111">degree</span><span style="color:#111">)),</span>
+        <span style="color:#111">(</span><span style="color:#d88200">&#39;linear_regression&#39;</span><span style="color:#111">,</span> <span style="color:#111">LinearRegression</span><span style="color:#111">())</span>
+    <span style="color:#111">])</span>
+
+    <span style="color:#111">lr</span> <span style="color:#f92672">=</span> <span style="color:#111">pipeline</span><span style="color:#f92672">.</span><span style="color:#111">fit</span><span style="color:#111">(</span><span style="color:#111">X_train</span><span style="color:#111">,</span> <span style="color:#111">t_train</span><span style="color:#111">)</span>
+    <span style="color:#00a8c8">print</span><span style="color:#111">(</span><span style="color:#d88200">&#34;train R^2:&#34;</span><span style="color:#111">,</span> <span style="color:#111">lr</span><span style="color:#f92672">.</span><span style="color:#111">score</span><span style="color:#111">(</span><span style="color:#111">X_train</span><span style="color:#111">,</span> <span style="color:#111">t_train</span><span style="color:#111">))</span>
+    <span style="color:#00a8c8">print</span><span style="color:#111">(</span><span style="color:#d88200">&#34;test R^2:&#34;</span><span style="color:#111">,</span> <span style="color:#111">lr</span><span style="color:#f92672">.</span><span style="color:#111">score</span><span style="color:#111">(</span><span style="color:#111">X_test</span><span style="color:#111">,</span> <span style="color:#111">t_test</span><span style="color:#111">))</span>
+    <span style="color:#00a8c8">print</span><span style="color:#111">(</span><span style="color:#111">pipeline</span><span style="color:#f92672">.</span><span style="color:#111">steps</span><span style="color:#111">[</span><span style="color:#ae81ff">1</span><span style="color:#111">][</span><span style="color:#ae81ff">1</span><span style="color:#111">]</span><span style="color:#f92672">.</span><span style="color:#111">coef_</span><span style="color:#111">)</span>
+    
+    <span style="color:#111">Xcont</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">linspace</span><span style="color:#111">(</span><span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">min</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">),</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">max</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">),</span> <span style="color:#ae81ff">200</span><span style="color:#111">)</span><span style="color:#f92672">.</span><span style="color:#111">reshape</span><span style="color:#111">((</span><span style="color:#ae81ff">200</span><span style="color:#111">,</span> <span style="color:#ae81ff">1</span><span style="color:#111">))</span>
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">plot</span><span style="color:#111">(</span><span style="color:#111">Xcont</span><span style="color:#111">,</span> <span style="color:#111">f</span><span style="color:#111">(</span><span style="color:#111">Xcont</span><span style="color:#111">),</span> <span style="color:#111">label</span><span style="color:#f92672">=</span><span style="color:#d88200">&#39;original&#39;</span><span style="color:#111">)</span>
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">plot</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">,</span> <span style="color:#111">t</span><span style="color:#111">,</span><span style="color:#d88200">&#39;.&#39;</span><span style="color:#111">,</span> <span style="color:#111">label</span><span style="color:#f92672">=</span><span style="color:#d88200">&#39;training data&#39;</span><span style="color:#111">)</span>
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">plot</span><span style="color:#111">(</span><span style="color:#111">Xcont</span><span style="color:#111">,</span> <span style="color:#111">lr</span><span style="color:#f92672">.</span><span style="color:#111">predict</span><span style="color:#111">(</span><span style="color:#111">Xcont</span><span style="color:#111">),</span> <span style="color:#111">label</span><span style="color:#f92672">=</span><span style="color:#d88200">&#39;predictive&#39;</span><span style="color:#111">)</span>
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">set_title</span><span style="color:#111">(</span><span style="color:#d88200">&#39;degree : {}&#39;</span><span style="color:#f92672">.</span><span style="color:#111">format</span><span style="color:#111">(</span><span style="color:#111">degree</span><span style="color:#111">))</span>
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">legend</span><span style="color:#111">()</span>
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">set_xlabel</span><span style="color:#111">(</span><span style="color:#d88200">r</span><span style="color:#d88200">&#39;$x$&#39;</span><span style="color:#111">)</span>
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">set_ylabel</span><span style="color:#111">(</span><span style="color:#d88200">r</span><span style="color:#d88200">&#39;$t$&#39;</span><span style="color:#111">)</span></code></pre></div>
+<p>$\boldsymbol{\phi(x)} = (1, x, sin(x))$のようにすることで，三角関数を含んだモデルを構築することができる．が，自身での実装が必要になる．</p>
+
+<h1 id="過学習をどのように抑えるか">過学習をどのように抑えるか</h1>
+
+<p>0 &lt; x &lt; 1 の範囲でxをランダムに10点生成し，$y=sin(2\pi x)$に入力した後，yにσ=0.2のガウシアンノイズを加えたtを教師データとした．青線が関数y，散布図がtである．</p>
+
+<p>scikit-learnのLinearRegressionとPolynomialFeaturesを用いて，1次，3次，9次のモデルによって$y=sin(2\pi x)$を予測したものが赤線である．</p>
+
+<p>9次において，教師データに過剰に適合しようとしていることがわかる．これが過学習(過適合，over-fitting)である．</p>
+
+<p><img src="/img/overfitting_with_high_degree.png" alt="overfitting_with_high_degree" /></p>
+
+<p>次数を小さくする（＝モデルをシンプルにする）ことで過学習を避けることが期待できるが，うまい次数を探す必要がある．</p>
+
+<p>教師データを増やすことで過学習を避けることができる．教師データ数を10組から100組に増やした例が以下であり，9次のモデルでも予測できている．</p>
+
+<p><img src="/img/avoid_overfitting_with_huge_data.png" alt="avoid_overfitting_with_huge_data" /></p>
+
+<p>教師データが大量に手に入る場合はいいかもしれないが，限られた量しか手に入らない場合は断念しなければならないといった問題がある．</p>
+
+<p>ここで，各次数のモデルにおける係数$w$を見てみる．</p>
+
+
+    <div class = "table">
+
+<table>
+<thead>
+<tr>
+<th align="right">$w_0$</th>
+<th align="right">$w_1$</th>
+<th align="right">$w_2$</th>
+<th align="right">$w_3$</th>
+<th align="right">$w_4$</th>
+<th align="right">$w_5$</th>
+<th align="right">$w_6$</th>
+<th align="right">$w_7$</th>
+<th align="right">$w_8$</th>
+<th align="right">$w_9$</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="right">0.0</td>
+<td align="right">-2.1</td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+
+<tr>
+<td align="right">0.0</td>
+<td align="right">12.6</td>
+<td align="right">-35.3</td>
+<td align="right">22.7</td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+<td align="right"></td>
+</tr>
+
+<tr>
+<td align="right">0.0</td>
+<td align="right">22.2</td>
+<td align="right">-263.1</td>
+<td align="right">2140.3</td>
+<td align="right">-9774.9</td>
+<td align="right">25228.6</td>
+<td align="right">-38193.9</td>
+<td align="right">33691.2</td>
+<td align="right">-16021.9</td>
+<td align="right">3171.9</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p>過学習である/ないに関わらず，モデルの次数が大きくなるほど係数wが大きくなっている．つまり，小さいノイズが誇張されてしまうので，過学習が発生すると考えることができる．</p>
+
+<p>より論理的には， $\boldsymbol{w}$を求める際に，$\Phi^{\mathrm{T}} \Phi$の逆行列ギリギリ求められるか求められない場合に起こる．例えば，$\boldsymbol{x_n}$の各スカラー間に相関がある場合や$\boldsymbol{x_n}$の要素数が教師データ数より多いときに計画行列のランクが落ちてしまうので逆行列を持てなくなってしまう．</p>
+
+<div class="mathjax">
+$$
+\boldsymbol{w} = (\Phi^{\mathrm{T}} \Phi)^{-1} \Phi^{\mathrm{T}} \boldsymbol{t}
+$$
+</div>
+
+<p>そこで，単位行列$I$を導入することで逆行列を確実に持つようにする．これを<strong>正則化</strong>という．</p>
+
+<div class="mathjax">
+$$
+\boldsymbol{w} = (\Phi^{\mathrm{T}} \Phi - \lambda I)^{-1} \Phi^{\mathrm{T}} \boldsymbol{t}
+$$
+</div>
+
+<p>これは，以下の二乗和誤差を最小にする値である．$ \| \boldsymbol{w} \| = \boldsymbol{w}^{\mathrm{T}}\boldsymbol{w} $である．これを<strong>Ridge回帰</strong>という．</p>
+
+<div class="mathjax">
+$$
+E(\boldsymbol{w})
+=
+\sum_{n=1}^{N} \{\boldsymbol{w}^{\mathrm{T}} \phi(\boldsymbol{x_n}) - t_n\}^2 + \lambda \| \boldsymbol{w} \|^2
+$$
+</div>
+
+<p>scikit-learnのRidgeを用いてRidge回帰を行った結果が以下である．過学習が抑えられている．</p>
+
+<p>Ridgeには，$\lambda$に相当するalphaというパラメータがあり，今回はalpha=0.0000001と指定した．この$\lambda$の値をどのように探すかは，後ほど述べることにする．</p>
+
+<p>9次のモデルにおいて，$\boldsymbol{w}$を見ると，(0.0, 23.7, -87.5, 91.0, 24.7, -51.1, -40.1, 10.9, 34.7, -4.4)というように，比較的小さな値に抑えられている．</p>
+
+<p><img src="/img/linear_regression_with_ridge.png" alt="linear_regression_with_ridge" /></p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> <span style="color:#111">numpy</span> <span style="color:#f92672">as</span> <span style="color:#111">np</span>
+<span style="color:#f92672">from</span> <span style="color:#111">matplotlib</span> <span style="color:#f92672">import</span> <span style="color:#111">pyplot</span> <span style="color:#00a8c8">as</span> <span style="color:#111">plt</span>
+<span style="color:#f92672">from</span> <span style="color:#111">matplotlib.colors</span> <span style="color:#f92672">import</span> <span style="color:#111">ListedColormap</span>
+<span style="color:#f92672">from</span> <span style="color:#111">sklearn.pipeline</span> <span style="color:#f92672">import</span> <span style="color:#111">Pipeline</span>
+<span style="color:#f92672">from</span> <span style="color:#111">sklearn.preprocessing</span> <span style="color:#f92672">import</span> <span style="color:#111">PolynomialFeatures</span>
+<span style="color:#f92672">from</span> <span style="color:#111">sklearn.linear_model</span> <span style="color:#f92672">import</span> <span style="color:#111">Ridge</span>
+    
+<span style="color:#111">colors</span> <span style="color:#f92672">=</span> <span style="color:#111">[</span><span style="color:#d88200">&#39;#e74c3c&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#3498db&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#1abc9c&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#9b59b6&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#f1c40f&#39;</span><span style="color:#111">]</span> <span style="color:#75715e"># red, blue, green, purple, yellow</span>
+<span style="color:#111">cmap</span> <span style="color:#f92672">=</span> <span style="color:#111">ListedColormap</span><span style="color:#111">(</span><span style="color:#111">colors</span><span style="color:#111">)</span>
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">style</span><span style="color:#f92672">.</span><span style="color:#111">use</span><span style="color:#111">(</span><span style="color:#d88200">&#39;seaborn&#39;</span><span style="color:#111">)</span>
+
+<span style="color:#00a8c8">def</span> <span style="color:#75af00">f</span><span style="color:#111">(</span><span style="color:#111">x</span><span style="color:#111">):</span>
+    <span style="color:#00a8c8">return</span>  <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">sin</span><span style="color:#111">(</span><span style="color:#ae81ff">2</span><span style="color:#f92672">*</span><span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">pi</span><span style="color:#f92672">*</span><span style="color:#111">x</span><span style="color:#111">)</span>
+
+<span style="color:#111">N</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>
+<span style="color:#111">X</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">zeros</span><span style="color:#111">((</span><span style="color:#111">N</span><span style="color:#111">,</span><span style="color:#ae81ff">1</span><span style="color:#111">))</span>
+<span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">random</span><span style="color:#f92672">.</span><span style="color:#111">seed</span><span style="color:#111">(</span><span style="color:#111">seed</span><span style="color:#f92672">=</span><span style="color:#ae81ff">3</span><span style="color:#111">)</span>
+<span style="color:#111">X</span><span style="color:#111">[:,</span><span style="color:#ae81ff">0</span><span style="color:#111">]</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">random</span><span style="color:#f92672">.</span><span style="color:#111">uniform</span><span style="color:#111">(</span><span style="color:#ae81ff">0</span><span style="color:#111">,</span> <span style="color:#ae81ff">1.1</span><span style="color:#111">,</span> <span style="color:#111">N</span><span style="color:#111">)</span>
+<span style="color:#111">noise</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.2</span><span style="color:#f92672">*</span><span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">random</span><span style="color:#f92672">.</span><span style="color:#111">randn</span><span style="color:#111">(</span><span style="color:#111">N</span><span style="color:#111">)</span> <span style="color:#75715e"># σ=0.2 </span>
+<span style="color:#111">t</span> <span style="color:#f92672">=</span> <span style="color:#111">f</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">[:,</span><span style="color:#ae81ff">0</span><span style="color:#111">])</span><span style="color:#f92672">+</span> <span style="color:#111">noise</span>
+
+<span style="color:#111">X_train</span><span style="color:#111">,</span> <span style="color:#111">X_test</span><span style="color:#111">,</span> <span style="color:#111">t_train</span><span style="color:#111">,</span> <span style="color:#111">t_test</span> <span style="color:#f92672">=</span> <span style="color:#111">train_test_split</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">,</span> <span style="color:#111">t</span><span style="color:#111">,</span> <span style="color:#111">random_state</span><span style="color:#f92672">=</span><span style="color:#ae81ff">0</span><span style="color:#111">)</span>
+
+<span style="color:#111">fig</span><span style="color:#111">,</span> <span style="color:#111">ax</span> <span style="color:#f92672">=</span> <span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">subplots</span><span style="color:#111">(</span><span style="color:#ae81ff">1</span><span style="color:#111">,</span> <span style="color:#ae81ff">3</span><span style="color:#111">,</span> <span style="color:#111">figsize</span> <span style="color:#f92672">=</span> <span style="color:#111">(</span><span style="color:#ae81ff">15</span><span style="color:#111">,</span> <span style="color:#ae81ff">5</span><span style="color:#111">))</span>
+
+<span style="color:#00a8c8">for</span> <span style="color:#111">degree</span><span style="color:#111">,</span> <span style="color:#111">ax</span> <span style="color:#f92672">in</span> <span style="color:#111">zip</span><span style="color:#111">([</span><span style="color:#ae81ff">1</span><span style="color:#111">,</span><span style="color:#ae81ff">3</span><span style="color:#111">,</span><span style="color:#ae81ff">9</span><span style="color:#111">],</span> <span style="color:#111">ax</span><span style="color:#111">):</span>
+    <span style="color:#111">pipeline</span> <span style="color:#f92672">=</span> <span style="color:#111">Pipeline</span><span style="color:#111">([</span>
+        <span style="color:#111">(</span><span style="color:#d88200">&#39;polynominal_features&#39;</span><span style="color:#111">,</span> <span style="color:#111">PolynomialFeatures</span><span style="color:#111">(</span><span style="color:#111">degree</span><span style="color:#f92672">=</span><span style="color:#111">degree</span><span style="color:#111">)),</span>
+        <span style="color:#111">(</span><span style="color:#d88200">&#39;ridge&#39;</span><span style="color:#111">,</span> <span style="color:#111">Ridge</span><span style="color:#111">(</span><span style="color:#111">alpha</span><span style="color:#f92672">=</span><span style="color:#ae81ff">0.0000001</span><span style="color:#111">))</span>
+    <span style="color:#111">])</span>
+
+    <span style="color:#111">lr</span> <span style="color:#f92672">=</span> <span style="color:#111">pipeline</span><span style="color:#f92672">.</span><span style="color:#111">fit</span><span style="color:#111">(</span><span style="color:#111">X_train</span><span style="color:#111">,</span> <span style="color:#111">t_train</span><span style="color:#111">)</span>
+    <span style="color:#00a8c8">print</span><span style="color:#111">(</span><span style="color:#d88200">&#34;train R^2:&#34;</span><span style="color:#111">,</span> <span style="color:#111">lr</span><span style="color:#f92672">.</span><span style="color:#111">score</span><span style="color:#111">(</span><span style="color:#111">X_train</span><span style="color:#111">,</span> <span style="color:#111">t_train</span><span style="color:#111">))</span>
+    <span style="color:#00a8c8">print</span><span style="color:#111">(</span><span style="color:#d88200">&#34;test R^2:&#34;</span><span style="color:#111">,</span> <span style="color:#111">lr</span><span style="color:#f92672">.</span><span style="color:#111">score</span><span style="color:#111">(</span><span style="color:#111">X_test</span><span style="color:#111">,</span> <span style="color:#111">t_test</span><span style="color:#111">))</span>
+    <span style="color:#00a8c8">print</span><span style="color:#111">(</span><span style="color:#111">pipeline</span><span style="color:#f92672">.</span><span style="color:#111">steps</span><span style="color:#111">[</span><span style="color:#ae81ff">1</span><span style="color:#111">][</span><span style="color:#ae81ff">1</span><span style="color:#111">]</span><span style="color:#f92672">.</span><span style="color:#111">coef_</span><span style="color:#111">)</span>
+    
+    <span style="color:#111">Xcont</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">linspace</span><span style="color:#111">(</span><span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">min</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">),</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">max</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">),</span> <span style="color:#ae81ff">200</span><span style="color:#111">)</span><span style="color:#f92672">.</span><span style="color:#111">reshape</span><span style="color:#111">((</span><span style="color:#ae81ff">200</span><span style="color:#111">,</span> <span style="color:#ae81ff">1</span><span style="color:#111">))</span>
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">plot</span><span style="color:#111">(</span><span style="color:#111">Xcont</span><span style="color:#111">,</span> <span style="color:#111">f</span><span style="color:#111">(</span><span style="color:#111">Xcont</span><span style="color:#111">),</span> <span style="color:#111">label</span><span style="color:#f92672">=</span><span style="color:#d88200">&#39;original&#39;</span><span style="color:#111">)</span>
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">plot</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">,</span> <span style="color:#111">t</span><span style="color:#111">,</span><span style="color:#d88200">&#39;.&#39;</span><span style="color:#111">,</span> <span style="color:#111">label</span><span style="color:#f92672">=</span><span style="color:#d88200">&#39;training data&#39;</span><span style="color:#111">)</span>
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">plot</span><span style="color:#111">(</span><span style="color:#111">Xcont</span><span style="color:#111">,</span> <span style="color:#111">lr</span><span style="color:#f92672">.</span><span style="color:#111">predict</span><span style="color:#111">(</span><span style="color:#111">Xcont</span><span style="color:#111">),</span> <span style="color:#111">label</span><span style="color:#f92672">=</span><span style="color:#d88200">&#39;predictive&#39;</span><span style="color:#111">)</span>
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">set_xlim</span><span style="color:#111">(</span><span style="color:#ae81ff">0.0</span><span style="color:#111">,</span> <span style="color:#ae81ff">1.0</span><span style="color:#111">)</span>
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">set_title</span><span style="color:#111">(</span><span style="color:#d88200">&#39;degree : {}&#39;</span><span style="color:#f92672">.</span><span style="color:#111">format</span><span style="color:#111">(</span><span style="color:#111">degree</span><span style="color:#111">))</span>
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">legend</span><span style="color:#111">()</span>
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">set_xlabel</span><span style="color:#111">(</span><span style="color:#d88200">r</span><span style="color:#d88200">&#39;$x$&#39;</span><span style="color:#111">)</span>
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">set_ylabel</span><span style="color:#111">(</span><span style="color:#d88200">r</span><span style="color:#d88200">&#39;$t$&#39;</span><span style="color:#111">)</span></code></pre></div>
+    <div class="share">
+    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2flinear-model%2f&text=%e7%b7%9a%e5%bd%a2%e3%83%a2%e3%83%87%e3%83%ab%e3%81%a7%e3%83%87%e3%83%bc%e3%82%bf%e3%82%92%e8%a1%a8%e7%8f%be%e3%81%99%e3%82%8b - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
+    <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2flinear-model%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
+    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2flinear-model%2f&title=%e7%b7%9a%e5%bd%a2%e3%83%a2%e3%83%87%e3%83%ab%e3%81%a7%e3%83%87%e3%83%bc%e3%82%bf%e3%82%92%e8%a1%a8%e7%8f%be%e3%81%99%e3%82%8b - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
+</div>
+  </div>
+  <footer class="post-footer">
+    
+  </footer>
+</article>
+<footer class="footer">
+  <span>&copy; 2020 yasakura</span>
+</footer>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [['$','$'], ['\\(','\\)']],
+      processEscapes: true
+    },
+    linebreaks: {
+      automatic: true
+    }
+  });
+</script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+</body>
+</html>
+

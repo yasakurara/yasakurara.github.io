@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  
+  <title>python2とpython3を共存させる - yasakura</title>
+  
+  <meta name="description" content=" モチベーション  pythonとpython3とpipとpip3をいちいち使い分けるのが面倒くさい． むやみやたらにpipすると環境がどんどん汚れていくのが嫌だ． プロジェクトごとにDockerコンテナを立ち上げるような，大げさな管理はしたくない．  venvでsandboxをつくる $ python -V Python 2.7.10 $ python3 -V Python 3.7.3 $ mkdir ml $ cd ml $ python3 -m venv venv $ . venv/bin/activate (venv) $ python -V Python 3.7.3  venv下にあるパッケージを確認する (venv) $ pip freeze  venvを解除する (venv) $ deactivate $ python -V Python 2.7.10  ">
+  
+  <link href=/css/style.css rel="stylesheet">
+  
+  <link href=/css/font.css rel="stylesheet">
+  
+  <link rel="icon" href="https://yasakura.meimg/favicon.ico">
+  
+  <link rel="alternate" type="application/atom+xml" href="https://yasakura.meindex.xml" title="yasakura">
+  
+</head>
+<body>
+  <header class="header">
+    <div class="title"><a href="https://yasakura.me">yasakura</a></div>
+    <nav id="navigation">
+      <ul class="menu">
+        <li><a href="https://yasakura.meabout/">ABOUT</a></li>
+      </ul>
+    </nav>
+  </header>
+<article class="post post-view">
+  <header class="post-header">
+    <p class="post-meta">2020.4.1</p>
+    <h1 class="post-title">python2とpython3を共存させる</h1>
+    
+  </header>
+  <div class="post-content">
+    <div class="share">
+    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27%2f&text=python2%e3%81%a8python3%e3%82%92%e5%85%b1%e5%ad%98%e3%81%95%e3%81%9b%e3%82%8b - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
+    <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
+    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27%2f&title=python2%e3%81%a8python3%e3%82%92%e5%85%b1%e5%ad%98%e3%81%95%e3%81%9b%e3%82%8b - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
+</div>
+    
+
+<h1 id="モチベーション">モチベーション</h1>
+
+<ul>
+<li>pythonとpython3とpipとpip3をいちいち使い分けるのが面倒くさい．</li>
+<li>むやみやたらにpipすると環境がどんどん汚れていくのが嫌だ．</li>
+<li>プロジェクトごとにDockerコンテナを立ち上げるような，大げさな管理はしたくない．</li>
+</ul>
+
+<h2 id="venvでsandboxをつくる">venvでsandboxをつくる</h2>
+
+<pre><code>$ python -V
+Python 2.7.10
+$ python3 -V
+Python 3.7.3
+$ mkdir ml
+$ cd ml
+$ python3 -m venv venv
+$ . venv/bin/activate
+(venv) $ python -V
+Python 3.7.3
+</code></pre>
+
+<h2 id="venv下にあるパッケージを確認する">venv下にあるパッケージを確認する</h2>
+
+<pre><code>(venv) $ pip freeze
+</code></pre>
+
+<h2 id="venvを解除する">venvを解除する</h2>
+
+<pre><code>(venv) $ deactivate
+$ python -V
+Python 2.7.10
+</code></pre>
+
+    <div class="share">
+    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27%2f&text=python2%e3%81%a8python3%e3%82%92%e5%85%b1%e5%ad%98%e3%81%95%e3%81%9b%e3%82%8b - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
+    <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
+    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27%2f&title=python2%e3%81%a8python3%e3%82%92%e5%85%b1%e5%ad%98%e3%81%95%e3%81%9b%e3%82%8b - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
+</div>
+  </div>
+  <footer class="post-footer">
+    
+  </footer>
+</article>
+<footer class="footer">
+  <span>&copy; 2020 yasakura</span>
+</footer>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [['$','$'], ['\\(','\\)']],
+      processEscapes: true
+    },
+    linebreaks: {
+      automatic: true
+    }
+  });
+</script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+</body>
+</html>
+

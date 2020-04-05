@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  
+  <title>Hugoで静的サイトをジェネる - yasakura</title>
+  
+  <meta name="description" content=" モチベーション  ブログを書きたい CMSで管理するほどでもない Hugoがよさそう  プレビューしながら執筆or開発する hugo server --watch -D --port &lt;port&gt; --bind 0.0.0.0 --baseURL=&lt;local machine&#39;s IP address&gt;   コードを変更するごとに自動でリロードさせるためには，--watchをつける．
+ Draft記事を表示させるためには，-Dをつける．
+ --bindを指定しない場合は，127.0.0.1にbindされる．127.0.0.1へのbindだと，hugo serverを実行しているローカルマシンからのアクセスhttp://localhost:&lt;port&gt;のみに制限されてしまう．0.0.0.0にbindすることで，LAN内にあるローカルマシン以外からはhttp://&lt;local machine&#39;s IP address&gt;:&lt;port&gt;でアクセスできるようになる．  記事を新規作成する hugo new post/&lt;article name&gt;.md  Themeカスタマイズ .Params.xxxはarticleのfront-matterから参照される
+.Site.Params.xxxはconfig.tomlから参照される
+静的サイトをジェネる ">
+  
+  <link href=/css/style.css rel="stylesheet">
+  
+  <link href=/css/font.css rel="stylesheet">
+  
+  <link rel="icon" href="https://yasakura.meimg/favicon.ico">
+  
+  <link rel="alternate" type="application/atom+xml" href="https://yasakura.meindex.xml" title="yasakura">
+  
+</head>
+<body>
+  <header class="header">
+    <div class="title"><a href="https://yasakura.me">yasakura</a></div>
+    <nav id="navigation">
+      <ul class="menu">
+        <li><a href="https://yasakura.meabout/">ABOUT</a></li>
+      </ul>
+    </nav>
+  </header>
+<article class="post post-view">
+  <header class="post-header">
+    <p class="post-meta">2020.4.1</p>
+    <h1 class="post-title">Hugoで静的サイトをジェネる</h1>
+    
+  </header>
+  <div class="post-content">
+    <div class="share">
+    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fgenerate-static-site-with-hugo%2f&text=Hugo%e3%81%a7%e9%9d%99%e7%9a%84%e3%82%b5%e3%82%a4%e3%83%88%e3%82%92%e3%82%b8%e3%82%a7%e3%83%8d%e3%82%8b - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
+    <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fgenerate-static-site-with-hugo%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
+    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fgenerate-static-site-with-hugo%2f&title=Hugo%e3%81%a7%e9%9d%99%e7%9a%84%e3%82%b5%e3%82%a4%e3%83%88%e3%82%92%e3%82%b8%e3%82%a7%e3%83%8d%e3%82%8b - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
+</div>
+    
+
+<h1 id="モチベーション">モチベーション</h1>
+
+<ul>
+<li>ブログを書きたい</li>
+<li>CMSで管理するほどでもない</li>
+<li><a href="https://gohugo.io/">Hugo</a>がよさそう</li>
+</ul>
+
+<h1 id="プレビューしながら執筆or開発する">プレビューしながら執筆or開発する</h1>
+
+<pre><code>hugo server --watch -D --port &lt;port&gt; --bind 0.0.0.0 --baseURL=&lt;local machine's IP address&gt;
+</code></pre>
+
+<ul>
+<li>コードを変更するごとに自動でリロードさせるためには，<code>--watch</code>をつける．<br /></li>
+<li>Draft記事を表示させるためには，<code>-D</code>をつける．<br /></li>
+<li><code>--bind</code>を指定しない場合は，127.0.0.1にbindされる．127.0.0.1へのbindだと，<code>hugo server</code>を実行しているローカルマシンからのアクセス<code>http://localhost:&lt;port&gt;</code>のみに制限されてしまう．0.0.0.0にbindすることで，LAN内にあるローカルマシン以外からは<code>http://&lt;local machine's IP address&gt;:&lt;port&gt;</code>でアクセスできるようになる．</li>
+</ul>
+
+<h1 id="記事を新規作成する">記事を新規作成する</h1>
+
+<pre><code>hugo new post/&lt;article name&gt;.md
+</code></pre>
+
+<h1 id="themeカスタマイズ">Themeカスタマイズ</h1>
+
+<p><code>.Params.xxx</code>はarticleのfront-matterから参照される<br />
+<code>.Site.Params.xxx</code>はconfig.tomlから参照される</p>
+
+<h1 id="静的サイトをジェネる">静的サイトをジェネる</h1>
+
+    <div class="share">
+    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fgenerate-static-site-with-hugo%2f&text=Hugo%e3%81%a7%e9%9d%99%e7%9a%84%e3%82%b5%e3%82%a4%e3%83%88%e3%82%92%e3%82%b8%e3%82%a7%e3%83%8d%e3%82%8b - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
+    <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fgenerate-static-site-with-hugo%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
+    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fgenerate-static-site-with-hugo%2f&title=Hugo%e3%81%a7%e9%9d%99%e7%9a%84%e3%82%b5%e3%82%a4%e3%83%88%e3%82%92%e3%82%b8%e3%82%a7%e3%83%8d%e3%82%8b - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
+</div>
+  </div>
+  <footer class="post-footer">
+    
+  </footer>
+</article>
+<footer class="footer">
+  <span>&copy; 2020 yasakura</span>
+</footer>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [['$','$'], ['\\(','\\)']],
+      processEscapes: true
+    },
+    linebreaks: {
+      automatic: true
+    }
+  });
+</script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+</body>
+</html>
+

@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  
+  <title>劣微分とLassoによるスパース性 - yasakura</title>
+  
+  <meta name="description" content="モチベーション  部分的に微分できない関数をなんとか微分したい L1正則化(Lasso)を用いると，過学習を防げるかもしれないらしい  関数の種類 目的関数の最小値を求めたい機会は多々ある，目的関数を微分することで最小値を求めることがあるが，関数の形によっては，部分的に微分できない場合がある．例えば，$y=\|x\|$は$x=0$で微分不可能である．
+ 関数が連続でない：境界（$y=\|x\|$の$x=0$付近）において，左極限と右極限が一致しないもの $C_1$級関数：1階微分可能であり，それが連続であるもの $C_n$級関数：n階微分可能であり，n階の導関数が連続であるもの 滑らかな関数：任意階微分可能であり，任意階の導関数が連続であるもの．$C_\infty$級関数．  劣微分・劣勾配 凸関数を最小化するために勾配情報が欲しいが，凸関数はいつでも微分可能であるとは限らない．例えば，$y=|x|$は凸関数だが，$x=0$で微分可能でない．このような関数に対して勾配（劣勾配）を定義してみる．
+真凸関数$f:\mathbb{R}^n \to \mathbb{R} \cup \{\infty\}$かつ$x \in dom(f)$の元で，$\forall y \in \mathbb{R}^n$が
+$$ f(\boldsymbol{y}) \geq f(\boldsymbol{x}) &#43; \boldsymbol{g}^{\mathrm{T}}(\boldsymbol{y}-\boldsymbol{x}) $$  を満たすとき，$\boldsymbol{g}$を$\boldsymbol{x}$における劣勾配という．劣勾配の集合$\partial f(\boldsymbol{x})$を劣微分という．
+$f(x)=|x|$の$x=0$における劣微分は，以下より，$\partial f(0) = [-1,1]$と求まる．
+ $y \gt 0$の場合，$f(y)=|y|=y \geq f(0) &#43; g (y - 0)$なので，$g \leq 1$ $y = 0$の場合，$f(y)=|y|=0 \geq f(0) &#43; g (0 - 0)$なので，$g \in \mathbb{R}$ $y \lt 0$の場合，$f(y)=|y|=-y \geq f(0) &#43; g (y - 0)$なので，$g \geq -1$  もっと複雑な関数を微分したい 座標降下法(Coordinate Descent)または勾配降下法(Gradient Descent)を用いる．">
+  
+  <link href=/css/style.css rel="stylesheet">
+  
+  <link href=/css/font.css rel="stylesheet">
+  
+  <link rel="icon" href="https://yasakura.meimg/favicon.ico">
+  
+  <link rel="alternate" type="application/atom+xml" href="https://yasakura.meindex.xml" title="yasakura">
+  
+</head>
+<body>
+  <header class="header">
+    <div class="title"><a href="https://yasakura.me">yasakura</a></div>
+    <nav id="navigation">
+      <ul class="menu">
+        <li><a href="https://yasakura.meabout/">ABOUT</a></li>
+      </ul>
+    </nav>
+  </header>
+<article class="post post-view">
+  <header class="post-header">
+    <p class="post-meta">2020.4.1</p>
+    <h1 class="post-title">劣微分とLassoによるスパース性</h1>
+    
+  </header>
+  <div class="post-content">
+    <div class="share">
+    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fsubdifferential%2f&text=%e5%8a%a3%e5%be%ae%e5%88%86%e3%81%a8Lasso%e3%81%ab%e3%82%88%e3%82%8b%e3%82%b9%e3%83%91%e3%83%bc%e3%82%b9%e6%80%a7 - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
+    <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fsubdifferential%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
+    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fsubdifferential%2f&title=%e5%8a%a3%e5%be%ae%e5%88%86%e3%81%a8Lasso%e3%81%ab%e3%82%88%e3%82%8b%e3%82%b9%e3%83%91%e3%83%bc%e3%82%b9%e6%80%a7 - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
+</div>
+    
+
+<h1 id="モチベーション">モチベーション</h1>
+
+<ul>
+<li>部分的に微分できない関数をなんとか微分したい</li>
+<li>L1正則化(Lasso)を用いると，過学習を防げるかもしれないらしい</li>
+</ul>
+
+<h1 id="関数の種類">関数の種類</h1>
+
+<p>目的関数の最小値を求めたい機会は多々ある，目的関数を微分することで最小値を求めることがあるが，関数の形によっては，部分的に微分できない場合がある．例えば，$y=\|x\|$は$x=0$で微分不可能である．</p>
+
+<ul>
+<li>関数が連続でない：境界（$y=\|x\|$の$x=0$付近）において，左極限と右極限が一致しないもの</li>
+<li>$C_1$級関数：1階微分可能であり，それが連続であるもの</li>
+<li>$C_n$級関数：n階微分可能であり，n階の導関数が連続であるもの</li>
+<li>滑らかな関数：任意階微分可能であり，任意階の導関数が連続であるもの．$C_\infty$級関数．</li>
+</ul>
+
+<h1 id="劣微分-劣勾配">劣微分・劣勾配</h1>
+
+<p>凸関数を最小化するために勾配情報が欲しいが，凸関数はいつでも微分可能であるとは限らない．例えば，$y=|x|$は凸関数だが，$x=0$で微分可能でない．このような関数に対して勾配（劣勾配）を定義してみる．</p>
+
+<p>真凸関数$f:\mathbb{R}^n \to \mathbb{R} \cup \{\infty\}$かつ$x \in dom(f)$の元で，$\forall y \in \mathbb{R}^n$が</p>
+
+<div class="mathjax">
+$$
+f(\boldsymbol{y}) \geq f(\boldsymbol{x}) + \boldsymbol{g}^{\mathrm{T}}(\boldsymbol{y}-\boldsymbol{x})
+$$
+</div>
+
+<p>を満たすとき，$\boldsymbol{g}$を$\boldsymbol{x}$における劣勾配という．劣勾配の集合$\partial f(\boldsymbol{x})$を劣微分という．</p>
+
+<p>$f(x)=|x|$の$x=0$における劣微分は，以下より，$\partial f(0) = [-1,1]$と求まる．</p>
+
+<ul>
+<li>$y \gt 0$の場合，$f(y)=|y|=y \geq f(0) + g (y - 0)$なので，$g \leq 1$</li>
+<li>$y = 0$の場合，$f(y)=|y|=0 \geq f(0) + g (0 - 0)$なので，$g \in \mathbb{R}$</li>
+<li>$y \lt 0$の場合，$f(y)=|y|=-y \geq f(0) + g (y - 0)$なので，$g \geq -1$</li>
+</ul>
+
+<h1 id="もっと複雑な関数を微分したい">もっと複雑な関数を微分したい</h1>
+
+<p>座標降下法(Coordinate Descent)または勾配降下法(Gradient Descent)を用いる．</p>
+
+<ul>
+<li>座標降下法：目的関数の変数を一つずつ最小化する</li>
+<li>勾配降下法：あとで書く</li>
+</ul>
+
+<h1 id="座標降下法-coodinate-descent-によるl1正則化-lasso-の最適化">座標降下法(Coodinate Descent)によるL1正則化(Lasso)の最適化</h1>
+
+<p>LassoとはLeast absolute shrinkage and selection operatorの略であり，以下の式で表される．以下を最小にするような$\boldsymbol{w}$を探したいが，微分できない項を含んでいる．ここで，$\boldsymbol{x_n}^{\mathrm{T}} = (1, x_{n1} , x_{n2}, &hellip;, x_{nD})$，$\boldsymbol{w}^{\mathrm{T}} = (w_0, w_1, &hellip;, w_D)$である．$\boldsymbol{w}_{-j}$は列ベクトル$\boldsymbol{w}$からj列目を除いたものを表す．</p>
+
+<div class="mathjax">
+$$
+E(\boldsymbol{w})
+=
+\frac{1}{2} \sum_{n=1}^{N} \{\boldsymbol{w}^{\mathrm{T}} \boldsymbol{x_n} - t_n\}^2 + \lambda \| \boldsymbol{w}_{-0} \|
+=
+\frac{1}{2} (\boldsymbol{Xw-t}) ^{\mathrm{T}} (\boldsymbol{Xw-t})  + \lambda \| \boldsymbol{w}_{-0} \|
+$$
+</div>
+
+<p>$w_0$は正則化項に含まれないので，$E(\boldsymbol{w})$を$w_0$で微分することで$w_0$の最小値が求まる．</p>
+
+<div class="mathjax">
+$$
+\frac{ \partial E(\boldsymbol{w}) }{ \partial w_0 } = \sum_{n=1}^{N} \{\boldsymbol{w}^{\mathrm{T}} \boldsymbol{x_n} - t_n\}
+
+= \sum_{n=1}^{N} \{w_0 + \boldsymbol{w_{-0}}^{\mathrm{T}} \boldsymbol{{x_n}_{-0}} - t_n\} = 0 \\
+
+\therefore w_0
+=
+\frac{1}{N} \sum_{n=1}^{N} \{t_n - \boldsymbol{w_{-0}}^{\mathrm{T}} \boldsymbol{{x_n}_{-0}}\}
+$$
+</div>
+
+<p>次に，$E(\boldsymbol{w})$を$w_k ( \neq 0, 0 \lt k \leq D )$で偏微分した値を0とする．</p>
+
+<div class="mathjax">
+$$
+\frac{ \partial E(\boldsymbol{w}) }{ \partial w_k }  = \boldsymbol{X_{(:,k)}^{\mathrm{T}}} \{ \boldsymbol{X_{(:,k)}} w_k + \boldsymbol{X_{(:,-k)}} \boldsymbol{w_{-k}} - \boldsymbol{t} \} + \lambda  sign(w_k) = 0
+$$
+</div>
+
+<p>$\boldsymbol{X_{(:,k)}}$は行列Xのk列ベクトルを表し，$\boldsymbol{X_{(:,k)}^{\mathrm{T}}}$はそれの転置ベクトルを表す．また，$\boldsymbol{X_{(:,-k)}}$は行列Xからk列ベクトルを除いたものを表す．</p>
+
+<p>$w_k$について整理すると，$w_k &gt; 0$の場合と$w_k &lt;0$の場合ができる．</p>
+
+<div class="mathjax">
+$$
+\begin{eqnarray}
+w_k 
+=
+\begin{cases}
+\frac{1}{\boldsymbol{X_{(:,k)}^{\mathrm{T}}} \boldsymbol{X_{(:,k)}}} \{ \boldsymbol{X_{(:,k)}^{\mathrm{T}}} \{ \boldsymbol{t} - \boldsymbol{X_{(:,-k)}} \boldsymbol{w_{-k}} \} - \lambda\} & ( w_k \gt 0) & (1)\\
+\frac{1}{\boldsymbol{X_{(:,k)}^{\mathrm{T}}} \boldsymbol{X_{(:,k)}}} \{ \boldsymbol{X_{(:,k)}^{\mathrm{T}}} \{ \boldsymbol{t} - \boldsymbol{X_{(:,-k)}} \boldsymbol{w_{-k}} \} + \lambda\} & ( w_k \lt 0) & (2)
+\end{cases}
+\end{eqnarray}
+$$
+</div>
+
+<p>ここで劣微分を導入する．具体的には，(1)式または(2)式を満たさない場合は問答無用で$w_k=0$とするだけ．λの大きさによって$w_k=0$とする範囲を制御できる．これらをまとめてsoft thresholding operatorと呼ぶ．</p>
+
+<p>で，以下の手順に沿って$\boldsymbol{w}$を求める．以下のように，目的変数（最小化したい変数）を一つずつ触って，目的関数（今回はLasso）を最小化する方法を，座標降下法(Coodinate Descent)という．</p>
+
+<ol>
+<li>$\boldsymbol{w}$を適当な値で初期化</li>
+<li>$w_0$を計算</li>
+<li>while $\boldsymbol{w}$が収束条件を満たすまで
+
+<ul>
+<li>for k in 1,2,&hellip;,D
+
+<ul>
+<li>$w_k$を計算</li>
+</ul></li>
+<li>$w_0$を計算</li>
+</ul></li>
+</ol>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> <span style="color:#111">numpy</span> <span style="color:#f92672">as</span> <span style="color:#111">np</span>
+<span style="color:#f92672">import</span> <span style="color:#111">copy</span>
+
+<span style="color:#00a8c8">class</span> <span style="color:#75af00">MyLasso</span><span style="color:#111">:</span>
+  <span style="color:#00a8c8">def</span> <span style="color:#111">__init__</span><span style="color:#111">(</span><span style="color:#111">self</span><span style="color:#111">,</span> <span style="color:#111">alpha</span><span style="color:#f92672">=</span><span style="color:#ae81ff">1.0</span><span style="color:#111">,</span> <span style="color:#111">max_iter</span><span style="color:#f92672">=</span><span style="color:#ae81ff">100</span><span style="color:#111">):</span>
+    <span style="color:#111">self</span><span style="color:#f92672">.</span><span style="color:#111">alpha</span> <span style="color:#f92672">=</span> <span style="color:#111">alpha</span>
+    <span style="color:#111">self</span><span style="color:#f92672">.</span><span style="color:#111">max_iter</span> <span style="color:#f92672">=</span> <span style="color:#111">max_iter</span>
+    <span style="color:#111">self</span><span style="color:#f92672">.</span><span style="color:#111">coef_</span> <span style="color:#f92672">=</span> <span style="color:#111">None</span>
+    <span style="color:#111">self</span><span style="color:#f92672">.</span><span style="color:#111">intercept_</span> <span style="color:#f92672">=</span> <span style="color:#111">None</span>
+
+  <span style="color:#00a8c8">def</span> <span style="color:#75af00">fit</span><span style="color:#111">(</span><span style="color:#111">self</span><span style="color:#111">,</span> <span style="color:#111">X</span><span style="color:#111">,</span> <span style="color:#111">t</span><span style="color:#111">):</span>
+    <span style="color:#111">X</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">column_stack</span><span style="color:#111">((</span><span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">ones</span><span style="color:#111">(</span><span style="color:#111">len</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">)),</span><span style="color:#111">X</span><span style="color:#111">))</span> <span style="color:#75715e"># (1,x1,x2,...)</span>
+    <span style="color:#111">w</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">zeros</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#f92672">.</span><span style="color:#111">shape</span><span style="color:#111">[</span><span style="color:#ae81ff">1</span><span style="color:#111">])</span>
+    
+    <span style="color:#111">w</span><span style="color:#111">[</span><span style="color:#ae81ff">0</span><span style="color:#111">]</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">sum</span><span style="color:#111">(</span><span style="color:#111">t</span> <span style="color:#f92672">-</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">dot</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">[:,</span><span style="color:#ae81ff">1</span><span style="color:#111">:],</span> <span style="color:#111">w</span><span style="color:#111">[</span><span style="color:#ae81ff">1</span><span style="color:#111">:]))</span><span style="color:#f92672">/</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#f92672">.</span><span style="color:#111">shape</span><span style="color:#111">[</span><span style="color:#ae81ff">0</span><span style="color:#111">])</span>
+    
+    <span style="color:#00a8c8">for</span> <span style="color:#111">iter</span> <span style="color:#f92672">in</span> <span style="color:#111">range</span><span style="color:#111">(</span><span style="color:#111">self</span><span style="color:#f92672">.</span><span style="color:#111">max_iter</span><span style="color:#111">):</span>
+        <span style="color:#00a8c8">for</span> <span style="color:#111">i</span> <span style="color:#f92672">in</span> <span style="color:#111">range</span><span style="color:#111">(</span><span style="color:#ae81ff">1</span><span style="color:#111">,</span> <span style="color:#111">len</span><span style="color:#111">(</span><span style="color:#111">w</span><span style="color:#111">)):</span>
+            <span style="color:#111">_w</span> <span style="color:#f92672">=</span> <span style="color:#111">copy</span><span style="color:#f92672">.</span><span style="color:#111">deepcopy</span><span style="color:#111">(</span><span style="color:#111">w</span><span style="color:#111">)</span>
+            <span style="color:#111">_w</span><span style="color:#111">[</span><span style="color:#111">i</span><span style="color:#111">]</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.0</span>
+
+            <span style="color:#111">w</span><span style="color:#111">[</span><span style="color:#111">i</span><span style="color:#111">]</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.0</span>
+            <span style="color:#111">a</span> <span style="color:#f92672">=</span> <span style="color:#111">(</span><span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">dot</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">[:,</span> <span style="color:#111">i</span><span style="color:#111">],</span> <span style="color:#111">t</span> <span style="color:#f92672">-</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">dot</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">,</span> <span style="color:#111">_w</span><span style="color:#111">))</span> <span style="color:#f92672">-</span> <span style="color:#111">self</span><span style="color:#f92672">.</span><span style="color:#111">alpha</span><span style="color:#111">)</span><span style="color:#f92672">/</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">[:,</span> <span style="color:#111">i</span><span style="color:#111">]</span><span style="color:#f92672">**</span><span style="color:#ae81ff">2</span><span style="color:#111">)</span><span style="color:#f92672">.</span><span style="color:#111">sum</span><span style="color:#111">()</span>
+            <span style="color:#00a8c8">if</span> <span style="color:#111">a</span> <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0.0</span> <span style="color:#111">:</span> <span style="color:#111">w</span><span style="color:#111">[</span><span style="color:#111">i</span><span style="color:#111">]</span> <span style="color:#f92672">=</span> <span style="color:#111">a</span>
+            <span style="color:#111">a</span> <span style="color:#f92672">=</span> <span style="color:#111">(</span><span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">dot</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">[:,</span> <span style="color:#111">i</span><span style="color:#111">],</span> <span style="color:#111">t</span> <span style="color:#f92672">-</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">dot</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">,</span> <span style="color:#111">_w</span><span style="color:#111">))</span> <span style="color:#f92672">+</span> <span style="color:#111">self</span><span style="color:#f92672">.</span><span style="color:#111">alpha</span><span style="color:#111">)</span><span style="color:#f92672">/</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">[:,</span> <span style="color:#111">i</span><span style="color:#111">]</span><span style="color:#f92672">**</span><span style="color:#ae81ff">2</span><span style="color:#111">)</span><span style="color:#f92672">.</span><span style="color:#111">sum</span><span style="color:#111">()</span>
+            <span style="color:#00a8c8">if</span> <span style="color:#111">a</span> <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0.0</span> <span style="color:#111">:</span> <span style="color:#111">w</span><span style="color:#111">[</span><span style="color:#111">i</span><span style="color:#111">]</span> <span style="color:#f92672">=</span> <span style="color:#111">a</span>
+
+        <span style="color:#111">w</span><span style="color:#111">[</span><span style="color:#ae81ff">0</span><span style="color:#111">]</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">sum</span><span style="color:#111">(</span><span style="color:#111">t</span> <span style="color:#f92672">-</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">dot</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">[:,</span><span style="color:#ae81ff">1</span><span style="color:#111">:],</span> <span style="color:#111">w</span><span style="color:#111">[</span><span style="color:#ae81ff">1</span><span style="color:#111">:]))</span><span style="color:#f92672">/</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#f92672">.</span><span style="color:#111">shape</span><span style="color:#111">[</span><span style="color:#ae81ff">0</span><span style="color:#111">])</span>
+
+        <span style="color:#111">self</span><span style="color:#f92672">.</span><span style="color:#111">intercept_</span> <span style="color:#f92672">=</span> <span style="color:#111">w</span><span style="color:#111">[</span><span style="color:#ae81ff">0</span><span style="color:#111">]</span>
+        <span style="color:#111">self</span><span style="color:#f92672">.</span><span style="color:#111">coef_</span> <span style="color:#f92672">=</span> <span style="color:#111">w</span><span style="color:#111">[</span><span style="color:#ae81ff">1</span><span style="color:#111">:]</span>
+
+    <span style="color:#00a8c8">return</span> <span style="color:#111">self</span>
+
+  <span style="color:#00a8c8">def</span> <span style="color:#75af00">predict</span><span style="color:#111">(</span><span style="color:#111">self</span><span style="color:#111">,</span> <span style="color:#111">X</span><span style="color:#111">):</span>
+    <span style="color:#111">y</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">dot</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">,</span> <span style="color:#111">self</span><span style="color:#f92672">.</span><span style="color:#111">coef_</span><span style="color:#111">)</span>
+    <span style="color:#111">y</span> <span style="color:#f92672">+=</span> <span style="color:#111">self</span><span style="color:#f92672">.</span><span style="color:#111">intercept_</span><span style="color:#f92672">*</span><span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">ones</span><span style="color:#111">(</span><span style="color:#111">len</span><span style="color:#111">(</span><span style="color:#111">y</span><span style="color:#111">))</span>
+    <span style="color:#00a8c8">return</span> <span style="color:#111">y</span></code></pre></div>
+<p>$y=x^2+2x+3$にσ=1.0のノイズを加えた50点を教師データとして，Lassoで予測した結果が以下である．</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> <span style="color:#111">sklearn.model_selection</span> <span style="color:#f92672">import</span> <span style="color:#111">train_test_split</span>
+<span style="color:#f92672">from</span> <span style="color:#111">sklearn.pipeline</span> <span style="color:#f92672">import</span> <span style="color:#111">Pipeline</span>
+<span style="color:#f92672">from</span> <span style="color:#111">sklearn.preprocessing</span> <span style="color:#f92672">import</span> <span style="color:#111">PolynomialFeatures</span>
+
+<span style="color:#00a8c8">def</span> <span style="color:#75af00">f</span><span style="color:#111">(</span><span style="color:#111">x</span><span style="color:#111">):</span>
+    <span style="color:#00a8c8">return</span>  <span style="color:#111">x</span><span style="color:#f92672">**</span><span style="color:#ae81ff">2</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">2</span><span style="color:#f92672">*</span><span style="color:#111">x</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">3</span>
+
+<span style="color:#111">N</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span>
+<span style="color:#111">X</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">zeros</span><span style="color:#111">((</span><span style="color:#111">N</span><span style="color:#111">,</span><span style="color:#ae81ff">1</span><span style="color:#111">))</span>
+<span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">random</span><span style="color:#f92672">.</span><span style="color:#111">seed</span><span style="color:#111">(</span><span style="color:#111">seed</span><span style="color:#f92672">=</span><span style="color:#ae81ff">2</span><span style="color:#111">)</span>
+<span style="color:#111">X</span><span style="color:#111">[:,</span><span style="color:#ae81ff">0</span><span style="color:#111">]</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">random</span><span style="color:#f92672">.</span><span style="color:#111">uniform</span><span style="color:#111">(</span><span style="color:#f92672">-</span><span style="color:#ae81ff">3</span><span style="color:#111">,</span> <span style="color:#ae81ff">3</span><span style="color:#111">,</span> <span style="color:#111">N</span><span style="color:#111">)</span>
+<span style="color:#111">noise</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.0</span><span style="color:#f92672">*</span><span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">random</span><span style="color:#f92672">.</span><span style="color:#111">randn</span><span style="color:#111">(</span><span style="color:#111">N</span><span style="color:#111">)</span>
+<span style="color:#111">t</span> <span style="color:#f92672">=</span> <span style="color:#111">f</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">[:,</span><span style="color:#ae81ff">0</span><span style="color:#111">])</span><span style="color:#f92672">+</span> <span style="color:#111">noise</span>
+
+<span style="color:#111">X_train</span><span style="color:#111">,</span> <span style="color:#111">X_test</span><span style="color:#111">,</span> <span style="color:#111">t_train</span><span style="color:#111">,</span> <span style="color:#111">t_test</span> <span style="color:#f92672">=</span> <span style="color:#111">train_test_split</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">,</span> <span style="color:#111">t</span><span style="color:#111">,</span> <span style="color:#111">random_state</span><span style="color:#f92672">=</span><span style="color:#ae81ff">0</span><span style="color:#111">)</span>
+
+<span style="color:#111">fig</span><span style="color:#111">,</span> <span style="color:#111">ax</span> <span style="color:#f92672">=</span> <span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">subplots</span><span style="color:#111">(</span><span style="color:#ae81ff">1</span><span style="color:#111">,</span> <span style="color:#ae81ff">3</span><span style="color:#111">,</span> <span style="color:#111">figsize</span> <span style="color:#f92672">=</span> <span style="color:#111">(</span><span style="color:#ae81ff">15</span><span style="color:#111">,</span> <span style="color:#ae81ff">5</span><span style="color:#111">))</span>
+
+<span style="color:#00a8c8">for</span> <span style="color:#111">degree</span><span style="color:#111">,</span> <span style="color:#111">ax</span> <span style="color:#f92672">in</span> <span style="color:#111">zip</span><span style="color:#111">([</span><span style="color:#ae81ff">1</span><span style="color:#111">,</span><span style="color:#ae81ff">3</span><span style="color:#111">,</span><span style="color:#ae81ff">9</span><span style="color:#111">],</span><span style="color:#111">ax</span><span style="color:#111">):</span>
+    <span style="color:#111">pipeline</span> <span style="color:#f92672">=</span> <span style="color:#111">Pipeline</span><span style="color:#111">([</span>
+        <span style="color:#111">(</span><span style="color:#d88200">&#39;polynominal_features&#39;</span><span style="color:#111">,</span> <span style="color:#111">PolynomialFeatures</span><span style="color:#111">(</span><span style="color:#111">degree</span><span style="color:#f92672">=</span><span style="color:#111">degree</span><span style="color:#111">)),</span>
+        <span style="color:#111">(</span><span style="color:#d88200">&#39;linear_regression&#39;</span><span style="color:#111">,</span> <span style="color:#111">MyLasso</span><span style="color:#111">(</span><span style="color:#111">alpha</span><span style="color:#f92672">=</span><span style="color:#ae81ff">0.01</span><span style="color:#111">))</span>
+    <span style="color:#111">])</span>
+
+    <span style="color:#111">lr</span> <span style="color:#f92672">=</span> <span style="color:#111">pipeline</span><span style="color:#f92672">.</span><span style="color:#111">fit</span><span style="color:#111">(</span><span style="color:#111">X_train</span><span style="color:#111">,</span> <span style="color:#111">t_train</span><span style="color:#111">)</span>
+    <span style="color:#00a8c8">print</span><span style="color:#111">(</span><span style="color:#111">pipeline</span><span style="color:#f92672">.</span><span style="color:#111">steps</span><span style="color:#111">[</span><span style="color:#ae81ff">1</span><span style="color:#111">][</span><span style="color:#ae81ff">1</span><span style="color:#111">]</span><span style="color:#f92672">.</span><span style="color:#111">intercept_</span><span style="color:#111">)</span>
+    <span style="color:#00a8c8">print</span><span style="color:#111">(</span><span style="color:#111">pipeline</span><span style="color:#f92672">.</span><span style="color:#111">steps</span><span style="color:#111">[</span><span style="color:#ae81ff">1</span><span style="color:#111">][</span><span style="color:#ae81ff">1</span><span style="color:#111">]</span><span style="color:#f92672">.</span><span style="color:#111">coef_</span><span style="color:#111">)</span>
+    
+    <span style="color:#111">Xcont</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">linspace</span><span style="color:#111">(</span><span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">min</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">),</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">max</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">),</span> <span style="color:#ae81ff">200</span><span style="color:#111">)</span><span style="color:#f92672">.</span><span style="color:#111">reshape</span><span style="color:#111">((</span><span style="color:#ae81ff">200</span><span style="color:#111">,</span> <span style="color:#ae81ff">1</span><span style="color:#111">))</span>
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">plot</span><span style="color:#111">(</span><span style="color:#111">Xcont</span><span style="color:#111">,</span> <span style="color:#111">f</span><span style="color:#111">(</span><span style="color:#111">Xcont</span><span style="color:#111">),</span> <span style="color:#111">label</span><span style="color:#f92672">=</span><span style="color:#d88200">&#39;original&#39;</span><span style="color:#111">)</span>
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">plot</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">,</span> <span style="color:#111">t</span><span style="color:#111">,</span><span style="color:#d88200">&#39;.&#39;</span><span style="color:#111">,</span> <span style="color:#111">label</span><span style="color:#f92672">=</span><span style="color:#d88200">&#39;training data&#39;</span><span style="color:#111">)</span>
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">plot</span><span style="color:#111">(</span><span style="color:#111">Xcont</span><span style="color:#111">,</span> <span style="color:#111">lr</span><span style="color:#f92672">.</span><span style="color:#111">predict</span><span style="color:#111">(</span><span style="color:#111">Xcont</span><span style="color:#111">),</span> <span style="color:#111">label</span><span style="color:#f92672">=</span><span style="color:#d88200">&#39;predictive&#39;</span><span style="color:#111">)</span>
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">set_title</span><span style="color:#111">(</span><span style="color:#d88200">&#39;degree : {}&#39;</span><span style="color:#f92672">.</span><span style="color:#111">format</span><span style="color:#111">(</span><span style="color:#111">degree</span><span style="color:#111">))</span>
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">legend</span><span style="color:#111">()</span>
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">set_xlabel</span><span style="color:#111">(</span><span style="color:#d88200">r</span><span style="color:#d88200">&#39;$x$&#39;</span><span style="color:#111">)</span>
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">set_ylabel</span><span style="color:#111">(</span><span style="color:#d88200">r</span><span style="color:#d88200">&#39;$t$&#39;</span><span style="color:#111">)</span></code></pre></div>
+<p>多項式モデルで予測し，具体的には１次，３次，５次のモデルで予測してみた．</p>
+
+<p><img src="/img/linear_regression_with_lasso.png" alt="linear_regression_with_lasso" /></p>
+
+<p>各モデルが予測した式は以下（係数を小数点以下第一位に丸めている）であり，３次以上の項の係数は0か非常に小さな値になっている．<strong>これはL1正則化によりスパースなモデルを求めることができたことを意味する．</strong></p>
+
+<p>１次式モデル：$1.8x+5.5$</p>
+
+<p>３次式モデル：$0.0x^3 + 0.9x^2 + 2.1x + 3.1$</p>
+
+<p>５次式モデル：$0.0x^5 + 0.0x^4 + -0.1x^3 + 0.9x^2 + 2.2x + 3.1$</p>
+
+<h1 id="lassoを考慮したモデルがなぜスパースになるのかを知るには-ラグランジュの未定乗数法を知ると良い">Lassoを考慮したモデルがなぜスパースになるのかを知るには，ラグランジュの未定乗数法を知ると良い</h1>
+
+<h1 id="ラグランジュの未定乗数法とは">ラグランジュの未定乗数法とは</h1>
+
+<p>制約条件$g(x,y)=0$が与えられた状態で，関数$f(x,y)$の最小値または最大値を求めるために便利なのがラグランジュの未定乗数法である．具体的には，ラグランジュ関数$L(x,y)$とラグランジュ乗数$\lambda$を用いて，以下を解けば良い．</p>
+
+<div class="mathjax">
+$$
+L(x,y,\lambda) = f(x,y) - \lambda g(x,y) \\
+\frac{ \partial L }{ \partial x } = \frac{ \partial L }{ \partial y } = \frac{ \partial L }{ \partial \lambda } = 0
+$$
+</div>
+
+<h1 id="なぜこれで停留点を求めることができるか">なぜこれで停留点を求めることができるか</h1>
+
+<div class="mathjax">
+$$
+\frac{ \partial L }{ \partial x } = \frac{ \partial L }{ \partial y } = 0
+$$
+</div>
+
+<p>を行列で書き直すと，</p>
+
+<div class="mathjax">
+$$
+\begin{pmatrix} 
+\frac{ \partial f(x,y) }{ \partial x } \\ 
+\frac{ \partial f(x,y) }{ \partial y }
+\end{pmatrix}
+=
+\lambda
+\begin{pmatrix} 
+\frac{ \partial g(x,y) }{ \partial x } \\ 
+\frac{ \partial g(x,y) }{ \partial y }
+\end{pmatrix}
+$$
+</div>
+
+<p>となり，ベクトル$\partial g$をλ倍したものがベクトル$\partial f$であることを表している．では，ベクトル$\partial g$とは何か．</p>
+
+<p>制約面$g(x,y)=0$上の点$(x_0,y_0)$と$(x_0+\delta x, y_0+\delta y)$を考えると，$(x_0,y_0)$の周りでのテイラー展開より以下が得られる．</p>
+
+<div class="mathjax">
+$$
+g(x_0+\delta x, y_0+\delta y) \simeq g(x_0,y_0) + \left. \frac{ \partial g(x,y) }{ \partial x } \right|_{ (x_0,y_0) } \delta x + \left. \frac{ \partial g(x,y) }{ \partial y }\right|_{ (x_0,y_0) } \delta y
+$$
+</div>
+
+<p>いま，$(x_0,y_0)$と$(x_0+\delta x, y_0+\delta y)$は制約面上に存在しているので，$g(x_0,y_0)=g(x_0+\delta x, y_0+\delta y)$が成立するためには，以下が成り立つ必要がある．</p>
+
+<div class="mathjax">
+$$
+\left. \frac{ \partial g(x,y) }{ \partial x } \right|_{ (x_0,y_0) } \delta x + \left. \frac{ \partial g(x,y) }{ \partial y } \right|_{ (x_0,y_0) } \delta y = 0
+$$
+</div>
+
+<p>内積で書き直すと，</p>
+
+<div class="mathjax">
+$$
+\begin{pmatrix} 
+\frac{ \partial g(x,y) }{ \partial x } \\ 
+\frac{ \partial g(x,y) }{ \partial y }
+\end{pmatrix}_{ (x_0,y_0) }
+\cdot
+\begin{pmatrix} 
+\delta x \\ 
+\delta y
+\end{pmatrix}
+
+= 0
+$$
+</div>
+
+<p>$\delta x$と$\delta y$が十分に小さければ，$(\delta x, \delta y)$は点$(x_0,y_0)$における制約面$g$の接線を表すので，ベクトル$(\frac{ \partial g(x,y) }{ \partial x }, \frac{ \partial g(x,y) }{ \partial y })$は接線の法線ベクトルを表す．</p>
+
+<p>先程の</p>
+
+<div class="mathjax">
+$$
+\begin{pmatrix} 
+\frac{ \partial f(x,y) }{ \partial x } \\ 
+\frac{ \partial f(x,y) }{ \partial y }
+\end{pmatrix}
+=
+\lambda
+\begin{pmatrix} 
+\frac{ \partial g(x,y) }{ \partial x } \\ 
+\frac{ \partial g(x,y) }{ \partial y }
+\end{pmatrix}
+$$
+</div>
+
+<p>より，ベクトル$\partial g$とベクトル$\partial f$が点$(x_0,y_0)$で並行であれば，その点で$f(x,y)$が停留点を持つ．</p>
+
+<p>「ベクトル$\partial g$とベクトル$\partial f$が点$(x_0,y_0)$で並行である」という部分が肝である．例えば，下図において，制約条件$g(x,y)=0$は赤の等高線，$f(x,y)$はc1,c2,c3の等高線で表し，c1 &lt; c2 &lt; c3 とすると，勾配$\nabla f$は図のようになる(わざと$g(x,y)=0$と$f(x,y)=c2$が接するように描いている)．ラグランジュ乗数法により勾配$\nabla g$と勾配$\nabla f$が並行な点，すなわち(x0,y0)において，$g(x,y)=0$を満たす$f(x,y)$の停留点（下図の場合は最小値)となることがわかる．</p>
+
+<p><img src="/img/lagrange_multiplier.svg" alt="lagrange_multiplier" /></p>
+
+<h1 id="nabla-g-に対する1次独立性が必要">$\nabla g$に対する1次独立性が必要</h1>
+
+<p>制約条件$g$が複数ある場合，ラグランジュの未定乗数法によって最適解を求めるためには，$\nabla g$がそれぞれ1次独立である必要がある．1次独立な$\nabla g$と$\lambda$の線形和によって，$\nabla f$を表現する必要があることが理由．</p>
+
+<h1 id="最適性の２次の十分条件を満たせば局所最適解">最適性の２次の十分条件を満たせば局所最適解</h1>
+
+<p>関数$f,g_1,&hellip;,g_p$は二階微分可能とし，局所最適解を$x^*$とする．$\nabla g_1(x^*),&hellip;,\nabla g_p(x^*)$は１次独立であり，ラグランジュ乗数を$\lambda^*_1,&hellip;,\lambda^*_p \in \mathbb{ R }$とする．</p>
+
+<p>ここで，部分空間$S$を以下のように定義する．</p>
+
+<div class="mathjax">
+$$
+S = \{y \in \mathbb{ R } | \nabla g_i(x^*)^T y =0, i=1,...,p \}
+$$
+</div>
+
+<p>更に，行列$L \in \mathbb{ R }^{n \times n}$を以下のように定義する．</p>
+
+<div class="mathjax">
+$$
+L = \nabla^2 f(x^*) + \displaystyle \sum_{ i = 1 }^{ m } \lambda_i^* \nabla^2 g_i(x^*)
+$$
+</div>
+
+<p>これら$S,L$について，$y \in S, y \neq 0$を用いて，以下を満たせば$x^*$は局所最適解である．</p>
+
+<div class="mathjax">
+$$
+y^T L y \gt 0
+$$
+</div>
+
+<p>つまり，ヘッセ行列$L$が正定値であれば，$x^*$は局所最適解である．</p>
+
+<p>ちなみに，２次の必要条件は，上記ヘッセ行列が半正定値であるという，十分条件を緩くしたものになる．</p>
+
+<h1 id="ラグランジュ乗数法のkkt条件">ラグランジュ乗数法のKKT条件</h1>
+
+<p>これまでは制約条件$g(x,y)$が0である元で議論してきたが，$g(x,y)$に範囲がある場合を考える．</p>
+
+<p>下図において，$g(x,y)=0$を赤の等高線で表し，内側に向かって$g(x,y)$が大きくなっているとすると，$g(x,y) \gt 0$は楕円の内部に該当し，勾配$\nabla g$は図のような向きになる．また，$f(x,y)$を緑の等高線で表し，c1 &lt; c2 &lt; c3 であるとすると，勾配$\nabla f$は図のような向きになる．</p>
+
+<p><img src="/img/lagrange_multiplier_kkt1.svg" alt="lagrange_multiplier_kkt1" /></p>
+
+<p>この場合，「制約条件$g(x,y) \geq 0$の元で$f(x,y)$を最大にする点」をラグランジュ乗数法により，点(x0,y0)と求めることができる．</p>
+
+<p>また，「制約条件$g(x,y) \geq 0$の元で$f(x,y)$を最小にする点」は，ラグランジュ乗数法により，下図の点(x1,y1)と求めることができる．</p>
+
+<p><img src="/img/lagrange_multiplier_kkt2.svg" alt="lagrange_multiplier_kkt2" /></p>
+
+<p>更に，下図の場合，「制約条件$g(x,y) \geq 0$の元で$f(x,y)$を最大にする点」は，c1 &lt; c2 &lt; c3 であるとするなら，ラグランジュ乗数法のλを0とし，単に$f(x,y)$の最大点を求めれば良いので，点(x2,y2)と求まる．</p>
+
+<p><img src="/img/lagrange_multiplier_kkt3.svg" alt="lagrange_multiplier_kkt3" /></p>
+
+<p>これらの条件をまとめたものが以下のKKT条件(Karush-Kuhn-Tucker condition)である．</p>
+
+<ul>
+<li>$g(x,y) \geq 0$の元で$f(x,y)$を<strong>最大化</strong>するには以下を解く</li>
+</ul>
+
+<div class="mathjax">
+$$
+L(x,y,\lambda) = f(x,y) + \lambda g(x,y) \\
+\frac{ \partial L }{ \partial x } = \frac{ \partial L }{ \partial y } = \frac{ \partial L }{ \partial \lambda } = 0 \\ 
+g(x,y) \geq 0 \\
+\lambda \geq 0 \\
+\lambda g(x,y) = 0
+$$
+</div>
+
+<ul>
+<li>$g(x,y) \geq 0$の元で$f(x,y)$を<strong>最小化</strong>するには以下を解く</li>
+</ul>
+
+<div class="mathjax">
+$$
+L(x,y,\lambda) = f(x,y) - \lambda g(x,y) \\
+\frac{ \partial L }{ \partial x } = \frac{ \partial L }{ \partial y } = \frac{ \partial L }{ \partial \lambda } = 0 \\
+g(x,y) \geq 0 \\
+\lambda \geq 0 \\
+\lambda g(x,y) = 0
+$$
+</div>
+
+<p>条件式がややこしく見えるが，言っていることは単純で，「最大化したいのか最小化したいのかに注意し，勾配$\nabla f$と$\nabla g$の向きをλの正負で制御して，ラグランジュ乗数法を解け」ということである．</p>
+
+<p>$\lambda g(x) = 0$は相補性条件と呼ばれ，$\lambda$または$g(x)$のどちらかが0になることを表している．</p>
+
+<h1 id="正則化とラグランジュ乗数法">正則化とラグランジュ乗数法</h1>
+
+<p>以下の二乗和誤差と正則化項を合わせた関数$E(\boldsymbol{w})$を最小化したいとする．ξは正則化項の係数であり，正であるとする．</p>
+
+<div class="mathjax">
+$$
+E(\boldsymbol{w})
+=
+\frac{1}{2} \sum_{n=1}^{N} \{\boldsymbol{w}^{\mathrm{T}} \boldsymbol{x_n} - t_n\}^2 + \xi \sum_{i=1}^{D} | w_i |^q
+$$
+</div>
+
+<p>いま，以下の二乗和誤差の最小値を</p>
+
+<div class="mathjax">
+$$
+f(\boldsymbol w) 
+= 
+\frac{1}{2} \sum_{n=1}^{N} \{\boldsymbol{w}^{\mathrm{T}} \boldsymbol{x_n} - t_n\}^2
+$$
+</div>
+
+<p>以下の制約条件で求めるとする．</p>
+
+<div class="mathjax">
+$$
+g(\boldsymbol w)
+=
+\eta - \sum_{i=1}^{D} | w_i |^q
+$$
+</div>
+
+<p>$f(\boldsymbol w)$の最小化には，KKT条件$g(\boldsymbol w) \geq 0$と$\lambda \geq 0$の元で，以下のラグランジュ関数を解く必要がある．</p>
+
+<div class="mathjax">
+$$
+L(\boldsymbol {w},\lambda) = f(\boldsymbol w) - \lambda g(\boldsymbol w) \\
+\frac{ \partial L }{ \partial \boldsymbol{w} } = 0 
+$$
+</div>
+
+<p>ここで，</p>
+
+<div class="mathjax">
+$$
+\frac{ \partial L }{ \partial \boldsymbol{w} } = \frac{ \partial}{ \partial \boldsymbol{w} } \{ \frac{1}{2} \sum_{n=1}^{N} \{\boldsymbol{w}^{\mathrm{T}} \boldsymbol{x_n} - t_n\}^2 + \lambda \sum_{i=1}^{D} | w_i |^q \} = 0
+$$
+</div>
+
+<p>であるので，$\lambda = \xi$とすると，内部的には，二乗和誤差+正則化の最小値を求めていることになる．$\xi &gt; 0$であるので，$\lambda &gt; 0$である必要が出てくる．KKT条件$\lambda g(\boldsymbol w) = 0$より，$g(\boldsymbol w) = 0$なので以下が成り立つ．</p>
+
+<div class="mathjax">
+$$
+\eta = \sum_{i=1}^{D} | w_i |^q
+$$
+</div>
+
+<p>q=1のときの$f(\boldsymbol w)$と$g(\boldsymbol w)$を以下のように図示してみた．</p>
+
+<p><img src="/img/visualize_of_lasso.svg" alt="visualize_of_lasso" /></p>
+
+<p>更に，断面を簡易的に図示してみた．ラグランジュ乗数法の仕組みにより，制約条件$g$の元で，関数$f$の停留点を求めるには，勾配ベクトル$\nabla g$のスカラーλ倍したものが，勾配ベクトル$\nabla f$と並行である必要があるので，停留点はもちろん，ηもλに依存する．</p>
+
+<p><img src="/img/fragment_of_lasso.svg" alt="fragment_of_lasso" /></p>
+
+<p>上図の停留点においてw1=0となっている．疎（スパース）な解が得られている例であり，lassoの特徴である．この特徴を用いることで，モデルの複雑さを抑えることができるが，必ずスパースな解が得られるとは限らない．例えば，下図のような場合はスパースでない解が得られ，関数f(w)が制約条件g(w)&gt;0内に入っている場合は，関数f(w)そのものの最小値となる．</p>
+
+<p><img src="/img/visualize_of_lasso_without_sparse.svg" alt="visualize_of_lasso_without_sparse" /></p>
+
+<h1 id="近接勾配法">近接勾配法</h1>
+
+<p>つづく</p>
+
+    <div class="share">
+    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fsubdifferential%2f&text=%e5%8a%a3%e5%be%ae%e5%88%86%e3%81%a8Lasso%e3%81%ab%e3%82%88%e3%82%8b%e3%82%b9%e3%83%91%e3%83%bc%e3%82%b9%e6%80%a7 - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
+    <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fsubdifferential%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
+    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fsubdifferential%2f&title=%e5%8a%a3%e5%be%ae%e5%88%86%e3%81%a8Lasso%e3%81%ab%e3%82%88%e3%82%8b%e3%82%b9%e3%83%91%e3%83%bc%e3%82%b9%e6%80%a7 - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
+</div>
+  </div>
+  <footer class="post-footer">
+    
+  </footer>
+</article>
+<footer class="footer">
+  <span>&copy; 2020 yasakura</span>
+</footer>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [['$','$'], ['\\(','\\)']],
+      processEscapes: true
+    },
+    linebreaks: {
+      automatic: true
+    }
+  });
+</script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+</body>
+</html>
+

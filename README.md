@@ -1,1 +1,1 @@
-# yasakurara.github.io
+# yasakura.hugo

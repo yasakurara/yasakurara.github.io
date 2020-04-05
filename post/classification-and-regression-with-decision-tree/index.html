@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  
+  <title>決定木で分類と回帰を行う - yasakura</title>
+  
+  <meta name="description" content="モチベーション  決定木で分類と回帰をやりたい なぜ決定木で分類と回帰ができるのかを知りたい scikit-learnでサクッとやりたい  scikit-learnのDecisionTreeClassifierで分類する 2つの特徴量$X_0,X_1$からなる，以下のようなデータセットを分類したい．
+from sklearn.datasets import make_moons import matplotlib.pyplot as plt from matplotlib.colors import ListedColormap # style colors = [&#39;#e74c3c&#39;, &#39;#3498db&#39;, &#39;#1abc9c&#39;, &#39;#9b59b6&#39;, &#39;#f1c40f&#39;] # red, blue, green, purple, yellow cmap = ListedColormap(colors) plt.style.use(&#39;seaborn&#39;) X, y = make_moons(n_samples=100, noise=0.25, random_state=0) plt.figure(figsize=(4,4)) plt.scatter(X[:,0], X[:,1], c=y, cmap=cmap, marker=&#39;.&#39;) plt.ylabel(&#39;X0&#39;) plt.xlabel(&#39;X1&#39;) plt.show() scikit-learnのDecisionTreeClassifierで分類した結果が以下である．
+ 1.10. Decision Trees Users Guide sklearn.tree.DecisionTreeClassifier  from sklearn.datasets import make_moons from matplotlib.colors import ListedColormap from sklearn.">
+  
+  <link href=/css/style.css rel="stylesheet">
+  
+  <link href=/css/font.css rel="stylesheet">
+  
+  <link rel="icon" href="https://yasakura.meimg/favicon.ico">
+  
+  <link rel="alternate" type="application/atom+xml" href="https://yasakura.meindex.xml" title="yasakura">
+  
+</head>
+<body>
+  <header class="header">
+    <div class="title"><a href="https://yasakura.me">yasakura</a></div>
+    <nav id="navigation">
+      <ul class="menu">
+        <li><a href="https://yasakura.meabout/">ABOUT</a></li>
+      </ul>
+    </nav>
+  </header>
+<article class="post post-view">
+  <header class="post-header">
+    <p class="post-meta">2020.4.1</p>
+    <h1 class="post-title">決定木で分類と回帰を行う</h1>
+    
+  </header>
+  <div class="post-content">
+    <div class="share">
+    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fclassification-and-regression-with-decision-tree%2f&text=%e6%b1%ba%e5%ae%9a%e6%9c%a8%e3%81%a7%e5%88%86%e9%a1%9e%e3%81%a8%e5%9b%9e%e5%b8%b0%e3%82%92%e8%a1%8c%e3%81%86 - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
+    <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fclassification-and-regression-with-decision-tree%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
+    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fclassification-and-regression-with-decision-tree%2f&title=%e6%b1%ba%e5%ae%9a%e6%9c%a8%e3%81%a7%e5%88%86%e9%a1%9e%e3%81%a8%e5%9b%9e%e5%b8%b0%e3%82%92%e8%a1%8c%e3%81%86 - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
+</div>
+    
+
+<h1 id="モチベーション">モチベーション</h1>
+
+<ul>
+<li>決定木で分類と回帰をやりたい</li>
+<li>なぜ決定木で分類と回帰ができるのかを知りたい</li>
+<li>scikit-learnでサクッとやりたい</li>
+</ul>
+
+<h1 id="scikit-learnのdecisiontreeclassifierで分類する">scikit-learnのDecisionTreeClassifierで分類する</h1>
+
+<p>2つの特徴量$X_0,X_1$からなる，以下のようなデータセットを分類したい．</p>
+
+<p><img src="/img/dataset_moon.png" alt="dataset_moon" /></p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> <span style="color:#111">sklearn.datasets</span> <span style="color:#f92672">import</span> <span style="color:#111">make_moons</span>
+<span style="color:#f92672">import</span> <span style="color:#111">matplotlib.pyplot</span> <span style="color:#f92672">as</span> <span style="color:#111">plt</span>
+<span style="color:#f92672">from</span> <span style="color:#111">matplotlib.colors</span> <span style="color:#f92672">import</span> <span style="color:#111">ListedColormap</span>
+
+<span style="color:#75715e"># style</span>
+<span style="color:#111">colors</span> <span style="color:#f92672">=</span> <span style="color:#111">[</span><span style="color:#d88200">&#39;#e74c3c&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#3498db&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#1abc9c&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#9b59b6&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#f1c40f&#39;</span><span style="color:#111">]</span> <span style="color:#75715e"># red, blue, green, purple, yellow</span>
+<span style="color:#111">cmap</span> <span style="color:#f92672">=</span> <span style="color:#111">ListedColormap</span><span style="color:#111">(</span><span style="color:#111">colors</span><span style="color:#111">)</span>
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">style</span><span style="color:#f92672">.</span><span style="color:#111">use</span><span style="color:#111">(</span><span style="color:#d88200">&#39;seaborn&#39;</span><span style="color:#111">)</span>
+
+<span style="color:#111">X</span><span style="color:#111">,</span> <span style="color:#111">y</span> <span style="color:#f92672">=</span> <span style="color:#111">make_moons</span><span style="color:#111">(</span><span style="color:#111">n_samples</span><span style="color:#f92672">=</span><span style="color:#ae81ff">100</span><span style="color:#111">,</span> <span style="color:#111">noise</span><span style="color:#f92672">=</span><span style="color:#ae81ff">0.25</span><span style="color:#111">,</span> <span style="color:#111">random_state</span><span style="color:#f92672">=</span><span style="color:#ae81ff">0</span><span style="color:#111">)</span>
+
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">figure</span><span style="color:#111">(</span><span style="color:#111">figsize</span><span style="color:#f92672">=</span><span style="color:#111">(</span><span style="color:#ae81ff">4</span><span style="color:#111">,</span><span style="color:#ae81ff">4</span><span style="color:#111">))</span>
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">scatter</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">[:,</span><span style="color:#ae81ff">0</span><span style="color:#111">],</span> <span style="color:#111">X</span><span style="color:#111">[:,</span><span style="color:#ae81ff">1</span><span style="color:#111">],</span> <span style="color:#111">c</span><span style="color:#f92672">=</span><span style="color:#111">y</span><span style="color:#111">,</span> <span style="color:#111">cmap</span><span style="color:#f92672">=</span><span style="color:#111">cmap</span><span style="color:#111">,</span> <span style="color:#111">marker</span><span style="color:#f92672">=</span><span style="color:#d88200">&#39;.&#39;</span><span style="color:#111">)</span>
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">ylabel</span><span style="color:#111">(</span><span style="color:#d88200">&#39;X0&#39;</span><span style="color:#111">)</span>
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">xlabel</span><span style="color:#111">(</span><span style="color:#d88200">&#39;X1&#39;</span><span style="color:#111">)</span>
+
+
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">show</span><span style="color:#111">()</span></code></pre></div>
+<p>scikit-learnのDecisionTreeClassifierで分類した結果が以下である．</p>
+
+<ul>
+<li><a href="https://scikit-learn.org/stable/modules/tree.html">1.10. Decision Trees Users Guide</a></li>
+<li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html#sklearn.tree.DecisionTreeClassifier">sklearn.tree.DecisionTreeClassifier</a></li>
+</ul>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">from</span> <span style="color:#111">sklearn.datasets</span> <span style="color:#f92672">import</span> <span style="color:#111">make_moons</span>
+<span style="color:#f92672">from</span> <span style="color:#111">matplotlib.colors</span> <span style="color:#f92672">import</span> <span style="color:#111">ListedColormap</span>
+<span style="color:#f92672">from</span> <span style="color:#111">sklearn.tree</span> <span style="color:#f92672">import</span> <span style="color:#111">DecisionTreeClassifier</span><span style="color:#111">,</span> <span style="color:#111">export_graphviz</span>
+<span style="color:#f92672">import</span> <span style="color:#111">pydotplus</span>
+<span style="color:#f92672">import</span> <span style="color:#111">matplotlib.pyplot</span> <span style="color:#f92672">as</span> <span style="color:#111">plt</span>
+<span style="color:#f92672">import</span> <span style="color:#111">numpy</span> <span style="color:#f92672">as</span> <span style="color:#111">np</span>
+
+<span style="color:#75715e"># style</span>
+<span style="color:#111">colors</span> <span style="color:#f92672">=</span> <span style="color:#111">[</span><span style="color:#d88200">&#39;#e74c3c&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#3498db&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#1abc9c&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#9b59b6&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#f1c40f&#39;</span><span style="color:#111">]</span> <span style="color:#75715e"># red, blue, green, purple, yellow</span>
+<span style="color:#111">cmap</span> <span style="color:#f92672">=</span> <span style="color:#111">ListedColormap</span><span style="color:#111">(</span><span style="color:#111">colors</span><span style="color:#111">)</span>
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">style</span><span style="color:#f92672">.</span><span style="color:#111">use</span><span style="color:#111">(</span><span style="color:#d88200">&#39;seaborn&#39;</span><span style="color:#111">)</span>
+
+<span style="color:#00a8c8">def</span> <span style="color:#75af00">paint_classified_area</span><span style="color:#111">(</span><span style="color:#111">ax</span><span style="color:#111">,</span> <span style="color:#111">clf</span><span style="color:#111">,</span> <span style="color:#111">X</span><span style="color:#111">,</span> <span style="color:#111">t</span><span style="color:#111">,</span> <span style="color:#111">nx</span><span style="color:#f92672">=</span><span style="color:#ae81ff">100</span><span style="color:#111">,</span> <span style="color:#111">ny</span><span style="color:#f92672">=</span><span style="color:#ae81ff">100</span><span style="color:#111">,</span> <span style="color:#111">margin</span><span style="color:#f92672">=</span><span style="color:#ae81ff">0.1</span><span style="color:#111">):</span>
+    <span style="color:#111">x_min</span><span style="color:#111">,</span> <span style="color:#111">x_max</span> <span style="color:#f92672">=</span> <span style="color:#111">(</span><span style="color:#ae81ff">1</span> <span style="color:#f92672">+</span> <span style="color:#111">margin</span><span style="color:#111">)</span> <span style="color:#f92672">*</span> <span style="color:#111">X</span><span style="color:#111">[:,</span><span style="color:#ae81ff">0</span><span style="color:#111">]</span><span style="color:#f92672">.</span><span style="color:#111">min</span><span style="color:#111">()</span> <span style="color:#f92672">-</span> <span style="color:#111">margin</span> <span style="color:#f92672">*</span> <span style="color:#111">X</span><span style="color:#111">[:,</span><span style="color:#ae81ff">0</span><span style="color:#111">]</span><span style="color:#f92672">.</span><span style="color:#111">max</span><span style="color:#111">(),</span> <span style="color:#111">(</span><span style="color:#ae81ff">1</span> <span style="color:#f92672">+</span> <span style="color:#111">margin</span><span style="color:#111">)</span> <span style="color:#f92672">*</span> <span style="color:#111">X</span><span style="color:#111">[:,</span><span style="color:#ae81ff">0</span><span style="color:#111">]</span><span style="color:#f92672">.</span><span style="color:#111">max</span><span style="color:#111">()</span> <span style="color:#f92672">-</span> <span style="color:#111">margin</span> <span style="color:#f92672">*</span> <span style="color:#111">X</span><span style="color:#111">[:,</span><span style="color:#ae81ff">0</span><span style="color:#111">]</span><span style="color:#f92672">.</span><span style="color:#111">min</span><span style="color:#111">()</span>
+    <span style="color:#111">y_min</span><span style="color:#111">,</span> <span style="color:#111">y_max</span> <span style="color:#f92672">=</span> <span style="color:#111">(</span><span style="color:#ae81ff">1</span> <span style="color:#f92672">+</span> <span style="color:#111">margin</span><span style="color:#111">)</span> <span style="color:#f92672">*</span> <span style="color:#111">X</span><span style="color:#111">[:,</span><span style="color:#ae81ff">1</span><span style="color:#111">]</span><span style="color:#f92672">.</span><span style="color:#111">min</span><span style="color:#111">()</span> <span style="color:#f92672">-</span> <span style="color:#111">margin</span> <span style="color:#f92672">*</span> <span style="color:#111">X</span><span style="color:#111">[:,</span><span style="color:#ae81ff">1</span><span style="color:#111">]</span><span style="color:#f92672">.</span><span style="color:#111">max</span><span style="color:#111">(),</span> <span style="color:#111">(</span><span style="color:#ae81ff">1</span> <span style="color:#f92672">+</span> <span style="color:#111">margin</span><span style="color:#111">)</span> <span style="color:#f92672">*</span> <span style="color:#111">X</span><span style="color:#111">[:,</span><span style="color:#ae81ff">1</span><span style="color:#111">]</span><span style="color:#f92672">.</span><span style="color:#111">max</span><span style="color:#111">()</span> <span style="color:#f92672">-</span> <span style="color:#111">margin</span> <span style="color:#f92672">*</span> <span style="color:#111">X</span><span style="color:#111">[:,</span><span style="color:#ae81ff">1</span><span style="color:#111">]</span><span style="color:#f92672">.</span><span style="color:#111">min</span><span style="color:#111">()</span>
+    <span style="color:#111">xx</span><span style="color:#111">,</span> <span style="color:#111">yy</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">meshgrid</span><span style="color:#111">(</span><span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">linspace</span><span style="color:#111">(</span><span style="color:#111">x_min</span><span style="color:#111">,</span> <span style="color:#111">x_max</span><span style="color:#111">,</span> <span style="color:#111">nx</span><span style="color:#111">),</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">linspace</span><span style="color:#111">(</span><span style="color:#111">y_min</span><span style="color:#111">,</span> <span style="color:#111">y_max</span><span style="color:#111">,</span> <span style="color:#111">ny</span><span style="color:#111">))</span>
+    <span style="color:#111">Z</span> <span style="color:#f92672">=</span> <span style="color:#111">(</span><span style="color:#111">clf</span><span style="color:#f92672">.</span><span style="color:#111">predict</span><span style="color:#111">(</span><span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">c_</span><span style="color:#111">[</span><span style="color:#111">xx</span><span style="color:#f92672">.</span><span style="color:#111">ravel</span><span style="color:#111">(),</span> <span style="color:#111">yy</span><span style="color:#f92672">.</span><span style="color:#111">ravel</span><span style="color:#111">()]))</span><span style="color:#f92672">.</span><span style="color:#111">reshape</span><span style="color:#111">(</span><span style="color:#111">xx</span><span style="color:#f92672">.</span><span style="color:#111">shape</span><span style="color:#111">)</span>
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">contourf</span><span style="color:#111">(</span><span style="color:#111">xx</span><span style="color:#111">,</span> <span style="color:#111">yy</span><span style="color:#111">,</span> <span style="color:#111">Z</span><span style="color:#111">,</span> <span style="color:#111">alpha</span><span style="color:#f92672">=</span><span style="color:#ae81ff">0.1</span><span style="color:#111">,</span> <span style="color:#111">colors</span><span style="color:#f92672">=</span><span style="color:#111">colors</span><span style="color:#111">)</span>
+
+<span style="color:#00a8c8">def</span> <span style="color:#75af00">export_tree_graph</span><span style="color:#111">(</span><span style="color:#111">graph_name</span><span style="color:#111">,</span> <span style="color:#111">features</span><span style="color:#111">,</span> <span style="color:#111">classes</span><span style="color:#111">):</span>
+    <span style="color:#111">dot_name</span><span style="color:#f92672">=</span><span style="color:#d88200">&#34;./dtc.dot&#34;</span>
+    <span style="color:#111">export_graphviz</span><span style="color:#111">(</span><span style="color:#111">dtc</span><span style="color:#111">,</span> 
+                    <span style="color:#111">out_file</span><span style="color:#f92672">=</span><span style="color:#111">dot_name</span><span style="color:#111">,</span> 
+                    <span style="color:#111">impurity</span> <span style="color:#f92672">=</span> <span style="color:#111">False</span><span style="color:#111">,</span> 
+                    <span style="color:#111">filled</span> <span style="color:#f92672">=</span> <span style="color:#111">False</span><span style="color:#111">,</span>
+                    <span style="color:#111">class_names</span><span style="color:#f92672">=</span><span style="color:#111">classes</span><span style="color:#111">,</span>
+                    <span style="color:#111">feature_names</span><span style="color:#f92672">=</span><span style="color:#111">features</span><span style="color:#111">)</span>
+    <span style="color:#111">graph</span> <span style="color:#f92672">=</span> <span style="color:#111">pydotplus</span><span style="color:#f92672">.</span><span style="color:#111">graph_from_dot_file</span><span style="color:#111">(</span><span style="color:#111">dot_name</span><span style="color:#111">)</span>
+    <span style="color:#111">graph</span><span style="color:#f92672">.</span><span style="color:#111">write_png</span><span style="color:#111">(</span><span style="color:#111">graph_name</span><span style="color:#111">)</span>
+
+<span style="color:#111">fig</span><span style="color:#111">,</span> <span style="color:#111">ax</span> <span style="color:#f92672">=</span> <span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">subplots</span><span style="color:#111">(</span><span style="color:#ae81ff">1</span><span style="color:#111">,</span> <span style="color:#ae81ff">3</span><span style="color:#111">,</span> <span style="color:#111">figsize</span> <span style="color:#f92672">=</span> <span style="color:#111">(</span><span style="color:#ae81ff">15</span><span style="color:#111">,</span> <span style="color:#ae81ff">5</span><span style="color:#111">))</span>
+
+<span style="color:#111">X</span><span style="color:#111">,</span> <span style="color:#111">y</span> <span style="color:#f92672">=</span> <span style="color:#111">make_moons</span><span style="color:#111">(</span><span style="color:#111">n_samples</span><span style="color:#f92672">=</span><span style="color:#ae81ff">100</span><span style="color:#111">,</span> <span style="color:#111">noise</span><span style="color:#f92672">=</span><span style="color:#ae81ff">0.25</span><span style="color:#111">,</span> <span style="color:#111">random_state</span><span style="color:#f92672">=</span><span style="color:#ae81ff">0</span><span style="color:#111">)</span>
+<span style="color:#00a8c8">for</span> <span style="color:#111">max_depth</span><span style="color:#111">,</span> <span style="color:#111">ax</span> <span style="color:#f92672">in</span> <span style="color:#111">zip</span><span style="color:#111">([</span><span style="color:#ae81ff">1</span><span style="color:#111">,</span><span style="color:#ae81ff">3</span><span style="color:#111">,</span><span style="color:#ae81ff">9</span><span style="color:#111">],</span> <span style="color:#111">ax</span><span style="color:#111">):</span>
+    <span style="color:#111">dtc</span> <span style="color:#f92672">=</span> <span style="color:#111">DecisionTreeClassifier</span><span style="color:#111">(</span><span style="color:#111">criterion</span><span style="color:#f92672">=</span><span style="color:#d88200">&#34;entropy&#34;</span><span style="color:#111">,</span><span style="color:#111">max_depth</span><span style="color:#f92672">=</span><span style="color:#111">max_depth</span><span style="color:#111">,</span> <span style="color:#111">random_state</span><span style="color:#f92672">=</span><span style="color:#ae81ff">0</span><span style="color:#111">)</span>
+    <span style="color:#111">dtc</span><span style="color:#f92672">.</span><span style="color:#111">fit</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">,</span> <span style="color:#111">y</span><span style="color:#111">)</span>
+    <span style="color:#00a8c8">print</span><span style="color:#111">(</span><span style="color:#d88200">&#34;accuracy:{:.3f}&#34;</span><span style="color:#f92672">.</span><span style="color:#111">format</span><span style="color:#111">(</span><span style="color:#111">dtc</span><span style="color:#f92672">.</span><span style="color:#111">score</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">,</span> <span style="color:#111">y</span><span style="color:#111">)))</span>
+
+    <span style="color:#111">paint_classified_area</span><span style="color:#111">(</span><span style="color:#111">ax</span><span style="color:#111">,</span> <span style="color:#111">dtc</span><span style="color:#111">,</span> <span style="color:#111">X</span><span style="color:#111">,</span> <span style="color:#111">y</span><span style="color:#111">)</span>
+    
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">scatter</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">[:,</span><span style="color:#ae81ff">0</span><span style="color:#111">],</span> <span style="color:#111">X</span><span style="color:#111">[:,</span><span style="color:#ae81ff">1</span><span style="color:#111">],</span> <span style="color:#111">c</span><span style="color:#f92672">=</span><span style="color:#111">y</span><span style="color:#111">,</span> <span style="color:#111">cmap</span><span style="color:#f92672">=</span><span style="color:#111">cmap</span><span style="color:#111">,</span> <span style="color:#111">marker</span><span style="color:#f92672">=</span><span style="color:#d88200">&#39;.&#39;</span><span style="color:#111">)</span>
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">set_title</span><span style="color:#111">(</span><span style="color:#d88200">&#39;max_depth : {}&#39;</span><span style="color:#f92672">.</span><span style="color:#111">format</span><span style="color:#111">(</span><span style="color:#111">max_depth</span><span style="color:#111">))</span>
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">set_xlabel</span><span style="color:#111">(</span><span style="color:#d88200">&#34;X [0]&#34;</span><span style="color:#111">)</span>
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">set_ylabel</span><span style="color:#111">(</span><span style="color:#d88200">&#34;X [1]&#34;</span><span style="color:#111">)</span>
+    
+    <span style="color:#111">export_tree_graph</span><span style="color:#111">(</span>
+        <span style="color:#111">graph_name</span> <span style="color:#f92672">=</span> <span style="color:#d88200">&#34;dtc{}.png&#34;</span><span style="color:#f92672">.</span><span style="color:#111">format</span><span style="color:#111">(</span><span style="color:#111">max_depth</span><span style="color:#111">),</span>
+        <span style="color:#111">features</span> <span style="color:#f92672">=</span> <span style="color:#111">[</span><span style="color:#d88200">&#34;X[0]&#34;</span><span style="color:#111">,</span><span style="color:#d88200">&#34;X[1]&#34;</span><span style="color:#111">],</span>
+        <span style="color:#111">classes</span> <span style="color:#f92672">=</span> <span style="color:#111">[</span><span style="color:#d88200">&#34;upper&#34;</span><span style="color:#111">,</span><span style="color:#d88200">&#34;lower&#34;</span><span style="color:#111">])</span></code></pre></div>
+<p><img src="/img/decision_tree_139.png" alt="decision_tree_139" /></p>
+
+<p><img src="/img/dtc139.svg" alt="dtc139" /></p>
+
+<p>DecisionTreeClassifierのcriterionとしてentropyを指定した．最大深さ9の決定木について，深さ6で葉が純粋になっている．</p>
+
+<p>DecisionTreeClassifierの<code>.score(X, y)</code>にて，データへのフィッティング具合を知ることができる．今回は0.780, 0.880, 1.000であり，最大深さ９の場合が（<strong>訓練データセットに</strong>）一番フィットしている事になった．ただし，<code>.score(X, y)</code>が大きいからと言って，未知データの予測精度が高いわけではないことに注意する．訓練データセットに過剰適合していることが常である．</p>
+
+<p>DecisionTreeClassifierの<code>.feature_importances_</code>にて，分割に貢献している特徴量を知ることができる．最大の深さが1の場合の<code>.feature_importances_</code>は[0. 1.]となり，特徴量X1で分割されたことが反映されている．また，最大深さが9の場合の<code>.feature_importances_</code>は[0.49836396 0.50163604]となり，特徴量X0とX1でまんべんなく分割されていることが反映されている．</p>
+
+<h1 id="エントロピー-で-情報のあいまいさ-を表現する">「エントロピー」で「情報のあいまいさ」を表現する</h1>
+
+<p>「情報のあいまいさ」を定量的に表すことについて考えてみる．</p>
+
+<p>コインを投げて表が出る確率は1/2であり，６面のサイコロを投げて１の目が出る確率は1/6である．感覚としては，コインの表裏を予想するよりもサイコロの目を予想する方が「あいまいさ」が増す． また，サイコロを２回投げる場合を予想するとなると，１回分を予想するよりもあいまいになった気がする．</p>
+
+<p>サイコロを投げる事象は独立であるので，サイコロを２回投げたときに出る目は，1/6と1/6の積をとり，1/36の確率で予想できることになる．確率は低くなったが，あいまいさが増したと感じる．</p>
+
+<p>ここまでの話を一般化すると，xが起きる確率をp(x)とおくと，２つの事象x,yが独立なら，p(x,y)=p(x)p(y)が成り立ち，また，x事象に関するあいまいさをh(x)とすると，２つの独立な事象x,yに関して，h(x,y)=h(x)+h(y)が成り立つような「何か」が欲しいということになる．ということで先人は以下の式を情報のあいまいさとした．</p>
+
+<div class="mathjax">
+$$
+h(x)=-\log_2 {p(x)}
+$$
+</div>
+
+<p>これなら，確率が低ければ低いほどあいまいになることを表現できるし，確率の積によってあいまいさの和を表現することもできる．対数の底は何でもよく，２にすることが多いらしい．h(x)の単位はbit．</p>
+
+<p>ここで，８つの文字{a,b,c,d,e,f,g,h}を袋に詰め，袋から１文字を取り出すクソゲーをする．８文字それぞれが1/8の確率で取り出せることが保証されている場合，１文字あたりの情報のあいまいさは3bitなので，８文字ぶんのあいまいさの期待値（平均）をとると，このクソゲーの「あいまいさの平均」は3bitとなる．
+一方，{a,b,c,d,e,f,g,h}のそれぞれの確率が <sup>1</sup>&frasl;<sub>2</sub>, <sup>1</sup>&frasl;<sub>4</sub>, <sup>1</sup>&frasl;<sub>8</sub>, <sup>1</sup>&frasl;<sub>16</sub>, <sup>1</sup>&frasl;<sub>64</sub>, <sup>1</sup>&frasl;<sub>64</sub>, <sup>1</sup>&frasl;<sub>64</sub>, <sup>1</sup>&frasl;<sub>64</sub> であるとすると，{a,b,c,d,e,f,g,h}のそれぞれの複雑さは1bit, 2bit, 3bit, 4bit, 6bit, 6bit, 6bit, 6bit となる．このあいまいさの期待値（平均）を計算すると2bitになるので，この場合のクソゲーの「あいまいさの平均」は2bitとなる．つまり，{a}が出やすいという情報を知ることで，あいまいさが減ったということを表している．</p>
+
+<p>このような「あいまいさの平均」を<strong>情報エントロピー</strong>といい，各事象の確率次第で「あいまいさの平均」は変化することがわかる．</p>
+
+<p>事象$X_1,X_2,&hellip;,X_n$のそれぞれの確率を$p_1,p_2,&hellip;,p_n$とすると，全事象$X$のエントロピー$H[X]$は以下で表せる．</p>
+
+<div class="mathjax">
+$$
+H[X]=-\sum_{n} p_i \log_2 {p_i}
+$$
+</div>
+
+<p>事象$X=X_1,X_2$のそれぞれの確率を$p,p-1$とした場合（＝ベルヌーイ分布に従う場合）のエントロピー$H[X]$は次の図のように表せる．事象ごとの確率にばらつきがない場合にエントロピーが最も高くなり，ある事象だけ確率が極端に大きい/小さいときに，エントロピーが低くなることがわかる．表（または裏）のみが極端に出やすいコインはエントロピーが低く，表裏が等確率で出るコインはエントロピーが高い．</p>
+
+<p><img src="/img/entropy.png" alt="entropy" /></p>
+
+<h1 id="エントロピーの大小を基準にして決定木を構築する">エントロピーの大小を基準にして決定木を構築する</h1>
+
+<p>エントロピーを求めるには，予め，各事象（各クラス）の確率（割合）を求めておく必要がある．</p>
+
+<p>ノードmに属するクラスkの割合$p(m,k)$を求めるための式は以下である．$(x_i,y_i)$は（特徴量，クラス），Rmはノード（葉）m内のデータ集合，Nmはノードmに属するすべてのデータ数を表す．</p>
+
+<div class="mathjax">
+$$
+p(m,k) = \frac{1}{N_m} \sum_{x_i \in R_m} I(y_i = k)
+$$
+</div>
+
+<p>ノードmに関する情報エントロピーは以下の式で求められる．交差エントロピー誤差関数とも呼ぶ．</p>
+
+<div class="mathjax">
+$$
+H[X_m]=-　\sum_{k} p(m,k) \log_2 {p(m,k)}
+$$
+</div>
+
+<p>分割前のデータセットをノード0とすると，ノード0のエントロピー$H[X_0]$は1.0である．これは，クラスが未知の特徴量(X0,X1)が与えられたとき，この特徴量がクラス0なのかクラス1なのか見分けられない（あいまいさが大きい）ことを意味する．</p>
+
+<p>早速，冒頭で紹介した月形のデータセットを分割していく．まず，特徴量X1に着目し，X1を降順にソートした上で，クラスを見てみる．</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> <span style="color:#111">pandas</span> <span style="color:#f92672">as</span> <span style="color:#111">pd</span>
+
+<span style="color:#111">df</span> <span style="color:#f92672">=</span> <span style="color:#111">pd</span><span style="color:#f92672">.</span><span style="color:#111">DataFrame</span><span style="color:#111">({</span><span style="color:#d88200">&#34;X0&#34;</span><span style="color:#111">:</span><span style="color:#111">X</span><span style="color:#111">[:,</span><span style="color:#ae81ff">0</span><span style="color:#111">],</span><span style="color:#d88200">&#34;X1&#34;</span><span style="color:#111">:</span><span style="color:#111">X</span><span style="color:#111">[:,</span><span style="color:#ae81ff">1</span><span style="color:#111">],</span><span style="color:#d88200">&#34;_class&#34;</span><span style="color:#111">:</span><span style="color:#111">y</span><span style="color:#111">})</span>
+<span style="color:#111">df</span><span style="color:#f92672">.</span><span style="color:#111">sort_values</span><span style="color:#111">(</span><span style="color:#111">by</span><span style="color:#f92672">=</span><span style="color:#d88200">&#34;X1&#34;</span><span style="color:#111">,</span> <span style="color:#111">ascending</span><span style="color:#f92672">=</span><span style="color:#111">False</span><span style="color:#111">)</span><span style="color:#f92672">.</span><span style="color:#111">head</span><span style="color:#111">(</span><span style="color:#ae81ff">5</span><span style="color:#111">)</span></code></pre></div>
+<p>X1が大きい部分はクラス0のみだが，X1が小さくなる方をみていくと，クラス1のデータが出てくる．</p>
+
+<table>
+<thead>
+<tr>
+<th align="right">X0</th>
+<th align="right">X1</th>
+<th align="right">_class</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="right">-0.796819</td>
+<td align="right">0.649555</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td align="right">0.724286</td>
+<td align="right">0.610817</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td align="right">-0.652006</td>
+<td align="right">0.610241</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td align="right">1.114994</td>
+<td align="right">0.589595</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td align="right">2.081867</td>
+<td align="right">0.572525</td>
+<td align="right">1</td>
+</tr>
+</tbody>
+</table>
+
+<p>とりあえず，分割軸をX1=0.589595とX1=0.572525の中間とする．</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#111">df</span><span style="color:#f92672">.</span><span style="color:#111">sort_values</span><span style="color:#111">(</span><span style="color:#111">by</span><span style="color:#f92672">=</span><span style="color:#d88200">&#34;X1&#34;</span><span style="color:#111">,</span> <span style="color:#111">ascending</span><span style="color:#f92672">=</span><span style="color:#111">False</span><span style="color:#111">)</span><span style="color:#f92672">.</span><span style="color:#111">query</span><span style="color:#111">(</span><span style="color:#d88200">&#39;X1 &gt; 0.581060&#39;</span><span style="color:#111">)</span><span style="color:#f92672">.</span><span style="color:#111">count</span><span style="color:#111">()</span>
+
+<span style="color:#111">X0</span>       <span style="color:#ae81ff">28</span>
+<span style="color:#111">X1</span>       <span style="color:#ae81ff">28</span>
+<span style="color:#111">_class</span>    <span style="color:#ae81ff">28</span></code></pre></div>
+<p>これで，28点のクラス0のみを含んだノード1と，22点のクラス0，50点のクラス1を含んだノード2に分割したことになる．</p>
+
+<p>ノード1のエントロピー$H[X_1]$は，ノード1内にクラス0しか含まれていないことから，0.0である．</p>
+
+<p>ノード2のエントロピー$H[X_2]$は$- \frac{22}{72} \log \frac{22}{72} - \frac{50}{72} \log \frac{50}{72} = 0.615498$になる．</p>
+
+<p>で，ノード0から各ノードにどれだけデータが分岐したのかを重み付けすることで，ノード1と2全体でのエントロピーを算出する．</p>
+
+<div class="mathjax">
+$$
+\frac{28}{100} H[X_1] + \frac{72}{100} H[X_2] = 0.443159
+$$
+</div>
+
+<p>この値はノード0の$H[X_0] = 1.0$よりも小さいので，今回の分割によってあいまいさを小さくすることができたと言える．つまり，クラスが未知なデータ(X0,X1)が与えられたとき，X1が0.581060より大きな特徴量「クラス0だ」と予想でき，X1が0.581060より小さな特徴量は「クラス１である可能性が高い」と分類することができる．</p>
+
+<p>元ノードと分岐後のノードのエントロピーの差分を「情報ゲイン」と言うらしい．情報ゲインが最大になるような分割軸を探していく．</p>
+
+<p>試しに，更にX1が小さくなる方を見ていく．例えば，X1=0.18065とX1=0.164730の中間である0.172690らへんを分割軸にしてみる．</p>
+
+<table>
+<thead>
+<tr>
+<th align="right">X0</th>
+<th align="right">X1</th>
+<th align="right">_class</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="right">0.162802</td>
+<td align="right">0.217376</td>
+<td align="right">1</td>
+</tr>
+
+<tr>
+<td align="right">-1.238857</td>
+<td align="right">0.205974</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td align="right">-1.036595</td>
+<td align="right">0.195670</td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td align="right">0.803637</td>
+<td align="right"><strong>0.180650</strong></td>
+<td align="right">0</td>
+</tr>
+
+<tr>
+<td align="right">2.017774</td>
+<td align="right"><strong>0.164730</strong></td>
+<td align="right">1</td>
+</tr>
+</tbody>
+</table>
+
+<p>X1 &gt; 0.172690 なクラス0は43点，クラス1は11点あるらしい．</p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#111">df</span><span style="color:#f92672">.</span><span style="color:#111">sort_values</span><span style="color:#111">(</span><span style="color:#111">by</span><span style="color:#f92672">=</span><span style="color:#d88200">&#34;X1&#34;</span><span style="color:#111">,</span> <span style="color:#111">ascending</span><span style="color:#f92672">=</span><span style="color:#111">False</span><span style="color:#111">)</span><span style="color:#f92672">.</span><span style="color:#111">query</span><span style="color:#111">(</span><span style="color:#d88200">&#39;X1 &gt; 0.172690&#39;</span><span style="color:#111">)[</span><span style="color:#d88200">&#39;_class&#39;</span><span style="color:#111">]</span><span style="color:#f92672">.</span><span style="color:#111">value_counts</span><span style="color:#111">()</span>
+
+<span style="color:#ae81ff">0</span>    <span style="color:#ae81ff">43</span>
+<span style="color:#ae81ff">1</span>    <span style="color:#ae81ff">11</span>
+<span style="color:#111">Name</span><span style="color:#111">:</span> <span style="color:#111">_class</span><span style="color:#111">,</span> <span style="color:#111">dtype</span><span style="color:#111">:</span> <span style="color:#111">int64</span></code></pre></div>
+<p>X1 = 0.172690 で分割された事によってできた２つの領域（ノード）について，それぞれエントロピーを求める．</p>
+
+<div class="mathjax">
+$$
+H[X_1] = - \frac{43}{54} \log \frac{43}{54} - \frac{11}{54} \log \frac{11}{54}　= 0.505494 
+$$
+</div>
+
+<div class="mathjax">
+$$
+H[X_2] = - \frac{7}{46} \log \frac{7}{46} - \frac{39}{46} \log \frac{39}{46}　= 0.426461
+$$
+</div>
+
+<p>元のノードから分岐したデータの割合で重み付けをする．</p>
+
+<div class="mathjax">
+$$
+ \frac{54}{100} H[X_1] + \frac{46}{100} H[X_2] = 0.469137
+$$
+</div>
+
+<p>今回の情報ゲインは先に求めた情報ゲインよりも小さくなってしまったので，先程の分割の方が優秀であると言える．</p>
+
+<p>X0についても同様に検証（分割テストと言う）していき，エントロピーが小さくなるような分割軸を探していく．</p>
+
+<p>ここまでで，深さ（葉）が１の決定木ができたことになる．</p>
+
+<h1 id="ジニ不純度で決定木を構築する">ジニ不純度で決定木を構築する</h1>
+
+<p>DecisionTreeClassifierのcriterionには，&rdquo;gini&rdquo;が指定できる．</p>
+
+<p>ノードmのジニ不純度$H[X_m]$は以下の式で与えられる．</p>
+
+<div class="mathjax">
+$$
+H[X_m] = \sum_{k} p_{mk} (1-p_{mk})
+$$
+</div>
+
+<p>$p_{mk}$は先に述べたように，ノードmに属するクラスkの割合を表す．$(x_i,y_i)$は（特徴量，クラス），$R_m$はノードm内のデータ集合，$N_m$はノードmに属するすべてのデータ数を表す．</p>
+
+<div class="mathjax">
+$$
+p_{mk} = \frac{1}{N_m} \sum_{x_i \in R_m} I(y_i = k)
+$$
+</div>
+
+<p>事象$X=X_1,X_2$のそれぞれの確率を$p,p-1$とした場合（＝事象Xがベルヌーイ分布に従う場合）のジニ不純度とエントロピーをプロットしてみた．（ジニ不純度の最大値とエントロピーの最大値が一致するようにジニ不純度を２倍した）</p>
+
+<p><img src="/img/entropy_gini.png" alt="entropy_gini" /></p>
+
+<p>ジニ不純度とエントロピーを比較すると，エントロピーのグラフはp=0.0と1.0付近が急峻であるため，<strong>ノードが純粋であることを好む</strong>．一方，ジニ不純度のグラフはp=0.0と1.0付近が緩やかであるが，0.5付近は急峻であるため，<strong>ノードが純粋であることは強要しないが，p=0.5付近は白黒つけるぞ</strong>という気持ちがある．</p>
+
+<p><img src="/img/comparison_entropy_gini.png" alt="comparison_entropy_gini" /></p>
+
+<p>scikit-learnのDecisionTreeClassifierのcriterionにginiを設定した結果が以下である．</p>
+
+<p><img src="/img/decision_tree_gini_139.png" alt="decision_tree_gini_139" />
+<img src="/img/dtc_gini_139.svg" alt="dtc_gini_139" /></p>
+
+<table>
+<thead>
+<tr>
+<th align="right">.score()</th>
+<th align="right">.feature_importances_</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="right">0.820</td>
+<td align="right">[0. 1.]</td>
+</tr>
+
+<tr>
+<td align="right">0.920</td>
+<td align="right">[0.39375244 0.60624756]</td>
+</tr>
+
+<tr>
+<td align="right">1.000</td>
+<td align="right">[0.47248044 0.52751956]</td>
+</tr>
+</tbody>
+</table>
+
+<p>今回は，最大深さ9の場合にて，過剰適合を確認することができる．訓練データに対して<code>.score()</code>が1.0であるが，図を見てみると，気持ち悪い分割の仕方をしている部分がある．</p>
+
+<h1 id="scikit-learnのdecisiontreeregressorで回帰する">scikit-learnのDecisionTreeRegressorで回帰する</h1>
+
+<p>特徴量$X$とラベル$t$からなる，以下のようなノイズを含んだ正弦波を回帰したい．</p>
+
+<p><img src="/img/sin_wave_with_noise.png" alt="sin_wave_with_noise" /></p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> <span style="color:#111">numpy</span> <span style="color:#f92672">as</span> <span style="color:#111">np</span>
+<span style="color:#f92672">import</span> <span style="color:#111">matplotlib.pyplot</span> <span style="color:#f92672">as</span> <span style="color:#111">plt</span>
+<span style="color:#f92672">from</span> <span style="color:#111">matplotlib.colors</span> <span style="color:#f92672">import</span> <span style="color:#111">ListedColormap</span>
+
+<span style="color:#111">colors</span> <span style="color:#f92672">=</span> <span style="color:#111">[</span><span style="color:#d88200">&#39;#e74c3c&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#3498db&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#1abc9c&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#9b59b6&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#f1c40f&#39;</span><span style="color:#111">]</span> <span style="color:#75715e"># red, blue, green, purple, yellow</span>
+<span style="color:#111">cmap</span> <span style="color:#f92672">=</span> <span style="color:#111">ListedColormap</span><span style="color:#111">(</span><span style="color:#111">colors</span><span style="color:#111">)</span>
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">style</span><span style="color:#f92672">.</span><span style="color:#111">use</span><span style="color:#111">(</span><span style="color:#d88200">&#39;seaborn&#39;</span><span style="color:#111">)</span>
+
+<span style="color:#111">seed</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">random</span><span style="color:#f92672">.</span><span style="color:#111">RandomState</span><span style="color:#111">(</span><span style="color:#ae81ff">1</span><span style="color:#111">)</span>
+<span style="color:#111">X</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">sort</span><span style="color:#111">(</span><span style="color:#ae81ff">5</span> <span style="color:#f92672">*</span> <span style="color:#111">seed</span><span style="color:#f92672">.</span><span style="color:#111">rand</span><span style="color:#111">(</span><span style="color:#ae81ff">100</span><span style="color:#111">,</span> <span style="color:#ae81ff">1</span><span style="color:#111">),</span> <span style="color:#111">axis</span><span style="color:#f92672">=</span><span style="color:#ae81ff">0</span><span style="color:#111">)</span>
+<span style="color:#111">t</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">sin</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">)</span><span style="color:#f92672">.</span><span style="color:#111">ravel</span><span style="color:#111">()</span>
+<span style="color:#111">t</span><span style="color:#111">[::</span><span style="color:#ae81ff">5</span><span style="color:#111">]</span> <span style="color:#f92672">+=</span> <span style="color:#ae81ff">0.5</span> <span style="color:#f92672">-</span> <span style="color:#111">seed</span><span style="color:#f92672">.</span><span style="color:#111">rand</span><span style="color:#111">(</span><span style="color:#ae81ff">20</span><span style="color:#111">)</span>
+
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">figure</span><span style="color:#111">(</span><span style="color:#111">figsize</span><span style="color:#f92672">=</span><span style="color:#111">(</span><span style="color:#ae81ff">5</span><span style="color:#111">,</span><span style="color:#ae81ff">5</span><span style="color:#111">))</span>
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">scatter</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">,</span> <span style="color:#111">t</span><span style="color:#111">,</span> <span style="color:#111">marker</span><span style="color:#f92672">=</span><span style="color:#d88200">&#39;.&#39;</span><span style="color:#111">)</span>
+
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">xlabel</span><span style="color:#111">(</span><span style="color:#d88200">&#34;X&#34;</span><span style="color:#111">)</span>
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">ylabel</span><span style="color:#111">(</span><span style="color:#d88200">&#34;t&#34;</span><span style="color:#111">)</span>
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">show</span><span style="color:#111">()</span></code></pre></div>
+<p>scikit-learnのDecisionTreeRegressorで回帰した結果が以下である．</p>
+
+<ul>
+<li><a href="https://scikit-learn.org/stable/modules/tree.html">1.10. Decision Trees Users Guide</a></li>
+<li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeRegressor.html#sklearn.tree.DecisionTreeRegressor">sklearn.tree.DecisionTreeRegressor</a></li>
+</ul>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> <span style="color:#111">numpy</span> <span style="color:#f92672">as</span> <span style="color:#111">np</span>
+<span style="color:#f92672">import</span> <span style="color:#111">matplotlib.pyplot</span> <span style="color:#f92672">as</span> <span style="color:#111">plt</span>
+<span style="color:#f92672">from</span> <span style="color:#111">matplotlib.colors</span> <span style="color:#f92672">import</span> <span style="color:#111">ListedColormap</span>
+
+<span style="color:#111">colors</span> <span style="color:#f92672">=</span> <span style="color:#111">[</span><span style="color:#d88200">&#39;#e74c3c&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#3498db&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#1abc9c&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#9b59b6&#39;</span><span style="color:#111">,</span> <span style="color:#d88200">&#39;#f1c40f&#39;</span><span style="color:#111">]</span> <span style="color:#75715e"># red, blue, green, purple, yellow</span>
+<span style="color:#111">cmap</span> <span style="color:#f92672">=</span> <span style="color:#111">ListedColormap</span><span style="color:#111">(</span><span style="color:#111">colors</span><span style="color:#111">)</span>
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">style</span><span style="color:#f92672">.</span><span style="color:#111">use</span><span style="color:#111">(</span><span style="color:#d88200">&#39;seaborn&#39;</span><span style="color:#111">)</span>
+
+<span style="color:#111">seed</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">random</span><span style="color:#f92672">.</span><span style="color:#111">RandomState</span><span style="color:#111">(</span><span style="color:#ae81ff">1</span><span style="color:#111">)</span>
+<span style="color:#111">X</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">sort</span><span style="color:#111">(</span><span style="color:#ae81ff">5</span> <span style="color:#f92672">*</span> <span style="color:#111">seed</span><span style="color:#f92672">.</span><span style="color:#111">rand</span><span style="color:#111">(</span><span style="color:#ae81ff">100</span><span style="color:#111">,</span> <span style="color:#ae81ff">1</span><span style="color:#111">),</span> <span style="color:#111">axis</span><span style="color:#f92672">=</span><span style="color:#ae81ff">0</span><span style="color:#111">)</span>
+<span style="color:#111">t</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">sin</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">)</span><span style="color:#f92672">.</span><span style="color:#111">ravel</span><span style="color:#111">()</span>
+<span style="color:#111">t</span><span style="color:#111">[::</span><span style="color:#ae81ff">5</span><span style="color:#111">]</span> <span style="color:#f92672">+=</span> <span style="color:#ae81ff">0.5</span> <span style="color:#f92672">-</span> <span style="color:#111">seed</span><span style="color:#f92672">.</span><span style="color:#111">rand</span><span style="color:#111">(</span><span style="color:#ae81ff">20</span><span style="color:#111">)</span>
+
+<span style="color:#f92672">from</span> <span style="color:#111">sklearn</span> <span style="color:#f92672">import</span> <span style="color:#111">tree</span>
+
+<span style="color:#111">fig</span><span style="color:#111">,</span> <span style="color:#111">ax</span> <span style="color:#f92672">=</span> <span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">subplots</span><span style="color:#111">(</span><span style="color:#ae81ff">1</span><span style="color:#111">,</span> <span style="color:#ae81ff">3</span><span style="color:#111">,</span> <span style="color:#111">figsize</span> <span style="color:#f92672">=</span> <span style="color:#111">(</span><span style="color:#ae81ff">15</span><span style="color:#111">,</span> <span style="color:#ae81ff">5</span><span style="color:#111">))</span>
+
+<span style="color:#00a8c8">for</span> <span style="color:#111">max_depth</span><span style="color:#111">,</span> <span style="color:#111">ax</span> <span style="color:#f92672">in</span> <span style="color:#111">zip</span><span style="color:#111">([</span><span style="color:#ae81ff">1</span><span style="color:#111">,</span><span style="color:#ae81ff">3</span><span style="color:#111">,</span><span style="color:#ae81ff">9</span><span style="color:#111">],</span> <span style="color:#111">ax</span><span style="color:#111">):</span>
+
+    <span style="color:#111">dtr</span> <span style="color:#f92672">=</span> <span style="color:#111">tree</span><span style="color:#f92672">.</span><span style="color:#111">DecisionTreeRegressor</span><span style="color:#111">(</span><span style="color:#111">criterion</span><span style="color:#f92672">=</span><span style="color:#d88200">&#39;mse&#39;</span><span style="color:#111">,</span> <span style="color:#111">max_depth</span><span style="color:#f92672">=</span><span style="color:#111">max_depth</span><span style="color:#111">)</span>
+    <span style="color:#111">dtr</span><span style="color:#f92672">.</span><span style="color:#111">fit</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">,</span> <span style="color:#111">t</span><span style="color:#111">)</span>
+    <span style="color:#00a8c8">print</span><span style="color:#111">(</span><span style="color:#d88200">&#34;accuracy:{:.3f}&#34;</span><span style="color:#f92672">.</span><span style="color:#111">format</span><span style="color:#111">(</span><span style="color:#111">dtr</span><span style="color:#f92672">.</span><span style="color:#111">score</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">,</span> <span style="color:#111">y</span><span style="color:#111">)))</span>
+
+    <span style="color:#111">N</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1000</span>
+    <span style="color:#111">_X</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">zeros</span><span style="color:#111">((</span><span style="color:#111">N</span><span style="color:#111">,</span><span style="color:#ae81ff">1</span><span style="color:#111">))</span>
+    <span style="color:#111">_X</span><span style="color:#111">[:,</span><span style="color:#ae81ff">0</span><span style="color:#111">]</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">random</span><span style="color:#f92672">.</span><span style="color:#111">uniform</span><span style="color:#111">(</span><span style="color:#ae81ff">0</span><span style="color:#111">,</span> <span style="color:#ae81ff">5.0</span><span style="color:#111">,</span> <span style="color:#111">N</span><span style="color:#111">)</span>
+    <span style="color:#111">_y</span> <span style="color:#f92672">=</span> <span style="color:#111">dtr</span><span style="color:#f92672">.</span><span style="color:#111">predict</span><span style="color:#111">(</span><span style="color:#111">_X</span><span style="color:#111">)</span>
+
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">set_title</span><span style="color:#111">(</span><span style="color:#d88200">&#39;max_depth : {}&#39;</span><span style="color:#f92672">.</span><span style="color:#111">format</span><span style="color:#111">(</span><span style="color:#111">max_depth</span><span style="color:#111">))</span>
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">scatter</span><span style="color:#111">(</span><span style="color:#111">X</span><span style="color:#111">,</span> <span style="color:#111">t</span><span style="color:#111">,</span> <span style="color:#111">cmap</span><span style="color:#f92672">=</span><span style="color:#111">cmap</span><span style="color:#111">,</span> <span style="color:#111">marker</span><span style="color:#f92672">=</span><span style="color:#d88200">&#39;.&#39;</span><span style="color:#111">)</span>
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">scatter</span><span style="color:#111">(</span><span style="color:#111">_X</span><span style="color:#111">,</span> <span style="color:#111">_y</span><span style="color:#111">,</span> <span style="color:#111">cmap</span><span style="color:#f92672">=</span><span style="color:#111">cmap</span><span style="color:#111">,</span> <span style="color:#111">marker</span><span style="color:#f92672">=</span><span style="color:#d88200">&#39;.&#39;</span><span style="color:#111">)</span>
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">set_xlabel</span><span style="color:#111">(</span><span style="color:#d88200">&#34;X&#34;</span><span style="color:#111">)</span>
+    <span style="color:#111">ax</span><span style="color:#f92672">.</span><span style="color:#111">set_ylabel</span><span style="color:#111">(</span><span style="color:#d88200">&#34;t&#34;</span><span style="color:#111">)</span></code></pre></div>
+<p><img src="/img/decision_tree_regression_mse_139.png" alt="decision_tree_regression_mse_139" /></p>
+
+<p>今回はDecisionTreeRegressorのcriterionにmse(Mean Squared Error)を指定している．</p>
+
+<p>緑点がtの予測値であり，最大深さ9の場合においてノイズに過剰適合している部分がある．</p>
+
+<h1 id="平均二乗誤差を基準にして回帰木を構築する">平均二乗誤差を基準にして回帰木を構築する</h1>
+
+<p>木モデルは，分割軸を特徴空間の軸に沿わせているために，本質的には，<strong>準最適</strong>となってしまう．特徴軸に対して45度傾いた境界で分割することはできないことに留意する．</p>
+
+<p>上の<code>max_depth : 1</code>の例では，X=3を閾値として，データ・セットを左右に分割している．</p>
+
+<p>回帰木において，ノードm内の最適な予測値$y(m)$は，以下のようなノード内の平均値としている．$x_i$は特徴量，Rmはノードm内のデータ集合，Nmはノードmに属するすべてのデータ数を表す．</p>
+
+<div class="mathjax">
+$$
+y(m) = \frac{1}{N_m} \sum_{x_i \in R_m} t_i
+$$
+</div>
+
+<p>ノードmに関する平均二乗誤差(Mean Squared Error)は以下の式で求められる．ノードm内のデータに関して，$y(m)$からのばらつきを表現するものである．</p>
+
+<div class="mathjax">
+$$
+H[X_m] = \frac{1}{N_m} \sum_{x_i \in R_m} (t_i - y(m))^2
+$$
+</div>
+
+<p>分割によってできた２つのノードに対し，$H[X_m]$をそれぞれ計算し，分岐したデータ数で重み付けした和が元ノードのそれよりも<strong>小さく</strong>なるような閾値をひたすら探していくことで木を構築する．</p>
+
+<h1 id="平均絶対誤差を基準にして回帰木を構築する">平均絶対誤差を基準にして回帰木を構築する</h1>
+
+<p>ノードmに関する平均絶対誤差(Mean Absolute Error)は以下の式で求められる．$y(m)$は前述した通りである．</p>
+
+<div class="mathjax">
+$$
+H[X_m] = \frac{1}{N_m} \sum_{x_i \in R_m} |t_i - y(m)|
+$$
+</div>
+
+<p>DecisionTreeRegressorのcriterionにmaeを指定した結果が以下である．</p>
+
+<p><img src="/img/decision_tree_regression_mae_139.png" alt="decision_tree_regression_mae_139" /></p>
+
+<p>先程のMSEの場合はノイズに過敏であったが，MAEを用いた場合はノイズに対してロバストになっている．</p>
+
+<p>二乗誤差と絶対誤差を比較すると，以下のように誤差(diff)が大きいほど，squared errorは反応しやすいことがわかる．</p>
+
+<p><img src="/img/comparison_squared_absolute.png" alt="comparison_squared_absolute" /></p>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> <span style="color:#111">numpy</span> <span style="color:#f92672">as</span> <span style="color:#111">np</span>
+<span style="color:#f92672">import</span> <span style="color:#111">matplotlib.pyplot</span> <span style="color:#f92672">as</span> <span style="color:#111">plt</span>
+
+<span style="color:#111">diff</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">arange</span><span style="color:#111">(</span><span style="color:#f92672">-</span><span style="color:#ae81ff">2</span><span style="color:#111">,</span><span style="color:#ae81ff">2.1</span><span style="color:#111">,</span><span style="color:#ae81ff">0.1</span><span style="color:#111">)</span>
+<span style="color:#111">squared</span> <span style="color:#f92672">=</span> <span style="color:#111">diff</span><span style="color:#f92672">**</span><span style="color:#ae81ff">2</span>
+<span style="color:#111">absolute</span> <span style="color:#f92672">=</span> <span style="color:#111">abs</span><span style="color:#111">(</span><span style="color:#111">diff</span><span style="color:#111">)</span>
+
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">figure</span><span style="color:#111">(</span><span style="color:#111">figsize</span><span style="color:#f92672">=</span><span style="color:#111">(</span><span style="color:#ae81ff">5</span><span style="color:#111">,</span><span style="color:#ae81ff">5</span><span style="color:#111">))</span>
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">plot</span><span style="color:#111">(</span><span style="color:#111">diff</span><span style="color:#111">,</span> <span style="color:#111">squared</span><span style="color:#111">,</span> <span style="color:#111">label</span><span style="color:#f92672">=</span><span style="color:#d88200">&#39;squared error&#39;</span><span style="color:#111">)</span>
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">plot</span><span style="color:#111">(</span><span style="color:#111">diff</span><span style="color:#111">,</span> <span style="color:#111">absolute</span><span style="color:#111">,</span> <span style="color:#111">label</span><span style="color:#f92672">=</span><span style="color:#d88200">&#39;absolute error&#39;</span><span style="color:#111">)</span>
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">ylabel</span><span style="color:#111">(</span><span style="color:#d88200">&#39;H[X]&#39;</span><span style="color:#111">)</span>
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">xlabel</span><span style="color:#111">(</span><span style="color:#d88200">&#39;diff&#39;</span><span style="color:#111">)</span>
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">legend</span><span style="color:#111">()</span>
+<span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">show</span><span style="color:#111">()</span></code></pre></div>
+<h1 id="回帰木では外挿-extrapolate-ができないことに注意する">回帰木では外挿(extrapolate)ができないことに注意する</h1>
+
+<p>今回の例では，0.0 &lt; X &lt; 5.0 な教師データを用いてDecisionTreeRegressorに学習させたが，このXを超えるようなデータを予測させると以下のようになる．</p>
+
+<p><img src="/img/cant_extrapolate.png" alt="cant_extrapolate" /></p>
+
+<h1 id="appendix-決定木-ノード-を可視化するために必要なもの">Appendix. 決定木（ノード）を可視化するために必要なもの</h1>
+
+<p><code>pip install pydotplus</code><br />
+<code>pip install graphviz</code><br />
+<code>brew install graphviz</code></p>
+
+    <div class="share">
+    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fclassification-and-regression-with-decision-tree%2f&text=%e6%b1%ba%e5%ae%9a%e6%9c%a8%e3%81%a7%e5%88%86%e9%a1%9e%e3%81%a8%e5%9b%9e%e5%b8%b0%e3%82%92%e8%a1%8c%e3%81%86 - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
+    <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fclassification-and-regression-with-decision-tree%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
+    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fclassification-and-regression-with-decision-tree%2f&title=%e6%b1%ba%e5%ae%9a%e6%9c%a8%e3%81%a7%e5%88%86%e9%a1%9e%e3%81%a8%e5%9b%9e%e5%b8%b0%e3%82%92%e8%a1%8c%e3%81%86 - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
+</div>
+  </div>
+  <footer class="post-footer">
+    
+  </footer>
+</article>
+<footer class="footer">
+  <span>&copy; 2020 yasakura</span>
+</footer>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [['$','$'], ['\\(','\\)']],
+      processEscapes: true
+    },
+    linebreaks: {
+      automatic: true
+    }
+  });
+</script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+</body>
+</html>
+
