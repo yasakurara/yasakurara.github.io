@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-162790219-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-162790219-1');
+  </script>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  
+  <title>Gitをやっていく - yasakura</title>
+  
+  <meta name="description" content="モチベーション  個人的に普段よく使うGitコマンドについて自分なりにまとめておきたい Pro Gitだとカロリー過多  Repositoryを用意する Local Repositoryから始める  git init &lt;directory&gt;  &lt;directory&gt;をLocal repositoryとする． &lt;directory&gt;内に.gitという隠しフォルダが作成される．Gitの諸々は.gitで管理されることになる．   Remote Repositoryから始める  GitHubにSSH公開鍵を登録しておく
+ cd ~/.ssh ssh-keygen -t rsa -b 4096で鍵作成 pbcopy &lt; ~/.ssh/id_rsa.pubで公開鍵をクリップボードにコピー SSH and GPG keysのNew SSH keyに公開鍵をコピペ ~/.ssh/configに接続先を登録
+Host &lt;nickname&gt; HostName github.com IdentityFile &lt;秘密鍵へのパス&gt; User git  ssh -T &lt;nickname&gt;で接続確認
+ Hi XXX! You&#39;ve successfully authenticated, but GitHub does not provide shell access.と言われれば優勝   git clone https://&lt;repository&gt;.">
+  
+  <link href=/css/style.css rel="stylesheet">
+  
+  <link href=/css/font.css rel="stylesheet">
+  
+  <link rel="icon" href="https://yasakura.meimg/favicon.ico">
+  
+  <link rel="alternate" type="application/atom+xml" href="https://yasakura.meindex.xml" title="yasakura">
+  
+</head>
+<body>
+  <header class="header">
+    <div class="title"><a href="https://yasakura.me">yasakura</a></div>
+    <nav id="navigation">
+      <ul class="menu">
+        <li><a href="https://yasakura.me/about/">ABOUT</a></li>
+      </ul>
+    </nav>
+  </header>
+<article class="post post-view">
+  <header class="post-header">
+    <p class="post-meta">2020.8.8</p>
+    <h1 class="post-title">Gitをやっていく</h1>
+    
+  </header>
+  <div class="post-content">
+    <div class="share">
+    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fhow-to-use-git%2f&text=Git%e3%82%92%e3%82%84%e3%81%a3%e3%81%a6%e3%81%84%e3%81%8f - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
+    <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fhow-to-use-git%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
+    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fhow-to-use-git%2f&title=Git%e3%82%92%e3%82%84%e3%81%a3%e3%81%a6%e3%81%84%e3%81%8f - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
+</div>
+    
+
+<h1 id="モチベーション">モチベーション</h1>
+
+<ul>
+<li>個人的に普段よく使うGitコマンドについて自分なりにまとめておきたい</li>
+<li><a href="https://git-scm.com/book/ja/v2">Pro Git</a>だとカロリー過多</li>
+</ul>
+
+<h1 id="repositoryを用意する">Repositoryを用意する</h1>
+
+<h2 id="local-repositoryから始める">Local Repositoryから始める</h2>
+
+<ul>
+<li><code>git init &lt;directory&gt;</code>
+
+<ul>
+<li><code>&lt;directory&gt;</code>をLocal repositoryとする．</li>
+<li><code>&lt;directory&gt;</code>内に<code>.git</code>という隠しフォルダが作成される．Gitの諸々は<code>.git</code>で管理されることになる．</li>
+</ul></li>
+</ul>
+
+<h2 id="remote-repositoryから始める">Remote Repositoryから始める</h2>
+
+<ol>
+<li><p>GitHubにSSH公開鍵を登録しておく</p>
+
+<ol>
+<li><code>cd ~/.ssh</code></li>
+<li><code>ssh-keygen -t rsa -b 4096</code>で鍵作成</li>
+<li><code>pbcopy &lt; ~/.ssh/id_rsa.pub</code>で公開鍵をクリップボードにコピー</li>
+<li><a href="https://github.com/settings/keys">SSH and GPG keys</a>の<code>New SSH key</code>に公開鍵をコピペ</li>
+
+<li><p><code>~/.ssh/config</code>に接続先を登録</p>
+
+<pre><code>Host &lt;nickname&gt;
+HostName github.com
+IdentityFile &lt;秘密鍵へのパス&gt;
+User git
+</code></pre></li>
+
+<li><p><code>ssh -T &lt;nickname&gt;</code>で接続確認</p>
+
+<ul>
+<li><code>Hi XXX! You've successfully authenticated, but GitHub does not provide shell access.</code>と言われれば優勝</li>
+</ul></li>
+</ol></li>
+
+<li><p><code>git clone https://&lt;repository&gt;.git &lt;directory&gt;</code></p>
+
+<ul>
+<li><code>&lt;directory&gt;</code> : Local repositoryとしたいディレクトリへのパス</li>
+<li><code>&lt;directory&gt;</code>内に<code>.git</code>という隠しフォルダが作成される．Gitの諸々は<code>.git</code>で管理されることになる．</li>
+</ul></li>
+</ol>
+
+<h1 id="repositoryの初期設定をする">Repositoryの初期設定をする</h1>
+
+<h2 id="ユーザ情報を設定する">ユーザ情報を設定する</h2>
+
+<ol>
+<li><code>git config --global user.name &quot;&lt;username&gt;&quot;</code>
+
+<ul>
+<li>ローカルマシン内のすべてのlocal repositoryに触れるユーザを<code>&lt;username&gt;</code>に設定する．</li>
+<li>この設定情報は<code>~/.gitconfig</code>に保存される．</li>
+</ul></li>
+<li>Local repositroy内で<code>git config --local user.name &quot;&lt;username&gt;&quot;</code>
+
+<ul>
+<li>Local repositoryでの作業は<code>&lt;username&gt;</code>によって行われたものとしてログされていく．</li>
+<li><code>git config --local</code>により設定したものは<code>.git/config</code>に保存される．
+
+<ul>
+<li>globalとlocalをどっちも設定している場合は，localの設定が優先される．</li>
+</ul></li>
+</ul></li>
+<li>同じ要領で，<code>git config --global/local user.email</code>でメールアドレスを登録する．</li>
+</ol>
+
+<h2 id="デフォルトのエディタやmerge-tool-diff-toolを設定する">デフォルトのエディタやMerge tool, Diff toolを設定する</h2>
+
+<ul>
+<li><p><code>~/.gitconfig</code>または<code>.git/config</code>に以下を追加する．</p>
+
+<ul>
+<li>デフォルトエディタ，Marge tool, Diff toolにVSCodeを用いる場合は以下のようにする．</li>
+</ul>
+
+<pre><code>[core]
+    editor = code --wait
+[merge]
+    tool = vscode
+[mergetool &quot;vscode&quot;]
+    cmd = code --wait $MERGED
+[diff]
+    tool = vscode
+[difftool &quot;vscode&quot;]
+    cmd = code --wait --diff $LOCAL $REMOTE
+</code></pre></li>
+</ul>
+
+<h2 id="オリジナルのサブコマンドを設定する">オリジナルのサブコマンドを設定する</h2>
+
+<ul>
+<li>例えば，<code>git config --global alias.co &quot;checkout&quot;</code>
+
+<ul>
+<li><code>git co</code>で<code>git checkout</code>を呼ぶことができる</li>
+</ul></li>
+<li><code>~/.gitconfig</code>に直接設定してもよい．例えば，以下は<code>git history</code>で変更履歴を可視化するサブコマンド．</li>
+</ul>
+
+<pre><code>[alias]
+	history = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all
+</code></pre>
+
+<h2 id="設定値の確認">設定値の確認</h2>
+
+<ul>
+<li><code>git config --local -l</code>または<code>git config --global -l</code>で設定を確認できる</li>
+<li><code>~/.gitconfig</code>または<code>&lt;local repository&gt;/.git/config</code>を直接見ても良い．</li>
+</ul>
+
+<h2 id="gitで管理したくないファイルを指定する">Gitで管理したくないファイルを指定する</h2>
+
+<ul>
+<li><p>例えば，Macだと，<code>.DS_Store</code>という隠しファイルが勝手に作られてしまうので，<code>.DS_Store</code>をGitの管理対象から除くためには以下を実行すると良い．</p>
+
+<pre><code>git config --global core.excludesfile ~/.gitignore_global
+echo &quot;.DS_Store&quot; &gt;&gt; ~/.gitignore_global
+</code></pre></li>
+
+<li><p><code>git ls-files -io --exclude-standard</code>で，excludesfileにて無視されているファイル一覧を確認できる．</p></li>
+</ul>
+
+<h1 id="コミットのいろいろな呼ばれ方">コミットのいろいろな呼ばれ方</h1>
+
+<ul>
+<li>ブランチ：枝の先端のコミットを指す．「枝全体のコミット群をまとめたもの」をイメージしてしまうが，そうではない．</li>
+<li>HEAD：あるコミットを指すポインタのようなもの．
+
+<ul>
+<li>HEAD^ と HEAD~ は，HEADの一つ前を指す．</li>
+<li>HEAD^^^　と　HEAD~~~ と HEAD~3　は全部同じ意味．</li>
+<li>あるブランチをチェックアウトしたなら，HEADはそのブランチを指している．</li>
+<li>無名ブランチとしてチェックアウトしているのなら，HEADはそのブランチを指しており，これをdetached HEADという．
+
+<ul>
+<li>無名ブランチ：ブランチ名でなくあるコミットを直接チェックアウトした場合，チェックアウト先のブランチを無名ブランチと呼ぶらしい．</li>
+</ul></li>
+<li>ORIG_HEAD：コミットオブジェクトをつくるコマンドの実行前にHEADだったコミットを指す
+
+<ul>
+<li>基本的に，<code>git reflog</code>の<code>HEAD@{1}</code>と<code>ORIG_HEAD</code>は同じコミットを指すが，<code>git stash</code>はコミットオブジェクトをつくるので，<code>git reflog</code>の<code>HEAD@{1}</code>と<code>ORIG_HEAD</code>がずれることに注意．</li>
+</ul></li>
+<li>FETCH_HEAD：最後に<code>git fetch</code>によって更新された<code>origin/&lt;branch&gt;</code>を指す．</li>
+<li>MERGE_HEAD：マージ元のブランチを指す．</li>
+<li>CHERRY_PICK_HEAD：チェリーピック元のコミットを指す．</li>
+</ul></li>
+</ul>
+
+<h1 id="リモートリポジトリにはニックネームが付いている">リモートリポジトリにはニックネームが付いている</h1>
+
+<p>リモートリポジトリには，ニックネームがついている．例えば，cloneしてきたローカルリポジトリにて，<code>git config -l</code>または<code>git remote -v</code>を実行すると，以下のように，リモートリポジトリが<code>origin</code>と名付けられていることが確認できる．</p>
+
+<pre><code># git config -l でconfigを直接見る
+remote.origin.url=git@github.com:&lt;ユーザ名&gt;/&lt;リポジトリ名&gt;.git
+remote.origin.fetch=+refs/heads/*:refs/remotes/origin/*
+
+# git remote -v でリモートリポジトリ一覧をみる
+origin	git@github.com:&lt;ユーザ名&gt;/&lt;リポジトリ名&gt;.git (fetch)
+origin	git@github.com:&lt;ユーザ名&gt;/&lt;リポジトリ名&gt;.git (push)
+</code></pre>
+
+<p>一方，<code>git init</code>で作成したローカルリポジトリに，任意のリモートリポジトリのニックネームを設定するには，<code>git remote add &lt;nickname&gt; https://github.com/&lt;ユーザ名&gt;/&lt;リポジトリ名&gt;.git</code>を実行する．</p>
+
+<p>ここで設定された/されているリモートリポジトリのニックネーム（たとえば<code>origin</code>など）は，<code>git push origin master</code>や<code>git pull origin master</code>などのコマンドで利用される．</p>
+
+<h1 id="作業ブランチ-上流ブランチ-リモート追跡ブランチ-カレントブランチ">作業ブランチ，上流ブランチ，リモート追跡ブランチ，カレントブランチ</h1>
+
+<p><code>origin</code>が以下のようなブランチを持っているとすると，</p>
+
+<pre><code>master
+branch1
+branch2
+</code></pre>
+
+<p><code>git clone</code>により，以下のようなブランチがローカルリポジトリにつくられる．</p>
+
+<pre><code>master
+origin/master
+origin/branch1
+origin/branch2
+</code></pre>
+
+<ul>
+<li><code>master</code>は，<code>origin/master</code>を追跡するブランチであり，「作業ブランチ」と呼ぶ．</li>
+<li><code>origin/master</code>は，作業ブランチ<code>master</code>の「上流ブランチ」であり，リモートリポジトリの<code>master</code>を追跡する「リモート追跡ブランチ」でもある．
+
+<ul>
+<li><code>git branch -vv</code>にて，作業ブランチと上流ブランチの対応を確認することができる．</li>
+</ul></li>
+<li>いまいるブランチを「カレントブランチ」と呼ぶ．
+
+<ul>
+<li><code>git status</code>で確認できる</li>
+</ul></li>
+</ul>
+
+<h1 id="git-fetch-でリモートブランチをリモート追跡ブランチに取り込む"><code>git fetch</code>でリモートブランチをリモート追跡ブランチに取り込む</h1>
+
+<ul>
+<li><code>git fetch &lt;remote&gt; &lt;branch&gt;</code>すると，リモートの<code>&lt;branck&gt;</code>が<code>&lt;remote&gt;/&lt;branch&gt;</code>に取り込まれる．
+
+<ul>
+<li>例：<code>git fetch origin master</code>により，originのmasterがorigin/masterに取り込まれる．</li>
+</ul></li>
+
+<li><p><code>git fetch &lt;remote&gt;</code>すると，リモートの全ブランチが<code>origin/*</code>に取り込まれる．</p>
+
+<ul>
+<li><code>&lt;branch&gt;</code>を省略すると，<code>.git/config</code>の<code>remote.origin.fetch</code>の設定が用いられる．</li>
+</ul>
+
+<pre><code>[remote &quot;origin&quot;]
+    fetch = +refs/heads/*:refs/remotes/origin/* &lt;=== +&lt;source&gt;:&lt;target&gt;
+</code></pre>
+
+<ul>
+<li>例：<code>git fetch origin</code>を実行すると，originの全ブランチが<code>origin/*</code>に取り込まれる．</li>
+</ul></li>
+
+<li><p><code>git fetch</code>を実行すると</p>
+
+<ul>
+<li><p><code>&lt;remote&gt;</code>として，<code>.git/config</code>の作業ブランチごとに設定されている<code>remote</code>パラメータが適用される．</p>
+
+<ul>
+<li>例：以下のような<code>.git/config</code>の場合，<code>master</code>上で<code>&lt;remote&gt;</code>を省略すると，<code>origin</code>が適用される．</li>
+</ul>
+
+<pre><code>[branch &quot;master&quot;]
+        remote = origin
+</code></pre></li>
+
+<li><p>カレントブランチに上流ブランチがある場合は<code>git fetch &lt;remote&gt; &lt;branch&gt;</code>が実行される．</p></li>
+
+<li><p>カレントブランチに上流ブランチがない場合は<code>git fetch &lt;remote&gt;</code>が実行される．</p></li>
+</ul></li>
+</ul>
+
+<h1 id="特定のコミットを-git-merge-でカレントブランチに取り込む">特定のコミットを<code>git merge</code>でカレントブランチに取り込む</h1>
+
+<ul>
+<li>カレントブランチ上で<code>git merge &lt;branch&gt;</code>すると，<code>&lt;branch&gt;</code>がカレントブランチに取り込まれ，マージコミットが作られる．</li>
+</ul>
+
+<pre><code>      E---F---G dev
+     /
+A---B---C---D master
+
+git checkout master &amp; git merge dev
+
+      E---F---G dev
+     /         \
+A---B---C---D---H master
+</code></pre>
+
+<ul>
+<li><code>git merge</code>のように<code>&lt;branch&gt;</code>を省略すると，カレントブランチの上流ブランチがカレントブランチにマージされる．</li>
+<li>以下のようなマージを，fast-forward（ff,早送り）マージという．</li>
+</ul>
+
+<pre><code>      C---D---E dev
+     /
+A---B master
+
+git checkout master &amp; git merge dev
+
+      C---D---E dev,master
+     /
+A---B 
+</code></pre>
+
+<ul>
+<li><code>git merge --no-commit &lt;branch&gt;</code>：マージ後にコミットしない</li>
+</ul>
+
+<h1 id="リモートブランチを-git-pull-でカレントブランチに取り込む">リモートブランチを<code>git pull</code>でカレントブランチに取り込む</h1>
+
+<ul>
+<li>カレントブランチで<code>git pull &lt;remote&gt; &lt;branch&gt;</code>すると，リモートブランチ<code>&lt;branch&gt;</code>がカレントブランチに取り込まれる．
+
+<ul>
+<li><code>git fetch &lt;remote&gt; &lt;branch&gt; &amp; git merge &lt;remote&gt;/&lt;branch&gt;</code>をまとめたコマンド．</li>
+</ul></li>
+<li><code>git pull</code>のように<code>&lt;remote&gt;</code>と<code>&lt;branch&gt;</code>を省略して実行すると
+
+<ul>
+<li>カレントブランチに上流ブランチがある場合は，<code>git fetch</code>と<code>git merge</code>のルールが適用される．</li>
+<li>カレントブランチに上流ブランチが無い場合は，<code>git fetch</code>のみ適用される．</li>
+</ul></li>
+</ul>
+
+<h1 id="特定のコミットに-git-branch-checkout-で移動する">特定のコミットに<code>git branch/checkout</code>で移動する</h1>
+
+<ul>
+<li>コミットに移動する
+
+<ul>
+<li><code>git checkout &lt;commit&gt;</code>で，<code>&lt;commit&gt;</code>に移動する．
+
+<ul>
+<li><code>&lt;commit&gt;</code>にブランチ名を指定しないでチェックアウトした先を「無名ブランチ」と呼ぶ．一旦，名無しブランチにrebaseさせたりして様子を見て，大丈夫そうならmasterを名無しブランチにresetさせるというような使い方をする．</li>
+</ul></li>
+<li><code>git chekout -b &lt;branch名&gt;</code>で，<code>&lt;branch名&gt;</code>を作成して，<code>&lt;branck名&gt;</code>に移動する．</li>
+<li>チェックアウトすると，内部的には，オブジェクトからインデックスへのコピーが起こり，そこからワーキングツリーへ書き出すという作業が行われている．</li>
+</ul></li>
+<li>ブランチをつくる
+
+<ul>
+<li><code>git branch &lt;branch名&gt;</code>で，<code>&lt;branch名&gt;</code>を作成する．</li>
+<li><code>git branch &lt;branch名&gt; &lt;commit&gt;</code>で，<code>&lt;commit&gt;</code>を親にした新たなブランチを作成する．</li>
+</ul></li>
+<li><code>git branch -a</code>で，ブランチ一覧を確認できる．</li>
+<li>ブランチを削除する
+
+<ul>
+<li><code>git branch -d &lt;branch名&gt;</code></li>
+</ul></li>
+<li>上流ブランチを変更する
+
+<ul>
+<li><code>git branch -u &lt;remote&gt;/&lt;branch&gt; &lt;branch&gt;</code></li>
+</ul></li>
+<li>あるコミット時のファイルを参照する
+
+<ul>
+<li><code>git checkout &lt;commit&gt; &lt;filename&gt;</code></li>
+</ul></li>
+</ul>
+
+<h1 id="カレントブランチの状態を-git-status-で確認する">カレントブランチの状態を<code>git status</code>で確認する</h1>
+
+<ul>
+<li><code>git status</code>
+
+<ul>
+<li>カレントブランチの状態を確認できる．
+
+<ul>
+<li>ワーキングツリーで変更があったもの，ステージングされているもの，トラッキングされていないものなど</li>
+</ul></li>
+</ul></li>
+</ul>
+
+<h1 id="変更したものをとりあえず-git-add-でひとまとめにする">変更したものをとりあえず<code>git add</code>でひとまとめにする</h1>
+
+<ul>
+<li><code>git add</code>を実行することで，インデックス（変更されたファイルのスナップショットのようなもの）が内部的につくられる．この動作をステージングという．</li>
+<li><code>git add .</code>
+
+<ul>
+<li>ワーキングツリーにて新規作成または変更されたファイルをステージング</li>
+</ul></li>
+<li><code>git add -u</code>
+
+<ul>
+<li>ワーキングツリーにて<code>git rm</code>または変更されたファイルをステージング</li>
+<li>つかいどころ：<code>git rm</code>したときに<code>git add -u</code>する</li>
+</ul></li>
+<li><code>git add -A</code>
+
+<ul>
+<li><code>git add .</code>と<code>git add -u</code>を合体させたもの</li>
+</ul></li>
+</ul>
+
+<h1 id="git-commit-で変更を確定する"><code>git commit</code>で変更を確定する</h1>
+
+<ul>
+<li><code>git commit -m &lt;message&gt;</code>
+
+<ul>
+<li><code>&lt;message&gt;</code>というコミットメッセージをつけてコミットする</li>
+</ul></li>
+<li><code>git commit --amend -m 'hogehoge'</code>
+
+<ul>
+<li>直前のコミットメッセージを変更する</li>
+<li>いくつか前のコミットメッセージを変更したい場合は，<code>git rebase -i</code>で<code>reword</code>を指定する．</li>
+</ul></li>
+</ul>
+
+<h1 id="git-log-でコミットログをみる"><code>git log</code>でコミットログをみる</h1>
+
+<ul>
+<li><code>git log</code>でコミットログをみる
+
+<ul>
+<li><code>--oneline</code>すると見やすい</li>
+</ul></li>
+</ul>
+
+<h1 id="差分を-git-diff-でみる">差分を<code>git diff</code>でみる</h1>
+
+<ul>
+<li><code>git diff</code>
+
+<ul>
+<li>ワークツリーとインデックスの差分</li>
+</ul></li>
+<li><code>git diff &lt;target&gt;</code>
+
+<ul>
+<li>ワークツリーと<code>&lt;target&gt;</code>の差分．<code>&lt;target&gt;</code>にはHEADやHEAD^（HEADの一つ前），コミットのハッシュ値などを指定する．</li>
+</ul></li>
+<li><code>git diff &lt;source&gt; &lt;target&gt;</code>または<code>git diff &lt;source&gt;..&lt;target&gt;</code>
+
+<ul>
+<li><code>&lt;source&gt;</code>と<code>&lt;target&gt;</code>の差分．HEADやコミット，ブランチ，タグを指定する．</li>
+</ul></li>
+
+<li><p><code>git diff &lt;commit A&gt;...&lt;commit B&gt;</code></p>
+
+<ul>
+<li><code>&lt;commit A&gt;</code>と<code>&lt;commit B&gt;</code>の共通の親と，<code>&lt;commit B&gt;</code>との差分が得られる．</li>
+<li>例えば，以下の状態で，<code>git diff G...D</code>を実行すると，BとDの差分が得られる．pull requestの差分はこれ．</li>
+</ul>
+
+<pre><code>      E---F---G dev
+     /
+A---B---C---D master
+</code></pre></li>
+
+<li><p><code>git diff --cached(--staged)</code></p>
+
+<ul>
+<li><code>git add</code>したインデックスとHEADとの差分</li>
+</ul></li>
+
+<li><p><code>git diff --name-only</code></p>
+
+<ul>
+<li>変更されたファイル一覧</li>
+</ul></li>
+</ul>
+
+<h1 id="特定のコミットを-git-cherry-pick-でカレントブランチに反映させる">特定のコミットを<code>git cherry-pick</code>でカレントブランチに反映させる</h1>
+
+<ul>
+<li><code>git cherry-pick &lt;commit&gt;</code>：<code>&lt;commit&gt;</code>をカレントブランチに反映させる．
+
+<ul>
+<li><code>-n</code>を指定することで，カレントブランチのワークツリーとインデックスに<code>&lt;commit&gt;</code>を持ってくることができる．</li>
+</ul></li>
+</ul>
+
+<h1 id="git-rebase-で枝を付け替える"><code>git rebase</code>で枝を付け替える</h1>
+
+<ul>
+<li><code>git rebase</code>は既存のブランチをガッツリ変更してしまうので<code>git push</code>するときは<code>-f</code>オプションをつけて強制的にpushする必要がある．なので，<code>git rebase</code>を好まないプロジェクトもある．</li>
+</ul>
+
+<h2 id="git-rebase-start-end"><code>git rebase &lt;start&gt; &lt;end&gt;</code></h2>
+
+<ul>
+<li><code>&lt;start&gt;</code>の次のコミットから<code>&lt;end&gt;</code>までのコミットを<code>&lt;start&gt;</code>に移す．
+
+<ul>
+<li><code>&lt;start&gt;</code>がブランチ名なら，<code>&lt;start&gt;</code>の枝と<code>&lt;end&gt;</code>の枝の共通のコミットの次のコミットから<code>&lt;end&gt;</code>までのコミットが<code>&lt;start&gt;</code>に移される．</li>
+</ul></li>
+<li><code>&lt;end&gt;</code>は指定しなくても良い．指定しない場合はカレントブランチが選択される．</li>
+<li>rebase途中でコンフリクトが起きる場合がある．
+
+<ul>
+<li>コンフリクトを解消して続ける場合は<code>git rebase --continue</code></li>
+<li>rebaseをやめるには<code>git rebase --abort</code></li>
+</ul></li>
+
+<li><p>以下はrebaseの内部動作を図示したもの．元のE,F,Gが，Dからの新しいコミットとして順番にcherry-pickされる．親が変わるので，E,F,GのハッシュとE&rsquo;,F&rsquo;,G&rsquo;のハッシュは違うものになる．</p>
+
+<pre><code>      E---F---G dev
+     /
+A---B---C---D master
+
+# git checkout dev &amp; git rebase master
+# または
+# git rebase master dev
+
+    E---F---G
+
+A---B---C---D master
+             \
+              E' dev
+
+A---B---C---D master
+             \
+              E'---F' dev
+
+A---B---C---D master
+             \
+              E'---F'---G' dev
+
+# git chekout master &amp; git merge dev
+
+A---B---C---D 
+             \
+              E'---F'---G' dev,master
+
+</code></pre></li>
+</ul>
+
+<h2 id="git-rebase-i-start-end"><code>git rebase -i &lt;start&gt; &lt;end&gt;</code></h2>
+
+<ul>
+<li><p>対話モードでrebaseできる．cherry-pick中のコミットについて，細かい操作が行える．</p>
+
+<pre><code>      E---F---G dev
+     /
+A---B---C---D master
+
+# git rebase -i E dev
+#
+# pick F        &lt;=== Fは採用
+# squash G      &lt;=== GはFとまとめてしまう
+#
+# p, pick：コミットを採用
+# r, reword：コミットを採用するが、コミットメッセージを変更
+# e, edit：コミットを採用するが、ファイルを修正する
+# s, squash：一個前のコミットと合体させる
+# f, fixup：コミットメッセージを変更しない点以外、squashと同じ
+# x, exec：shellでコマンドを実行する
+
+      E---F' dev
+     /
+A---B---C---D master
+
+</code></pre></li>
+</ul>
+
+<h2 id="git-rebase-onto-target-start-end"><code>git rebase --onto &lt;target&gt; &lt;start&gt; &lt;end&gt;</code></h2>
+
+<ul>
+<li><code>&lt;start&gt;</code>の次のコミットから<code>&lt;end&gt;</code>までのコミットを<code>&lt;target&gt;</code>に持っていく．</li>
+
+<li><p><code>git checkout &lt;end&gt; &amp; git rebase --onto &lt;target&gt; &lt;start&gt;</code>でも良い．</p>
+
+<pre><code>
+           H--I--J dev2
+          /
+     E---F---G dev
+    /
+A---B---C---D master
+
+# git rebase --onto master F dev2
+# または
+# git checkout dev2 &amp; git rebase --onto master F
+    
+     E---F---G dev
+    /
+A---B---C---D master
+             \
+              H'--I'--J' dev2
+
+</code></pre></li>
+</ul>
+
+<h1 id="特定のブランチを-git-push-でリモート追跡ブランチ-リモートブランチに反映する">特定のブランチを<code>git push</code>でリモート追跡ブランチ＆リモートブランチに反映する</h1>
+
+<ul>
+<li><code>git push &lt;remote&gt; &lt;branch&gt;</code>
+
+<ul>
+<li>作業ブランチ<code>&lt;branch&gt;</code>を，同名のリモート追跡ブランチとリモートブランチに反映する</li>
+<li>コンフリクトが起きたら失敗する．</li>
+</ul></li>
+<li><code>git push &lt;remote&gt;</code>
+
+<ul>
+<li><code>&lt;branch&gt;</code>を省略した場合は，カレントブランチと同名のリモート追跡ブランチとリモートブランチに反映される．</li>
+<li>具体的な設定は<code>push.default</code>に依存する．</li>
+</ul></li>
+<li><code>git push &lt;remote&gt; &lt;local branch&gt;:&lt;remote branch&gt;</code>
+
+<ul>
+<li><code>&lt;local branch&gt;</code>の最新の状態を<code>&lt;remote branch&gt;</code>に反映する．</li>
+<li><code>&lt;local branch&gt;</code>を空にして実行すると，<code>&lt;remote branch&gt;</code>が削除される．</li>
+</ul></li>
+</ul>
+
+<h1 id="特定のコミットまで-git-reset-で戻す">特定のコミットまで<code>git reset</code>で戻す</h1>
+
+<ul>
+<li><code>git reset</code>には３つのオプションがある
+
+<ul>
+<li><code>--soft</code> : HEADの位置を変更する</li>
+<li><code>--mixed</code>または指定しない : HEADとインデックスの位置を変更する</li>
+<li><code>--hard</code> : HEADとインデックス，ワーキングツリーの位置を変更する</li>
+</ul></li>
+<li><code>git reset &lt;target&gt;</code>
+
+<ul>
+<li><code>&lt;target&gt;</code>（ファイルやディレクトリ）に対して<code>git reset</code>を実行する</li>
+<li><code>&lt;target&gt;</code>に<code>.</code>を指定すると，今いるディレクトリ配下のファイルに対して<code>git reset</code>が実行される．</li>
+</ul></li>
+</ul>
+
+<pre><code># 初期状態
+
+B &lt;- HEAD,インデックス,ワーキングツリー
+|
+A
+
+
+# ファイルを修正するとワーキングツリーが進む
+
+  &lt;- ワーキングツリー
+|
+B &lt;- HEAD,インデックス
+|
+A
+
+
+# git add により，インデックスが進む
+
+  &lt;- ワーキングツリー,インデックス
+|
+B &lt;- HEAD 
+|
+A
+
+
+# ファイルを修正するとワーキングツリーが進む
+
+  &lt;- ワーキングツリー 
+|
+  &lt;- インデックス
+|
+B &lt;- HEAD 
+|
+A
+
+# git reset --soft HEAD
+# HEADがHEADに移動する（この場合は何も起きない）
+
+  &lt;- ワーキングツリー 
+|
+  &lt;- インデックス
+|
+B &lt;- HEAD 
+|
+A
+
+
+# git reset --soft HEAD^
+# HEADがHEAD^に移動する
+
+  &lt;- ワーキングツリー 
+|
+  &lt;- インデックス
+|
+B 
+|
+A &lt;- HEAD 
+
+
+# git reset HEAD
+# HEADとインデックスがHEADに移動する
+
+  &lt;- ワーキングツリー 
+|
+B &lt;- HEAD,インデックス
+|
+A 
+
+# git reset HEAD^
+# HEADとインデックスがHEAD^に移動する
+
+  &lt;- ワーキングツリー 
+|
+B 
+|
+A &lt;- HEAD,インデックス
+
+# git reset --hard HEAD
+# HEAD，インデックス，ワーキングツリーがすべてHEADに移動する
+
+B &lt;- HEAD,インデックス,ワーキングツリー 
+|
+A
+
+# git reset --hard HEAD^
+# HEAD，インデックス，ワーキングツリーがすべてHEAD^に移動する
+
+B 
+|
+A &lt;- HEAD,インデックス,ワーキングツリー 
+
+
+</code></pre>
+
+<h1 id="特定のコミットまで-git-reflog-で戻す">特定のコミットまで<code>git reflog</code>で戻す</h1>
+
+<ul>
+<li><code>git reflog</code>
+
+<ul>
+<li>HEADの移動履歴をみる</li>
+<li><code>git reset --hard &lt;commit&gt;</code>でそのコミットまで戻る</li>
+</ul></li>
+<li><code>git reflog &lt;branch&gt;</code>
+* ブランチが指していたコミットの一覧をみる</li>
+</ul>
+
+<h1 id="コミットに-git-tag-でタグを付ける">コミットに<code>git tag</code>でタグを付ける</h1>
+
+<ul>
+<li><code>git tag &lt;name&gt; &lt;commit&gt;</code>
+
+<ul>
+<li><code>&lt;commit&gt;</code>に<code>&lt;name&gt;</code>というタグをつける．<code>&lt;commit&gt;</code>を省略した場合はカレントブランチが選択される．</li>
+<li>タグを作成したユーザの情報などは保存されない．</li>
+</ul></li>
+<li><code>git tag -a &lt;name&gt; &lt;commit&gt; -m &lt;comment&gt;</code>
+
+<ul>
+<li><code>&lt;commit&gt;</code>に<code>&lt;name&gt;</code>という注釈付きタグをつける．<code>&lt;commit&gt;</code>を省略した場合はカレントブランチが選択される．</li>
+<li>タグを作成したユーザの情報なども保存される．</li>
+</ul></li>
+<li><code>git tag -s &lt;name&gt; &lt;commit&gt; -m &lt;comment&gt;</code>
+
+<ul>
+<li><code>&lt;commit&gt;</code>に<code>&lt;name&gt;</code>という署名付きタグをつける．OSSなどにcontributeする際に使うことが多い．</li>
+</ul></li>
+<li><code>git tag -d &lt;tag&gt;</code>
+
+<ul>
+<li><code>&lt;tag&gt;</code>を削除する</li>
+</ul></li>
+<li><code>git show &lt;tag&gt;</code>
+
+<ul>
+<li><code>&lt;tag&gt;</code>がつけられたコミットをみる</li>
+</ul></li>
+<li><code>git push origin &lt;tag&gt;</code>
+
+<ul>
+<li><code>&lt;tag&gt;</code>をpushする．</li>
+<li><code>git push origin --tags</code>で，ローカルの全tagをpushできる．</li>
+</ul></li>
+<li>タグをチェックアウトするのはおすすめしない．
+
+<ul>
+<li><code>git checkout &lt;tag&gt;</code>しても，tagに紐付いたcommitをチェックアウトするだけ．</li>
+<li><code>git tag -d</code>で元のタグを消して<code>git tag -a</code>で新しいタグを付けるか，<code>git tag -f -a</code>で強制的に変更する．</li>
+</ul></li>
+</ul>
+
+<h1 id="git-rm-と-git-clean-でファイルを削除する"><code>git rm</code>と<code>git clean</code>でファイルを削除する</h1>
+
+<ul>
+<li><code>git rm/clean</code>を使わずにファイルを直接消しても問題ない．</li>
+<li><code>git rm &lt;target&gt;</code>
+
+<ul>
+<li>インデックスとワークツリーから<code>&lt;target&gt;</code>（ファイルまたはディレクトリ）を削除する</li>
+<li><code>-r</code>オプションで再帰</li>
+</ul></li>
+<li><code>git rm --cached &lt;file&gt;</code>
+
+<ul>
+<li>インデックスから<code>&lt;file&gt;</code>を削除する</li>
+</ul></li>
+<li><code>git clean -n</code>
+
+<ul>
+<li>トラックしていないファイル一覧</li>
+</ul></li>
+<li><code>git clean -f</code>
+
+<ul>
+<li>トラックしていないファイルを削除する</li>
+<li><code>-d</code>オプションでディレクトリも削除</li>
+</ul></li>
+</ul>
+
+<h1 id="ワークツリーの内容をまるっと-git-stash-で保存する">ワークツリーの内容をまるっと<code>git stash</code>で保存する</h1>
+
+<ul>
+<li><code>git stash</code>または<code>git stash save</code></li>
+<li><code>git stash clear</code>：全stashを削除</li>
+<li><code>git stash list</code>：stashの一覧を表示</li>
+<li><code>git stash list -p</code>：差分を確認</li>
+<li><code>git stash show stash@{X}</code>で，スタッシュされたファイル一覧をみる．</li>
+<li><code>git stash apply stash@{X}</code>でワーキングツリーに戻す．ただしstashには残っている．<br /></li>
+<li><code>git stash drop stash@{X}</code>で特定のstashを削除．<br /></li>
+<li><code>git stash pop stash@{X}</code>でpopする．</li>
+</ul>
+
+<h1 id="リポジトリに依存関係を持たす">リポジトリに依存関係を持たす</h1>
+
+<h2 id="あるリポジトリをsubmoduleとして追加する">あるリポジトリをsubmoduleとして追加する</h2>
+
+<ul>
+<li><code>git submodule add &lt;user&gt;@github.com:&lt;repository&gt;.git &lt;directory&gt;</code>
+
+<ul>
+<li><code>&lt;directory&gt;/</code>に<code>&lt;repository&gt;</code>へのリンクが追加される．<br /></li>
+<li>これにより，<code>.gitmodule</code>が作成され，どのリポジトリに依存しているかなどの情報が保持される．</li>
+</ul></li>
+<li><code>git submodule</code>
+
+<ul>
+<li>submoduleを確認することができる．</li>
+</ul></li>
+</ul>
+
+<h2 id="submoduleを持っているrepositoryをcloneする">submoduleを持っているrepositoryをcloneする</h2>
+
+<ul>
+<li><code>.gitmodule</code>が埋め込まれたrepositoryをcloneしても，submoduleは自動でcloneされない．</li>
+<li><code>git submodule update -i</code>
+
+<ul>
+<li>submoduleをclone/updateしてくれる．<code>-i</code>は，initとupdateを一括で行うためのオプション．<br /></li>
+</ul></li>
+<li><code>git submodule deinit</code>
+
+<ul>
+<li>submoduleとの依存を切ることができる．<code>git submodule</code>で&rdquo;-&ldquo;がついているものは依存が切れている．</li>
+</ul></li>
+<li><code>git rm &lt;submodule名&gt;</code>
+
+<ul>
+<li><code>.gitmodule</code>からsubmodule情報が消え，submoduleも消える．</li>
+</ul></li>
+</ul>
+
+<h1 id="そもそもgitはどのように差分を管理しているか">そもそもGitはどのように差分を管理しているか</h1>
+
+<h2 id="blob-tree-commitオブジェクトを関連付けて差分管理している">blob/tree/commitオブジェクトを関連付けて差分管理している</h2>
+
+<ul>
+<li>blobオブジェクト
+
+<ul>
+<li>treeの子．ファイルの中身を保持している．</li>
+<li><code>git hash-object &lt;filename&gt;</code>：<code>&lt;filename&gt;</code>からハッシュ値を生成できる
+
+<ul>
+<li>ファイルサイズとファイル内容からSHA-1でハッシュ値を計算している．</li>
+</ul></li>
+<li>あるローカルリポジトリ内で，
+
+<ul>
+<li><code>git cat-file -t &lt;hash&gt;</code>：<code>&lt;hash&gt;</code>で指定したものがblobなのかtreeなのかcommitなのかを確認できる．</li>
+<li><code>git cat-file blob &lt;hash&gt;</code>：<code>&lt;hash&gt;</code>に対応したファイルの内容を見ることができる．</li>
+</ul></li>
+</ul></li>
+<li>treeオブジェクト
+
+<ul>
+<li>blobの親．ファイル名や作成日時などのメタデータを保持している．</li>
+<li><code>git cat-file -p &lt;hash of tree&gt;</code>：ツリーにぶら下がっていblob/tree一覧を確認できる．
+
+<ul>
+<li><code>git cat-file -p &lt;branch&gt;^{tree}</code>：<code>&lt;branch&gt;</code>が参照しているツリーオブジェクトを見る．</li>
+</ul></li>
+</ul></li>
+<li>commitオブジェクト
+
+<ul>
+<li><code>git cat-file commit &lt;hash of commit&gt;</code>：treeやparentを確認できる．</li>
+</ul></li>
+<li><code>git ls-tree &lt;commit&gt;</code>：<code>&lt;commit&gt;</code>でリポジトリに追加されたblob/tree一覧を確認できる</li>
+<li><code>git rev-parse &lt;commit&gt;</code>：<code>&lt;commit&gt;</code>自体のtreeのhashを確認できる．</li>
+<li><code>find .git/objects -type f</code>：blob/tree/commitの実体．<code>git show</code>で見れるのはこれ．</li>
+</ul>
+
+<h2 id="git-add-と-git-commit-で何をやっているか"><code>git add</code>と<code>git commit</code>で何をやっているか</h2>
+
+<ol>
+<li><code>echo hoge &gt; hoge.txt &amp; echo hoge &gt; hoge.txt &amp; git add hoge.txt</code></li>
+<li><code>git ls-files --stage</code>
+
+<ul>
+<li>インデックスされたファイルのblob一覧が表示される</li>
+</ul></li>
+<li><code>git write-tree</code>
+
+<ul>
+<li>blobをまとめたtreeが作られ，そのtreeのハッシュが表示される．</li>
+</ul></li>
+<li><code>echo &quot;first commit&quot; | git commit-tree &lt;git write-treeのハッシュ&gt;</code>
+
+<ul>
+<li><code>git write-tree</code>で作られたtreeをまとめたcommitをつくる</li>
+</ul></li>
+<li><code>echo &lt;git commit-treeのハッシュ&gt; &gt; .git/refs/heads/master</code>または<code>git update-ref</code>
+
+<ul>
+<li>masterブランチが<code>git commit-tree</code>のハッシュを指すようにする</li>
+</ul></li>
+<li><code>git symbolic-ref HEAD refs/heads/master</code>
+
+<ul>
+<li>HEADがmasterブランチを指すようにする．</li>
+</ul></li>
+<li>コミット完了</li>
+</ol>
+
+<h2 id="通常のコミットとマージコミットの違い">通常のコミットとマージコミットの違い</h2>
+
+<ul>
+<li><code>git cat-file -p &lt;commit&gt;</code>で通常のコミットを見ると，parentを一つ持っていることがわかる．一方，マージコミットでは，parentを２つ持っている．１つ目のparentはマージ先のコミットを指し，２つ目のparentはマージ元のコミットを指している．</li>
+<li>マージを元に戻すときは<code>git reset --hard ORIG_HEAD</code>をおすすめする．<code>git reset --hard HEAD^</code>だと，以下のような現象が起こる．</li>
+</ul>
+
+<pre><code>      E---F---G dev
+     /
+A---B---C---D master
+
+git checkout dev &amp; git merge master
+
+      E---F---G---I dev
+     /           /
+A---B---C---D---H master
+
+git checkout master &amp; git merge dev
+
+      E---F---G---I dev,master &lt;=== fast-forward merge...
+     /           /
+A---B---C---D---H 
+
+git reset --hard HEAD^
+
+      E---F---G dev
+     /
+A---B---C---D master
+
+</code></pre>
+
+<ul>
+<li>fast-forward mergeにより，HEADがdevとmasterを指してしまっていることが原因．<code>git reset --hard ORIG_HEAD</code>で，チェックアウトしているブランチの直前のHEAD(ORIG_HEAD)にリセットすることで，期待通りの動作が行える．</li>
+</ul>
+
+<pre><code>      E---F---G---I dev,master
+     /           /
+A---B---C---D---H 
+
+git reset --hard ORIG_HEAD
+
+      E---F---G---I dev
+     /           /
+A---B---C---D---H master
+
+</code></pre>
+
+    <div class="share">
+    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fhow-to-use-git%2f&text=Git%e3%82%92%e3%82%84%e3%81%a3%e3%81%a6%e3%81%84%e3%81%8f - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
+    <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fhow-to-use-git%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
+    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fhow-to-use-git%2f&title=Git%e3%82%92%e3%82%84%e3%81%a3%e3%81%a6%e3%81%84%e3%81%8f - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
+</div>
+  </div>
+  <footer class="post-footer">
+    
+  </footer>
+</article>
+<footer class="footer">
+  <span>&copy; 2020 yasakura</span>
+</footer>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [['$','$'], ['\\(','\\)']],
+      processEscapes: true
+    },
+    linebreaks: {
+      automatic: true
+    }
+  });
+</script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+</body>
+</html>
+

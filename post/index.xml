@@ -6,10 +6,22 @@
     <description>Recent content in Posts on yasakura</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Wed, 01 Apr 2020 00:00:05 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 08 Aug 2020 00:00:00 +0900</lastBuildDate>
     
 	<atom:link href="https://yasakura.me/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Gitをやっていく</title>
+      <link>https://yasakura.me/post/how-to-use-git/</link>
+      <pubDate>Sat, 08 Aug 2020 00:00:00 +0900</pubDate>
+      
+      <guid>https://yasakura.me/post/how-to-use-git/</guid>
+      <description>モチベーション  個人的に普段よく使うGitコマンドについて自分なりにまとめておきたい Pro Gitだとカロリー過多  Repositoryを用意する Local Repositoryから始める  git init &amp;lt;directory&amp;gt;  &amp;lt;directory&amp;gt;をLocal repositoryとする． &amp;lt;directory&amp;gt;内に.gitという隠しフォルダが作成される．Gitの諸々は.gitで管理されることになる．   Remote Repositoryから始める  GitHubにSSH公開鍵を登録しておく
+ cd ~/.ssh ssh-keygen -t rsa -b 4096で鍵作成 pbcopy &amp;lt; ~/.ssh/id_rsa.pubで公開鍵をクリップボードにコピー SSH and GPG keysのNew SSH keyに公開鍵をコピペ ~/.ssh/configに接続先を登録
+Host &amp;lt;nickname&amp;gt; HostName github.com IdentityFile &amp;lt;秘密鍵へのパス&amp;gt; User git  ssh -T &amp;lt;nickname&amp;gt;で接続確認
+ Hi XXX! You&#39;ve successfully authenticated, but GitHub does not provide shell access.と言われれば優勝   git clone https://&amp;lt;repository&amp;gt;.</description>
+    </item>
     
     <item>
       <title>関数の最大値または最小値を機械的に求める</title>
