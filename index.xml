@@ -6,10 +6,20 @@
     <description>Recent content on yasakura</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Sat, 08 Aug 2020 00:00:00 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 09 Aug 2020 00:00:00 +0900</lastBuildDate>
     
 	<atom:link href="https://yasakura.me/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Dockerコンテナのライフサイクルとネットワーク構成</title>
+      <link>https://yasakura.me/post/how-to-use-docker/</link>
+      <pubDate>Sun, 09 Aug 2020 00:00:00 +0900</pubDate>
+      
+      <guid>https://yasakura.me/post/how-to-use-docker/</guid>
+      <description>モチベーション  Dockerのライフサイクルを自分なりにまとめておきたい． Dockerコンテナが構成するネットワークについて知りたい．  Dockerのライフサイクル  docker runで，Dockerイメージを元にコンテナを起動する． docker stopで，コンテナを停止する． docker commitで，停止中のコンテナを新たなDockerイメージとしてとっておく． docker save/loadで，Dockerイメージを持ち運ぶ． docker startで，停止中のコンテナを再開する． docker rmで，停止中のコンテナを破棄する． docker rmiで，Dockerイメージを破棄する．  Dockerイメージを用意する  Dockerfileの書き方
+ docker build -t &amp;lt;image name&amp;gt;:&amp;lt;tag&amp;gt; &amp;lt;Dockerfileがあるディレクトリ&amp;gt;によりDockerイメージがつくられる  &amp;lt;tag&amp;gt;にはimageのversionを設定するのが一般的．&amp;lt;tag&amp;gt;を省略した場合はlatestとされる．  docker pull &amp;lt;image name&amp;gt;でDockerイメージをもってくることができる．  DockerイメージはDocker Hubにて検索できる．  docker imagesで手元にあるDockerイメージ一覧を表示する．  docker images -qにより，DockerイメージID一覧を表示する．   Dockerイメージを元に，コンテナを立ち上げる  docker run -it --name &amp;lt;container name&amp;gt; &amp;lt;image name&amp;gt;:&amp;lt;tag&amp;gt; &amp;lt;command&amp;gt;  &amp;lt;image name&amp;gt;:&amp;lt;tag&amp;gt;から&amp;lt;container name&amp;gt;という名前のコンテナを立ち上げ，コンテナ内で&amp;lt;command&amp;gt;を実行する． -iはホストからコンテナへの標準入力を繋げるためのもの．-tはコンテナからホストへの標準出力を繋げるためのもの． -hオプションによって，ホスト名を指定できる． -dオプションによって，コンテナをバックグラウンドで実行できる． --rmフラグによって，コンテナがstopしたあとはコンテナを削除するようにする． --privilegedフラグによって，コンテナ内からホストのデバイスにアクセスすることができる．セキュリティには注意する．  --deviceフラグや--cap-addフラグによってデバイス単位で細かくアクセス権限を制御することができる．  Dockerイメージによっては，ずっと起動するものもあれば，&amp;lt;command&amp;gt;を一発実行してstopするものもある．  &amp;lt;command&amp;gt;に/bin/shを指定し，コンテナ内にshを立ち上げることで，コンテナを立ち上げたままにしておくことが多い．   docker ps  起動中のコンテナ一覧を表示する  docker attach &amp;lt;container&amp;gt;  コンテナにアタッチする．アタッチ後の振る舞いはDockerイメージによって異なり，コンテナの標準入出力が可能になる場合もあれば，何も起きない場合もある． アタッチしている状態で，ctrl+pしctrl+qすると，コンテナからデタッチすることができる．  docker exec -it &amp;lt;container&amp;gt; &amp;lt;command&amp;gt;  起動中のコンテナにコマンドを流し込むことができる． &amp;lt;command&amp;gt;に/bin/shを指定してコンテナ内にシェルを立ち上げることで，コンテナ内で作業することができる．   起動中のコンテナを停止させる  docker stop &amp;lt;container&amp;gt;  &amp;lt;container&amp;gt;を停止する．  docker ps -a  起動中または停止しているコンテナの一覧を表示する． docker ps -a -qで，コンテナIDの一覧を表示する．   停止したコンテナを立ち上げる  docker start &amp;lt;container&amp;gt;  コンテナをrestartさせる  docker restart &amp;lt;container name&amp;gt;で，docker stopとdocker startをまとめて実行してくれる，  停止中のコンテナをDockerイメージとして保存する  docker commit &amp;lt;container&amp;gt; &amp;lt;image name&amp;gt;:&amp;lt;new tag&amp;gt;  停止中の&amp;lt;container&amp;gt;から，&amp;lt;image name&amp;gt;:&amp;lt;new tag&amp;gt;というDockerイメージを作成する．   Dockerイメージをtarで固めて持ち運ぶ  docker save &amp;lt;image name&amp;gt;:&amp;lt;tag&amp;gt; &amp;gt; &amp;lt;filename&amp;gt;で&amp;lt;filename&amp;gt;に&amp;lt;image name&amp;gt;:&amp;lt;tag&amp;gt;を書き出す docker load &amp;lt; &amp;lt;filename&amp;gt;で読み込む docker imagesでイメージが読み込まれたことを確認 docker run -it &amp;lt;filename&amp;gt;  停止しているコンテナを破棄する  docker rm &amp;lt;container&amp;gt;  停止中のコンテナは，いつでも再開できるようにキャッシュされてるので，使わなくなったコンテナはdocker rmで破棄するようにする． docker rm -fで強制破棄． docker rm -f &#39;docker ps -a -q&#39;により，すべての停止中のコンテナを強制破棄することができる．   ローカルのDockerイメージを破棄する  docker rmi &amp;lt;image&amp;gt;  docker rmi &#39;docker images -q&#39;により，全てのDockerイメージを破棄する．   コンテナとホスト間でファイルをコピーする  docker cp &amp;lt;CONTAINER ID&amp;gt;:&amp;lt;source@container&amp;gt; &amp;lt;target@host&amp;gt;  コンテナからホストにファイルをコピーする  docker cp &amp;lt;source@host&amp;gt; &amp;lt;CONTAINER ID&amp;gt;:&amp;lt;target@container&amp;gt;  ホストからコンテナにファイルをコピーする   Dockerfileの書き方 Dockerfileとは，docker buildのための手順書のようなもの．Dockerfileを元にオリジナルのDockerイメージをつくることができる．</description>
+    </item>
     
     <item>
       <title>Gitをやっていく</title>

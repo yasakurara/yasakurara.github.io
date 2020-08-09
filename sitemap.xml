@@ -3,20 +3,25 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://yasakura.me/post/how-to-use-git/</loc>
-    <lastmod>2020-08-08T00:00:00+09:00</lastmod>
+    <loc>https://yasakura.me/post/how-to-use-docker/</loc>
+    <lastmod>2020-08-09T00:00:00+09:00</lastmod>
   </url>
   
   <url>
     <loc>https://yasakura.me/post/</loc>
-    <lastmod>2020-08-08T00:00:00+09:00</lastmod>
+    <lastmod>2020-08-09T00:00:00+09:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://yasakura.me/</loc>
-    <lastmod>2020-08-08T00:00:00+09:00</lastmod>
+    <lastmod>2020-08-09T00:00:00+09:00</lastmod>
     <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://yasakura.me/post/how-to-use-git/</loc>
+    <lastmod>2020-08-08T00:00:00+09:00</lastmod>
   </url>
   
   <url>
