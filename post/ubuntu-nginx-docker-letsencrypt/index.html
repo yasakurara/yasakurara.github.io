@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-162790219-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-162790219-1');
+    </script>
+  
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  
+  <title>UbuntuにNginxコンテナを立ててHTTPSに対応する - yasakura</title>
+  
+  <meta name="description" content="モチベーション  まっさらなUbuntuにNginxコンテナを立てて，それをWEBサーバーとして運用したい． Let&rsquo;s encryptでHTTPSに対応したい．  前準備  UbuntuがインストールされたAmazon EC2やAmazon Lightsail，GCP Compute Engine, VPSや物理サーバなどを用意し，グローバルなIPアドレスを設定しておく． ドメインを取得し，UbuntuサーバーのIPアドレスと関連付けておく．  パッケージをアップデートする  apt updateでパッケージ一覧を更新 apt upgradeでパッケージを更新 apt autoremoveで必要なくなったパッケージを削除 apt autocleanで.debファイルを削除
+ /var/log/apt/history.logにaptコマンドの履歴がある /var/log/apt/term.logにaptコマンドのログがある   パッケージの自動アップデートを設定する セキュリティ対策のため，パッケージは常に最新になるようにする．
+ 20-auto-upgradesを編集する
+vi /etc/apt/apt.conf.d/20auto-upgrades
+APT::Periodic::Update-Package-Lists &quot;1&quot;; APT::Periodic::Download-Upgradeable-Packages &quot;1&quot;; APT::Periodic::AutocleanInterval &quot;7&quot;; APT::Periodic::Unattended-Upgrade &quot;1&quot;;   Update-Package-Lists : アップデートの確認頻度[Day] Download-Upgradeable-Packages : アップデートをダウンロードしておくか AutocleanInterval : クリーンアップ頻度[Day] Unattended-Upgrade : アップデートをインストールするか  50unattended-upgradesを編集する
+vi /etc/apt/apt.conf.d/50unattended-upgrades
+&quot;${distro_id}:${distro_codename}-updates&quot;; をコメントアウト  20-auto-upgradesを適用する
+dpkg-reconfigure -plow unattended-upgrades">
+  
+  <link href=/css/style.css rel="stylesheet">
+  <link href=/css/font.css rel="stylesheet">
+  
+  <link rel="icon" href="https://yasakura.meimg/favicon.ico">
+  
+  <link rel="alternate" type="application/atom+xml" href="https://yasakura.meindex.xml" title="yasakura">
+</head>
+<body>
+  <header class="header">
+    <div class="title"><a href="https://yasakura.me">yasakura</a></div>
+    <nav id="navigation">
+      <ul class="menu">
+        <li><a href="https://yasakura.me/about/">ABOUT</a></li>
+      </ul>
+    </nav>
+  </header>
+<article class="post post-view">
+  <header class="post-header">
+    
+    <p class="post-meta">2020.8.13</p>
+    
+    <h1 class="post-title">UbuntuにNginxコンテナを立ててHTTPSに対応する</h1>
+    
+  </header>
+  <div class="post-content">
+    <div class="share">
+    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fubuntu-nginx-docker-letsencrypt%2f&text=Ubuntu%e3%81%abNginx%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%e3%82%92%e7%ab%8b%e3%81%a6%e3%81%a6HTTPS%e3%81%ab%e5%af%be%e5%bf%9c%e3%81%99%e3%82%8b - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
+    <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fubuntu-nginx-docker-letsencrypt%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
+    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fubuntu-nginx-docker-letsencrypt%2f&title=Ubuntu%e3%81%abNginx%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%e3%82%92%e7%ab%8b%e3%81%a6%e3%81%a6HTTPS%e3%81%ab%e5%af%be%e5%bf%9c%e3%81%99%e3%82%8b - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
+</div>
+    
+
+<h1 id="モチベーション">モチベーション</h1>
+
+<ul>
+<li>まっさらなUbuntuにNginxコンテナを立てて，それをWEBサーバーとして運用したい．</li>
+<li>Let&rsquo;s encryptでHTTPSに対応したい．</li>
+</ul>
+
+<h1 id="前準備">前準備</h1>
+
+<ul>
+<li>UbuntuがインストールされたAmazon EC2やAmazon Lightsail，GCP Compute Engine, VPSや物理サーバなどを用意し，グローバルなIPアドレスを設定しておく．</li>
+<li>ドメインを取得し，UbuntuサーバーのIPアドレスと関連付けておく．</li>
+</ul>
+
+<h1 id="パッケージをアップデートする">パッケージをアップデートする</h1>
+
+<ol>
+<li><code>apt update</code>でパッケージ一覧を更新</li>
+<li><code>apt upgrade</code>でパッケージを更新</li>
+<li><code>apt autoremove</code>で必要なくなったパッケージを削除</li>
+
+<li><p><code>apt autoclean</code>で.debファイルを削除</p>
+
+<ul>
+<li><code>/var/log/apt/history.log</code>にaptコマンドの履歴がある</li>
+<li><code>/var/log/apt/term.log</code>にaptコマンドのログがある</li>
+</ul></li>
+</ol>
+
+<h1 id="パッケージの自動アップデートを設定する">パッケージの自動アップデートを設定する</h1>
+
+<p>セキュリティ対策のため，パッケージは常に最新になるようにする．</p>
+
+<ol>
+<li><p>20-auto-upgradesを編集する<br />
+<code>vi /etc/apt/apt.conf.d/20auto-upgrades</code></p>
+
+<pre><code>APT::Periodic::Update-Package-Lists &quot;1&quot;;
+APT::Periodic::Download-Upgradeable-Packages &quot;1&quot;;
+APT::Periodic::AutocleanInterval &quot;7&quot;;
+APT::Periodic::Unattended-Upgrade &quot;1&quot;;
+</code></pre>
+
+<ul>
+<li>Update-Package-Lists : アップデートの確認頻度[Day]</li>
+<li>Download-Upgradeable-Packages : アップデートをダウンロードしておくか</li>
+<li>AutocleanInterval : クリーンアップ頻度[Day]</li>
+<li>Unattended-Upgrade : アップデートをインストールするか</li>
+</ul></li>
+
+<li><p>50unattended-upgradesを編集する<br />
+<code>vi /etc/apt/apt.conf.d/50unattended-upgrades</code></p>
+
+<pre><code>&quot;${distro_id}:${distro_codename}-updates&quot;; をコメントアウト
+</code></pre></li>
+
+<li><p>20-auto-upgradesを適用する<br />
+<code>dpkg-reconfigure -plow unattended-upgrades</code></p></li>
+
+<li><p>自動アップデートのサービスがactiveかを確認<br />
+<code>systemctl status unattended-upgrades.service</code></p></li>
+
+<li><p>テストする<br />
+<code>unattended-upgrade --dry-run --debug</code></p></li>
+</ol>
+
+<h1 id="一般ユーザを新規追加してsudoが使えるようにしておく">一般ユーザを新規追加してsudoが使えるようにしておく</h1>
+
+<ol>
+<li><code>adduser &lt;user&gt;</code></li>
+<li><code>gpasswd -a &lt;user&gt; sudo</code></li>
+</ol>
+
+<h1 id="一般ユーザでサーバーにsshできるようにする">一般ユーザでサーバーにSSHできるようにする</h1>
+
+<h2 id="ローカルで公開鍵を生成する">ローカルで公開鍵を生成する</h2>
+
+<ol>
+<li><code>cd ~/.ssh</code></li>
+<li><code>ssh-keygen -t rsa -b 4096</code></li>
+<li><code>chmod 600 &lt;秘密鍵&gt;</code></li>
+
+<li><p><code>vi config</code></p>
+
+<pre><code>Host &lt;nickname&gt;
+HostName &lt;ip address&gt;
+Port &lt;port for ssh&gt;
+User &lt;username&gt;
+IdentityFile ~/.ssh/&lt;秘密鍵&gt;
+</code></pre></li>
+
+<li><p><code>pbcopy &lt; ~/.ssh/&lt;公開鍵&gt;</code></p></li>
+</ol>
+
+<h2 id="サーバーに公開鍵を登録する">サーバーに公開鍵を登録する</h2>
+
+<ol>
+<li><code>su &lt;user&gt;</code></li>
+<li><code>mkdir ~/.ssh</code></li>
+<li><code>chmod 700 .ssh</code></li>
+<li><code>~/.ssh/authorized_keys</code>に公開鍵をコピペ</li>
+<li><code>chmod 600 authorized_keys</code></li>
+<li><code>cd /etc/ssh</code></li>
+<li><code>sudo cp sshd_config sshd_config.bk</code></li>
+
+<li><p><code>sshd_config</code>を編集する</p>
+
+<pre><code>Port &lt;port for ssh&gt; &lt;== 22番以外にしたほうが良い
+PermitRootLogin no
+PasswordAuthentication no
+PubkeyAuthentication yes
+UsePAM no
+</code></pre></li>
+
+<li><p><code>sudo systemctl restart ssh</code></p></li>
+
+<li><p>ローカルからサーバにsshできれば優勝</p></li>
+
+<li><p><code>rm &lt;公開鍵&gt;</code></p></li>
+</ol>
+
+<h1 id="firewallを設定する">Firewallを設定する</h1>
+
+<ol>
+<li><code>sudo ufw reset</code></li>
+<li><code>sudo ufw default DENY</code>で全パケットを拒否する設定にする</li>
+<li><code>sudo ufw allow &lt;port for ssh&gt;</code>でSSHのポートは許可しておく</li>
+<li><code>sudo ufw enable</code>でファイアウォールを有効化</li>
+<li><code>sudo ufw status verbose</code>で状態を確認</li>
+</ol>
+
+<ul>
+<li>ufwのログは<code>/var/log/ufw.log</code>に出力される</li>
+<li>設定したルールを削除したいなら
+
+<ul>
+<li><code>sudo ufw status numbered</code></li>
+<li><code>sudo ufw delete &lt;消したい番号&gt;</code></li>
+</ul></li>
+<li>Dockerはiptablesを直接書き換えるので，<code>ufw</code>で80/433番ポートをフィルタしても効果は無い．詳しくは<a href="https://yasakura.me/post/docker-network/">Dockerコンテナ/Kubernetesのネットワーク構成</a>を参照のこと．</li>
+</ul>
+
+<h1 id="dockerをインストールする">Dockerをインストールする</h1>
+
+<ol>
+<li>UbuntuにDockerをインストールする
+
+<ul>
+<li><a href="https://docs.docker.com/engine/install/ubuntu/">Install Docker Engine on Ubuntu</a></li>
+</ul></li>
+<li>一般ユーザが<code>docker</code>コマンドを使えるようにする
+
+<ul>
+<li><a href="https://docs.docker.com/engine/install/linux-postinstall/">Post-installation steps for Linux</a></li>
+</ul></li>
+</ol>
+
+<h1 id="nginxコンテナを立ち上げてhttpでアクセスできることを確認する">Nginxコンテナを立ち上げてHTTPでアクセスできることを確認する</h1>
+
+<p>今回は以下のようなフォルダ構成を仮定して説明する．</p>
+
+<pre><code>/web/
+  ├ nginx/
+  |  ├ letsencrypt/     &lt;=== let's encrypt関連
+  |  ├ logs/
+  |  |  ├ access.log    &lt;=== アクセスログ
+  |  |  ├ error.log     &lt;=== エラーログ
+  |  |  └ certbot.log   &lt;=== cronによる証明書の自動更新の際のログ
+  |  ├ default.conf     &lt;=== nginx.confからincludeされる設定
+  |  ├ nginx.conf       &lt;=== Nginxの設定
+  |  └ Dockerfile
+  └ docker-compose.yml 
+</code></pre>
+
+<p>まずは．Nginxコンテナを起動するためのDockerfileを書く．詳しくは<a href="https://yasakura.me/post/how-to-use-docker/">Dockerコンテナのライフサイクル</a>を参照のこと．</p>
+
+<pre><code>FROM nginx:latest
+RUN apt-get update &amp;&amp; \
+    apt-get install -y certbot python-certbot-nginx &amp;&amp; \
+    apt-get clean &amp;&amp; \
+    rm -rf /var/lib/apt/lists/* &amp;&amp; \
+    ln -sf  /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
+ADD nginx.conf /etc/nginx/
+ADD default.conf /etc/nginx/conf.d/
+</code></pre>
+
+<ul>
+<li>Nginxコンテナのベースイメージは<a href="https://hub.docker.com/_/nginx">nginx at docker hub</a>を用いることにする．<code>FROM nginx:latest</code>で取得できるNginxイメージはDebian10.4ベース．</li>
+<li>今回はHTTPS対応のためにLet&rsquo;s encryptを用いることにする．Let&rsquo;s encryptを使いやすくするためのパッケージである<a href="https://certbot.eff.org/lets-encrypt/debianbuster-nginx">certbot</a>をコンテナにインストールするため，DockerfileのRUNにて<code>apt-get install -y certbot python-certbot-nginx</code>を指定している．
+
+<ul>
+<li>インストール後，コンテナ内に<code>/etc/letsencrypt</code>というディレクトリが作られるので，後のdocker-compose.ymlにて，ホストの<code>/web/nginx/letsencrypt</code>とリンクさせている．</li>
+</ul></li>
+<li>ホスト側の<code>nginx.conf</code>と<code>default.conf</code>をコンテナ内にコピーするようにADDを指定する．</li>
+</ul>
+
+<p>次に，以下のようなNginxの設定ファイルを作成＆編集する．パラメータの説明は今回は省く．</p>
+
+<pre><code>user  nginx;
+worker_processes  1;
+
+error_log  /var/log/nginx/error.log warn;
+pid        /var/run/nginx.pid;
+
+
+events {
+    worker_connections  1024;
+    multi_accept on;
+    use epoll;
+}
+
+
+http {
+    server_tokens off;
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] &quot;$request&quot; '
+                      '$status $body_bytes_sent &quot;$http_referer&quot; '
+                      '&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;';
+
+    access_log  /var/log/nginx/access.log  main;
+
+    sendfile        on;
+    tcp_nopush      on;
+    tcp_nodelay     on;
+
+    keepalive_timeout  65;
+
+    include /etc/nginx/conf.d/*.conf; &lt;=== 別の.confファイルをincludeする
+}
+</code></pre>
+
+<p>また，以下のようなnginx.confからincludeされるdefault.confを作成＆編集する．パラメータの説明は今回は省く．</p>
+
+<pre><code>server {
+    server_name  &lt;hostname&gt;;
+    listen  80;
+
+    location / {
+        root   /usr/share/nginx/html;
+        index  index.html index.htm;
+    }
+
+    # redirect server error pages to the static page /50x.html
+    #
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+}
+
+</code></pre>
+
+<p>そして，以下のようなdocker-compose.ymlを書く．詳しくは<a href="https://yasakura.me/post/how-to-use-docker/">Dockerコンテナのライフサイクル</a>を参照のこと．</p>
+
+<pre><code>version: '3'
+services:
+  proxy:
+    build: ./nginx &lt;=== /web/nginx/Dockerfileへの相対パス
+    tty: true
+    container_name: proxy
+    logging:
+      driver: &quot;json-file&quot;
+      options:
+        max-size: &quot;10m&quot;
+        max-file: &quot;3&quot;
+    ports:
+      - &quot;80:80&quot;   &lt;=== HTTPで外部からアクセスできるように
+      - &quot;443:443&quot; &lt;=== HTTPSで外部からアクセスできるように
+    volumes:
+      - '/web/nginx/logs:/var/log/nginx' &lt;=== nginxのログはホスト側と共有する
+      - '/web/nginx/letsencrypt:/etc/letsencrypt' &lt;=== letsencryptのディレクトリもホストと共有する
+</code></pre>
+
+<p>最後に，ホストの<code>/web/</code>ディレクトリ内で<code>docker-compose up -d</code>を実行すると，docker-compose.ymlから新たなDockerイメージがビルドされてNginxコンテナが立ち上がる．ブラウザから<code>http://&lt;hostname&gt;</code>でアクセスできれば，HTTP部分は開通．</p>
+
+<pre><code>$ docker ps
+CONTAINER ID        IMAGE           COMMAND                  CREATED             STATUS              PORTS                                      NAMES
+5320cf3e8eff        web_proxy       &quot;/docker-entrypoint.…&quot;   21 seconds ago      Up 20 seconds       0.0.0.0:80-&gt;80/tcp, 0.0.0.0:443-&gt;443/tcp   proxy
+</code></pre>
+
+<h1 id="httpsに対応する">HTTPSに対応する</h1>
+
+<p>ホストで<code>docker exec -it proxy bash</code>を実行することでNginxコンテナに入り，<code>cerbot</code>を実行することでLet&rsquo;s encrypt証明書を発行する．発行された証明書はコンテナ内の<code>/etc/letsencrypt/live/&lt;hostname&gt;/</code>に保存される．</p>
+
+<p>次に，default.confを以下のように編集する．80番ポートへのアクセスは443番ポート(https://)へリダイレクトするように設定し，443番ポートにはsslの設定を行う．</p>
+
+<pre><code>server {
+    server_name  &lt;hostname&gt;;
+    listen 80;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    server_name  &lt;hostname&gt;;
+    listen  443;
+    ssl on;
+    ssl_protocols  TLSv1.2 TLSv1.3;
+    ssl_certificate     /etc/letsencrypt/live/&lt;hostname&gt;/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/&lt;hostname&gt;/privkey.pem;
+
+    location / {
+        root   /usr/share/nginx/html;
+        index  index.html index.htm;
+    }
+
+    # redirect server error pages to the static page /50x.html
+    #
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+}
+
+</code></pre>
+
+<p>最後に，ホストの<code>/web/</code>ディレクトリ内で<code>docker-compose restart</code>を実行して，Nginxコンテナを再起動することで，default.confを再読み込みさせる．ブラウザから<code>https://&lt;hostname&gt;</code>でアクセスできれば，HTTPSの対応が完了する．</p>
+
+<h1 id="let-s-encryptの証明書は90日で期限切れになる">Let&rsquo;s encryptの証明書は90日で期限切れになる</h1>
+
+<p>Let&rsquo;s encryptの証明書は90日で期限切れになるので，定期的に更新する必要がある．証明書の更新を自動で行うため，cronにjobを登録する．</p>
+
+<ol>
+<li><code>cp /etc/crontab /etc/cron.d/certbot_docker</code>にて，crontabフォーマットファイルをコピーする</li>
+
+<li><p><code>certbot_docker</code>に以下のような設定を行う．以下は，毎日午前3時に<code>date; docker exec proxy certbot renew</code>を実行し，結果を<code>/web/nginx/log/certbot.log</code>に出力するというジョブである．</p>
+
+<pre><code># m h dom mon dow user  command
+0 3    * * * &lt;username&gt; { date; docker exec proxy certbot renew; } &gt;&gt; /web/nginx/log/certbot.log 2&gt;&amp;1
+</code></pre></li>
+
+<li><p><code>sudo service cron restart</code>により，<code>certbot_docker</code>をcronに反映する．</p></li>
+
+<li><p>毎日午前3時に以下のようなログが<code>/web/nginx/log/certbot.log</code>に出力される．証明書の期限に余裕がある場合は，証明書の更新はスキップされ，証明書の期限が近づくと更新される．</p>
+
+<pre><code>Thu Jul 23 03:00:01 JST 2020
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Processing /etc/letsencrypt/renewal/&lt;hostname&gt;.conf
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Cert not yet due for renewal
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+The following certs are not due for renewal yet:
+/etc/letsencrypt/live/&lt;hostname&gt;/fullchain.pem expires on 20XX-XX-XX (skipped)
+No renewals were attempted.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+</code></pre></li>
+</ol>
+
+    <div class="share">
+    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fubuntu-nginx-docker-letsencrypt%2f&text=Ubuntu%e3%81%abNginx%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%e3%82%92%e7%ab%8b%e3%81%a6%e3%81%a6HTTPS%e3%81%ab%e5%af%be%e5%bf%9c%e3%81%99%e3%82%8b - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
+    <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fubuntu-nginx-docker-letsencrypt%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
+    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fubuntu-nginx-docker-letsencrypt%2f&title=Ubuntu%e3%81%abNginx%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%e3%82%92%e7%ab%8b%e3%81%a6%e3%81%a6HTTPS%e3%81%ab%e5%af%be%e5%bf%9c%e3%81%99%e3%82%8b - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
+</div>
+  </div>
+  <footer class="post-footer">
+    
+  </footer>
+</article>
+<footer class="footer">
+  <span>&copy; 2020 yasakura</span>
+</footer>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [['$','$'], ['\\(','\\)']],
+      processEscapes: true
+    },
+    linebreaks: {
+      automatic: true
+    }
+  });
+</script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+</body>
+</html>
+

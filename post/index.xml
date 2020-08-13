@@ -44,6 +44,22 @@ Host &amp;lt;nickname&amp;gt; HostName github.com IdentityFile &amp;lt;秘密鍵
     </item>
     
     <item>
+      <title>UbuntuにNginxコンテナを立ててHTTPSに対応する</title>
+      <link>https://yasakura.me/post/ubuntu-nginx-docker-letsencrypt/</link>
+      <pubDate>Thu, 13 Aug 2020 00:00:00 +0900</pubDate>
+      
+      <guid>https://yasakura.me/post/ubuntu-nginx-docker-letsencrypt/</guid>
+      <description>モチベーション  まっさらなUbuntuにNginxコンテナを立てて，それをWEBサーバーとして運用したい． Let&amp;rsquo;s encryptでHTTPSに対応したい．  前準備  UbuntuがインストールされたAmazon EC2やAmazon Lightsail，GCP Compute Engine, VPSや物理サーバなどを用意し，グローバルなIPアドレスを設定しておく． ドメインを取得し，UbuntuサーバーのIPアドレスと関連付けておく．  パッケージをアップデートする  apt updateでパッケージ一覧を更新 apt upgradeでパッケージを更新 apt autoremoveで必要なくなったパッケージを削除 apt autocleanで.debファイルを削除
+ /var/log/apt/history.logにaptコマンドの履歴がある /var/log/apt/term.logにaptコマンドのログがある   パッケージの自動アップデートを設定する セキュリティ対策のため，パッケージは常に最新になるようにする．
+ 20-auto-upgradesを編集する
+vi /etc/apt/apt.conf.d/20auto-upgrades
+APT::Periodic::Update-Package-Lists &amp;quot;1&amp;quot;; APT::Periodic::Download-Upgradeable-Packages &amp;quot;1&amp;quot;; APT::Periodic::AutocleanInterval &amp;quot;7&amp;quot;; APT::Periodic::Unattended-Upgrade &amp;quot;1&amp;quot;;   Update-Package-Lists : アップデートの確認頻度[Day] Download-Upgradeable-Packages : アップデートをダウンロードしておくか AutocleanInterval : クリーンアップ頻度[Day] Unattended-Upgrade : アップデートをインストールするか  50unattended-upgradesを編集する
+vi /etc/apt/apt.conf.d/50unattended-upgrades
+&amp;quot;${distro_id}:${distro_codename}-updates&amp;quot;; をコメントアウト  20-auto-upgradesを適用する
+dpkg-reconfigure -plow unattended-upgrades</description>
+    </item>
+    
+    <item>
       <title>関数の最大値または最小値を機械的に求める</title>
       <link>https://yasakura.me/post/how-to-solve-numerical-min-max/</link>
       <pubDate>Wed, 01 Apr 2020 00:00:05 +0900</pubDate>
