@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-162790219-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-162790219-1');
+    </script>
+  
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  
+  <title>Dockerコンテナ/Kubernetesのネットワーク構成 - yasakura</title>
+  
+  <meta name="description" content="モチベーション  Dockerコンテナのネットワークを理解するための足がかりとして，netnsについてまとめたい． Dockerコンテナが構成するネットワークについてまとめたい． -pオプションで何も考えずにポートを外に出すのは危険だよと言いたい  OSI参照モデルで役割を把握しておく OSI参照モデルを覚える必要は無いと思うが，どのレイヤーがどのような役割を行っているのかを理解しておく必要はあると思う．
+   レイヤー 呼称 例     L7 アプリケーション層 HTTP,FTP,DNS,SNMP   L6 プレゼンテーション層 HTTP,FTP,DNS,SNMP   L5 セッション層 HTTP,FTP,DNS,SNMP,TCP   L4 トランスポート層 TCP,UDP   L3 インターネット層 IP,ICMP,ARP   L2 リンク層 Ethernet,Wi-Fi   L1 物理層 UTP,STP     L2はブリッジ周辺  Ethernetヘッダの制御．IPパケットに，MACアドレスなどを埋め込んだEthernetヘッダをつける/とる． ブリッジはこの辺．  L3はルーター周辺  IPヘッダの制御．TCPセグメントやICMPセグメントにIPヘッダをつける/とる．  pingやtracerouteはL3で処理される． 経由するルータの数をTTL(Time To Live)として指定することで，TTL=0になるとそのパケットは破棄される．  192.">
+  
+  <link href=/css/style.css rel="stylesheet">
+  <link href=/css/font.css rel="stylesheet">
+  
+  <link rel="icon" href="https://yasakura.meimg/favicon.ico">
+  
+  <link rel="alternate" type="application/atom+xml" href="https://yasakura.meindex.xml" title="yasakura">
+</head>
+<body>
+  <header class="header">
+    <div class="title"><a href="https://yasakura.me">yasakura</a></div>
+    <nav id="navigation">
+      <ul class="menu">
+        <li><a href="https://yasakura.me/about/">ABOUT</a></li>
+      </ul>
+    </nav>
+  </header>
+<article class="post post-view">
+  <header class="post-header">
+    
+    <p class="post-meta">2020.8.13</p>
+    
+    <h1 class="post-title">Dockerコンテナ/Kubernetesのネットワーク構成</h1>
+    
+  </header>
+  <div class="post-content">
+    <div class="share">
+    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fdocker-network%2f&text=Docker%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%2fKubernetes%e3%81%ae%e3%83%8d%e3%83%83%e3%83%88%e3%83%af%e3%83%bc%e3%82%af%e6%a7%8b%e6%88%90 - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
+    <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fdocker-network%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
+    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fdocker-network%2f&title=Docker%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%2fKubernetes%e3%81%ae%e3%83%8d%e3%83%83%e3%83%88%e3%83%af%e3%83%bc%e3%82%af%e6%a7%8b%e6%88%90 - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
+</div>
+    
+
+<h1 id="モチベーション">モチベーション</h1>
+
+<ul>
+<li>Dockerコンテナのネットワークを理解するための足がかりとして，netnsについてまとめたい．</li>
+<li>Dockerコンテナが構成するネットワークについてまとめたい．</li>
+<li><code>-p</code>オプションで何も考えずにポートを外に出すのは危険だよと言いたい</li>
+</ul>
+
+<h1 id="osi参照モデルで役割を把握しておく">OSI参照モデルで役割を把握しておく</h1>
+
+<p>OSI参照モデルを覚える必要は無いと思うが，どのレイヤーがどのような役割を行っているのかを理解しておく必要はあると思う．</p>
+
+
+    <div class = "table">
+
+<table>
+<thead>
+<tr>
+<th>レイヤー</th>
+<th>呼称</th>
+<th>例</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>L7</td>
+<td>アプリケーション層</td>
+<td>HTTP,FTP,DNS,SNMP</td>
+</tr>
+
+<tr>
+<td>L6</td>
+<td>プレゼンテーション層</td>
+<td>HTTP,FTP,DNS,SNMP</td>
+</tr>
+
+<tr>
+<td>L5</td>
+<td>セッション層</td>
+<td>HTTP,FTP,DNS,SNMP,TCP</td>
+</tr>
+
+<tr>
+<td>L4</td>
+<td>トランスポート層</td>
+<td>TCP,UDP</td>
+</tr>
+
+<tr>
+<td>L3</td>
+<td>インターネット層</td>
+<td>IP,ICMP,ARP</td>
+</tr>
+
+<tr>
+<td>L2</td>
+<td>リンク層</td>
+<td>Ethernet,Wi-Fi</td>
+</tr>
+
+<tr>
+<td>L1</td>
+<td>物理層</td>
+<td>UTP,STP</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="l2はブリッジ周辺">L2はブリッジ周辺</h2>
+
+<ul>
+<li>Ethernetヘッダの制御．IPパケットに，MACアドレスなどを埋め込んだEthernetヘッダをつける/とる．</li>
+<li>ブリッジはこの辺．</li>
+</ul>
+
+<h2 id="l3はルーター周辺">L3はルーター周辺</h2>
+
+<ul>
+<li>IPヘッダの制御．TCPセグメントやICMPセグメントにIPヘッダをつける/とる．
+
+<ul>
+<li><code>ping</code>や<code>traceroute</code>はL3で処理される．</li>
+<li>経由するルータの数をTTL(Time To Live)として指定することで，TTL=0になるとそのパケットは破棄される．</li>
+</ul></li>
+<li>192.168.1.1を255.255.255.0（サブネットマスク）でマスクすると192.168.1.0（ネットワークID）が取り出せる（マスクされなかった部分はホストIDと呼ぶ）．これを192.168.1.1/24（先頭3byteでマスクするという意味）と表現しても良い．
+
+<ul>
+<li>ネットワークIDが異なる通信はデフォルトゲートウェイに解決してもらう
+
+<ul>
+<li>192.168.1.1/24なクライアントから192.168.1.2/24なサーバーへは，直接問い合わせることができる．</li>
+<li>192.168.1.1/24なクライアントから192.168.2.1/24なサーバーへは，ゲートウェイを通って問い合わせる．</li>
+</ul></li>
+</ul></li>
+<li>IPアドレスとMACアドレスを対応付けしたAPRテーブルにより．IPアドレスからMACアドレスを解決したりする．</li>
+<li>ルーターはこの辺．</li>
+</ul>
+
+<h2 id="l4はソケット周辺">L4はソケット周辺</h2>
+
+<ul>
+<li>主にソケットの制御を行う．TCPとかUDPとか．セッション管理的な事も行っているのでL5とラップしている．
+
+<ul>
+<li>アプリとポートの紐付け</li>
+<li>3way Handshakeによるコネクションの確立</li>
+<li>ACKによるパケットの保証と再送</li>
+<li>送受信パッファの空き状況による送信パケット数の調整＝フロー制御</li>
+<li>受信側でのパケットの整列＝順序制御</li>
+<li>パケットロスに対する送信パケット数の調整＝輻輳制御</li>
+</ul></li>
+</ul>
+
+<h2 id="l7-l6-l5はアプリケーション周辺">L7,L6,L5はアプリケーション周辺</h2>
+
+<ul>
+<li>例えばWEBアプリケーションだとすると，
+
+<ul>
+<li>HTTPのヘッダにはContent-Type,User-Agent,Cookieが埋め込まれているので，L7,L6,L5の役割をすべて担っていると考えて良い．</li>
+<li>HTTPのメソッドはGET/POST/PUT/DELETE/HEAD/OPTIONS/TRACE/CONNECTの8種類あるが，CRUDで大体済む．</li>
+</ul></li>
+</ul>
+
+
+    <div class = "table">
+
+<table>
+<thead>
+<tr>
+<th>CRUD</th>
+<th>HTTPメソッド</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>Create</td>
+<td>POST/PUT</td>
+</tr>
+
+<tr>
+<td>Read</td>
+<td>GET</td>
+</tr>
+
+<tr>
+<td>Update</td>
+<td>PUT</td>
+</tr>
+
+<tr>
+<td>Delete</td>
+<td>DELETE</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<h1 id="つまり-サーバー-クライアントアプリケーションはl7-l6-l5-l4らへん">つまり，サーバー/クライアントアプリケーションはL7,L6,L5,L4らへん</h1>
+
+<p>以下はC言語での実装例であるが，基本的にはどのサーバー/クライアントアプリケーションもL7,L6,L5,L4らへんを実装したものである．</p>
+
+<h2 id="サーバー側">サーバー側</h2>
+
+<ul>
+<li>TCPソケットを作成する．socket()</li>
+<li>ソケットに，IPアドレスやポート番号を紐付ける．bind()</li>
+<li>コネクションの数を設定し，接続可能状態にする．listen()</li>
+<li>以下をループする
+
+<ul>
+<li>コネクション確立により，クライアント用ソケットを作成する．accept()</li>
+<li>クライアント用ソケットとクライアント間でデータを送受信する．send()/recv()</li>
+<li>クライアント用ソケットを閉じて接続終了にする．close()</li>
+</ul></li>
+<li>ソケットを閉じる．close()</li>
+</ul>
+
+<h2 id="クライアント側">クライアント側</h2>
+
+<ul>
+<li>DNSによってIPアドレスを解決する．getaddrinfo()</li>
+<li>TCPソケットを作成する．socket()</li>
+<li>コネクションを確立させる．connect()</li>
+<li>サーバーとデータを送受信する．recv()/send()</li>
+<li>接続を終了する．close()</li>
+</ul>
+
+<h1 id="ifconfigとかiptablesとかで見ているのはl3-l2らへん">ifconfigとかiptablesとかで見ているのはL3,L2らへん</h1>
+
+<p>ここからが本題．L2,L3は物理層であるL1に依存しているため，基本的に，L1-L2-L3は一対一に対応している．しかし，同一のホスト内で異なるIPアドレスを持ったアプリケーションを実行するためには，L3（ルーター）を複数用意する必要があり，場合によっては，L3をまとめるL2（ブリッジ）も複数用意する必要がある．これを実現するには，複数のL2,L3を仮想的に用意できる機能であるnetnsを用いる．</p>
+
+<h1 id="network-namespace-netns-でホスト内のネットワークを分離する">Network Namespace(netns)でホスト内のネットワークを分離する</h1>
+
+<p>Network Namespace(netns)とは，ルーティングテーブルやブリッジなどのホスト内のネットワークスタックを仮想的に分離するLinuxカーネルの機能である．同一のホスト上でプロセス毎にネットワークスタックを設定することができ，分離された空間をNamespaceと呼ぶ．</p>
+
+<h2 id="network-namespaceをつくってみる">Network Namespaceをつくってみる</h2>
+
+<p>まず，<code>ifconfig</code>により，eth0やloなどのインターフェースを確認することができ，ethXは物理的なインターフェースであり，ホスト外からみたIPアドレスを指す．また，loは仮想的なインターフェースであり，ホストからみた自身のIPアドレス(一般的には127.0.0.0/8)を指す．</p>
+
+<p><code>ip netns add &lt;name&gt;</code>により．任意のnamespaceをホストに定義することができる．</p>
+
+<pre><code>$ sudo ip netns add mynamespace
+$ ip netns list
+mynamespace
+</code></pre>
+
+<p><code>ip netns exec &lt;namespace&gt; &lt;command&gt;</code>により，namespaceと<code>&lt;command&gt;</code>を紐付けることができる．これにより，<code>&lt;command&gt;</code>はホストのネットワークから隔離された状態で実行される．</p>
+
+<pre><code>$ sudo ip netns exec mynamespace sh
+
+# ifconfig &lt;=== この時点ではactiveなインターフェースは存在しない
+
+# ping 127.0.0.1 &lt;=== loへのpingも通らない
+connect: Network is unreachable
+
+# ip link set lo up &lt;=== loをupする
+# ping 127.0.0.1
+PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data.
+64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.028 ms
+64 bytes from 127.0.0.1: icmp_seq=2 ttl=64 time=0.032 ms
+^C
+--- 127.0.0.1 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1005ms
+rtt min/avg/max/mdev = 0.028/0.030/0.032/0.002 ms
+#
+# ifconfig
+lo: flags=73&lt;UP,LOOPBACK,RUNNING&gt;  mtu 65536 &lt;=== loが立ち上がる
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10&lt;host&gt;
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 4  bytes 336 (336.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 4  bytes 336 (336.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+# exit
+</code></pre>
+
+<p>ホストとnamespaceをつなげるためには，仮想的なインターフェースであるVirtual Ethernetのペアを用意する必要がある．</p>
+
+<pre><code>$ sudo ip link add type veth &lt;=== ホストでveth0/1のペアを用意する．ここではVirtual Ethernetのニックネームをvethとした．
+$ ip link
+...
+117: veth0@veth1: &lt;BROADCAST,MULTICAST,M-DOWN&gt; mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 36:07:ad:3a:ea:0e brd ff:ff:ff:ff:ff:ff
+118: veth1@veth0: &lt;BROADCAST,MULTICAST,M-DOWN&gt; mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 96:70:77:07:c0:98 brd ff:ff:ff:ff:ff:ff
+    veth0/1のペアが用意された．
+
+$ sudo ip link set veth1 netns mynamespace　&lt;=== mynamespaceにveth1を持っていく
+$ ip link
+...
+117: veth0@if118: &lt;BROADCAST,MULTICAST&gt; mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether 36:07:ad:3a:ea:0e brd ff:ff:ff:ff:ff:ff link-netnsid 2
+    veth1が見えなくなった．
+
+$ ip address show veth0
+117: veth0@if118: &lt;BROADCAST,MULTICAST&gt; mtu 1500 qdisc noop state DOWN group default qlen 1000
+    link/ether 36:07:ad:3a:ea:0e brd ff:ff:ff:ff:ff:ff link-netnsid 2
+    veth0にはIPアドレスが設定されていないようだ
+
+$ sudo ip addr add 172.19.0.1/24 dev veth0 &lt;=== veth0にIPアドレスを設定する
+$ ip address show veth0
+117: veth0@if118: &lt;BROADCAST,MULTICAST&gt; mtu 1500 qdisc noop state DOWN group default qlen 1000
+    link/ether 36:07:ad:3a:ea:0e brd ff:ff:ff:ff:ff:ff link-netnsid 2
+    inet 172.19.0.1/24 scope global veth0 &lt;=== IPアドレスが設定された
+       valid_lft forever preferred_lft foreve
+
+$ sudo ip link set veth0 up &lt;=== veth0をactiveにする
+$ ip address show veth0
+117: veth0@if118: &lt;NO-CARRIER,BROADCAST,MULTICAST,UP&gt; mtu 1500 qdisc noqueue state LOWERLAYERDOWN group default qlen 1000
+    link/ether 36:07:ad:3a:ea:0e brd ff:ff:ff:ff:ff:ff link-netnsid 2
+    inet 172.19.0.1/24 scope global veth0
+       valid_lft forever preferred_lft forever
+    &lt;NO-CARRIER,BROADCAST,MULTICAST,UP&gt;によるとUPしたらしい
+
+$ sudo ip netns exec mynamespace bash &lt;=== mynamespace内でbashを立ち上げる
+# ifconfig
+lo: flags=73&lt;UP,LOOPBACK,RUNNING&gt;  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10&lt;host&gt;
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 20  bytes 1504 (1.5 KB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 20  bytes 1504 (1.5 KB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+# ip link 
+1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+118: veth1@if117: &lt;BROADCAST,MULTICAST&gt; mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000　&lt;=== mynamespace内にveth1がつくられている
+    link/ether 96:70:77:07:c0:98 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    veth0の片割れがnamespace内で見つかった
+
+# sudo ip addr add 172.19.0.2/24 dev veth1 &lt;=== veth1にIPアドレスを設定する
+# ip addr
+1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host
+       valid_lft forever preferred_lft forever
+118: veth1@if117: &lt;BROADCAST,MULTICAST&gt; mtu 1500 qdisc noop state DOWN group default qlen 1000
+    link/ether 96:70:77:07:c0:98 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+    inet 172.19.0.2/24 scope global veth1 &lt;=== veth1にIPアドレスが設定された
+       valid_lft forever preferred_lft forever
+
+# ip link set veth1 up
+# ifconfig
+lo: flags=73&lt;UP,LOOPBACK,RUNNING&gt;  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10&lt;host&gt;
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 36  bytes 2672 (2.6 KB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 36  bytes 2672 (2.6 KB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+veth1: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500 &lt;=== veth1がactiveなインターフェースとして認識された
+        inet 172.19.0.2  netmask 255.255.255.0  broadcast 0.0.0.0
+        inet6 fe80::9470:77ff:fe07:c098  prefixlen 64  scopeid 0x20&lt;link&gt;
+        ether 96:70:77:07:c0:98  txqueuelen 1000  (Ethernet)
+        RX packets 6  bytes 516 (516.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 6  bytes 516 (516.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+# ping 172.19.0.1
+PING 172.19.0.1 (172.19.0.1) 56(84) bytes of data.
+64 bytes from 172.19.0.1: icmp_seq=1 ttl=64 time=0.073 ms &lt;=== ホスト側のveth0との疎通がとれている
+64 bytes from 172.19.0.1: icmp_seq=2 ttl=64 time=0.070 ms
+^C
+--- 172.19.0.1 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1010ms
+rtt min/avg/max/mdev = 0.070/0.071/0.073/0.008 ms
+
+</code></pre>
+
+<p>ここまでで，ホスト側からnamespace内のveth1への疎通は取れるようになる．しかし，veth1から172.19.0.0/24以外には出られない．
+なぜなら，namespace内のルーティングテーブルには，デフォルトルート（デフォルトゲートウェイ）が設定されていないので，172.19.0.0/24以外の行き先を解決することができないからである．
+したがって，namespace内でデフォルトルートを設定することで，namespaceから172.19.0.0/24以外に行くことができる．</p>
+
+<pre><code>$ sudo ip netns exec mynamespace bash
+# ip route
+172.19.0.0/24 dev veth1 proto kernel scope link src 172.19.0.2
+
+# ping 172.17.0.1
+connect: Network is unreachable &lt;=== ホスト側には予め用意した172.17.0.1があるはずだが見つからない
+
+# ip route add default via 172.19.0.1 &lt;=== 172.19.0.1をmynamespaceのデフォルトルートにする
+# ip route
+default via 172.19.0.1 dev veth1
+172.19.0.0/24 dev veth1 proto kernel scope link src 172.19.0.2
+
+# ping 172.17.0.1
+PING 172.17.0.1 (172.17.0.1) 56(84) bytes of data.
+64 bytes from 172.17.0.1: icmp_seq=1 ttl=64 time=0.047 ms &lt;=== ホスト側の172.17.0.1が見つかった
+64 bytes from 172.17.0.1: icmp_seq=2 ttl=64 time=0.054 ms
+^C
+--- 172.17.0.1 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1013ms
+rtt min/avg/max/mdev = 0.047/0.050/0.054/0.007 ms
+
+</code></pre>
+
+<p>ここまでの設定によって，namespaceとホストを行き来することが可能になるが，ホストのeth0からWAN側へは出られない．
+なぜなら，NATの設定をしていないので，IPアドレスの変換が行われないからである．
+したがって，ホストのiptableにNATの設定を行うことで，namespaceからWANに行くことが可能になる．</p>
+
+<pre><code># ping 185.XXX.XXX.XXX
+PING 185.XXX.XXX.XXX (185.XXX.XXX.XXX) 56(84) bytes of data.
+^C
+--- 185.XXX.XXX.XXX ping statistics ---
+3 packets transmitted, 0 received, 100% packet loss, time 2032ms &lt;=== mynamespaceからWANに出られない
+
+$ sudo iptables --table nat --append POSTROUTING --source 172.19.0.0/24 --jump MASQUERADE
+$ sudo iptables -vnL -t nat
+
+...
+Chain POSTROUTING (policy ACCEPT 1 packets, 59 bytes)
+ pkts bytes target     prot opt in     out     source               destination
+    0     0 MASQUERADE  all  --  *      *       172.19.0.0/24        0.0.0.0/0 
+    各インターフェースから出ようとする172.19.0.0/24からきたパケットのIPアドレスを，出ようとしたインターフェースのIPアドレスに変換するようにする．
+...
+
+# ping 185.XXX.XXX.XXX
+PING 185.XXX.XXX.XXX (185.XXX.XXX.XXX) 56(84) bytes of data.
+64 bytes from 185.XXX.XXX.XXX: icmp_seq=1 ttl=58 time=2.22 ms
+64 bytes from 185.XXX.XXX.XXX: icmp_seq=2 ttl=58 time=1.04 ms
+64 bytes from 185.XXX.XXX.XXX: icmp_seq=3 ttl=58 time=1.14 ms
+^C
+--- 185.XXX.XXX.XXX ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2006ms &lt;=== mynamespaceからWANに出られた
+rtt min/avg/max/mdev = 1.049/1.474/2.227/0.533 ms
+
+</code></pre>
+
+<p>一般に，同一のネットワークIDを持つVirtual Ethernetは一つのブリッジでまとめておく．</p>
+
+<pre><code>$ sudo ip link add mybridge type bridge &lt;=== mybridgeというブリッジを追加する
+$ sudo ip link
+117: veth0@if118: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UP mode DEFAULT group default qlen 1000
+    link/ether 36:07:ad:3a:ea:0e brd ff:ff:ff:ff:ff:ff link-netnsid 2
+119: mybridge: &lt;BROADCAST,MULTICAST&gt; mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000 &lt;=== mybridgeが追加された
+    link/ether da:09:90:31:b9:c3 brd ff:ff:ff:ff:ff:ff
+
+$ sudo ip link set dev veth0 master mybridge &lt;=== mybridgeにveth0を接続する
+$ sudo ip link show master mybridge
+117: veth0@if118: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue master mybridge state UP mode DEFAULT group default qlen 1000
+    link/ether 36:07:ad:3a:ea:0e brd ff:ff:ff:ff:ff:ff link-netnsid 2
+    mybridgeにveth0が接続された
+
+$ sudo ip link set mybridge up &lt;=== mybridgeをupする
+$ sudo ip link
+117: veth0@if118: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue master mybridge state UP mode DEFAULT group default qlen 1000
+    link/ether 36:07:ad:3a:ea:0e brd ff:ff:ff:ff:ff:ff link-netnsid 2
+119: mybridge: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UP mode DEFAULT group default qlen 1000 &lt;=== mybridgeがupした
+    link/ether 36:07:ad:3a:ea:0e brd ff:ff:ff:ff:ff:ff
+
+$ sudo ip addr del 172.19.0.1/24 dev veth0 &lt;=== veth0に割り当てているルートアドレスを消す
+$ sudo ip addr add 172.19.0.1/24 dev mybridge &lt;=== mybridgeにルートアドレスを設定する
+
+# ping 172.17.0.1
+PING 172.17.0.1 (172.17.0.1) 56(84) bytes of data.
+64 bytes from 172.17.0.1: icmp_seq=1 ttl=64 time=0.061 ms &lt;=== mynamespaceから別のホストIDにアクセスできた
+64 bytes from 172.17.0.1: icmp_seq=2 ttl=64 time=0.079 ms
+64 bytes from 172.17.0.1: icmp_seq=3 ttl=64 time=0.092 ms
+^C
+--- 172.17.0.1 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2044ms
+rtt min/avg/max/mdev = 0.061/0.077/0.092/0.014 ms
+
+</code></pre>
+
+<p>ここまでで，<code>eth0(ホスト)-bridge-veth(ホスト側)-veth(プロセス側)</code>という構成を実現できた．</p>
+
+<h1 id="コンテナがデフォルトで構成するネットワーク">コンテナがデフォルトで構成するネットワーク</h1>
+
+<p>ここまでやってきたnetnsによるL2,L3の仮想化作業をDockerは自動で行っている．Dockerサービスは<code>docker0</code>というDockerブリッジをデフォルトで用意する．</p>
+
+<pre><code>$ docker network ls | grep bridge
+dcec008f4804        bridge              bridge              local
+
+$ docker network inspect bridge
+[
+    {
+        &quot;Name&quot;: &quot;bridge&quot;,
+        &quot;Id&quot;: &quot;dcec008f4804...
+        &quot;Created&quot;: &quot;2020-07-04T02:51:36.795932003+09:00&quot;,
+        &quot;Scope&quot;: &quot;local&quot;,
+        &quot;Driver&quot;: &quot;bridge&quot;,
+        &quot;EnableIPv6&quot;: false,
+        &quot;IPAM&quot;: {
+            &quot;Driver&quot;: &quot;default&quot;,
+            &quot;Options&quot;: null,
+            &quot;Config&quot;: [
+                {
+                    &quot;Subnet&quot;: &quot;172.17.0.0/16&quot;
+                }
+            ]
+        },
+        &quot;Internal&quot;: false,
+        &quot;Attachable&quot;: false,
+        &quot;Ingress&quot;: false,
+        &quot;ConfigFrom&quot;: {
+            &quot;Network&quot;: &quot;&quot;
+        },
+        &quot;ConfigOnly&quot;: false,
+        &quot;Containers&quot;: {},
+        &quot;Options&quot;: {
+            &quot;com.docker.network.bridge.default_bridge&quot;: &quot;true&quot;,
+            &quot;com.docker.network.bridge.enable_icc&quot;: &quot;true&quot;,
+            &quot;com.docker.network.bridge.enable_ip_masquerade&quot;: &quot;true&quot;,
+            &quot;com.docker.network.bridge.host_binding_ipv4&quot;: &quot;0.0.0.0&quot;,
+            &quot;com.docker.network.bridge.name&quot;: &quot;docker0&quot;,
+            &quot;com.docker.network.driver.mtu&quot;: &quot;1500&quot;
+        },
+        &quot;Labels&quot;: {}
+    }
+]
+
+$ ifconfig docker0
+docker0: flags=4099&lt;UP,BROADCAST,MULTICAST&gt;  mtu 1500
+        inet 172.17.0.1  netmask 255.255.0.0  broadcast 172.17.255.255
+        inet6 ...  prefixlen 64  scopeid 0x20&lt;link&gt;
+        ether ...  txqueuelen 0  (Ethernet)
+        RX packets 33329  bytes 4334088 (4.3 MB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 155842  bytes 269698810 (269.6 MB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+</code></pre>
+
+<p>ここで，<code>docker exec -it &lt;container&gt; bash</code>などでコンテナを立ち上げると，<code>docker0</code>ブリッジにvethがつくられ，ホストからvethの片割れを確認することができる．</p>
+
+<pre><code>$ bridge link show
+116: veth7cd7c37 state UP @if115: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 master docker0 state forwarding priority 32 cost 2
+
+$ ifconfig veth7cd7c37
+veth7cd7c37: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500
+        inet6 ...  prefixlen 64  scopeid 0x20&lt;link&gt;
+        ether ...  txqueuelen 0  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 12  bytes 976 (976.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+</code></pre>
+
+<p>更に，立ち上げたコンテナプロセスのnamespaceに潜り込むと，コンテナ内のvethを確認することができる．</p>
+
+<pre><code>$ docker run -it --name hoge -p 8080:80 nginx bash
+
+$ docker inspect hoge
+...
+            &quot;Pid&quot;: 29942, &lt;=== コンテナのPID
+...
+
+$ sudo ln -fs /proc/29942/ns/net /var/run/netns/container &lt;=== コンテナ側のnetnsをホストで見れるようにsymbolic linkを張る
+
+$ sudo ip netns exec container bash
+
+# ifconfig
+eth0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500
+        inet 172.17.0.2  netmask 255.255.0.0  broadcast 172.17.255.255 &lt;=== コンテナ内のvethが見れた．eth0にリネームされている．
+        ether 02:42:ac:11:00:02  txqueuelen 0  (Ethernet)
+        RX packets 15  bytes 1186 (1.1 KB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags=73&lt;UP,LOOPBACK,RUNNING&gt;  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+</code></pre>
+
+<h2 id="コンテナへのパケットがiptablesによってどのようにフィルタされ-どのように外に出ていくかを知る">コンテナへのパケットがiptablesによってどのようにフィルタされ，どのように外に出ていくかを知る</h2>
+
+<ul>
+<li>コンテナでない，ホスト上のプロセスがパケットを扱う場合は，基本的に，<code>PREROUTING &gt; INPUT &gt; プロセス &gt; OUTPUT &gt; POSTROUTING</code>を通る．一方，コンテナはDockerブリッジを介してホストとパケットをやり取りするため，<code>PREROUTING &gt; FORWARD &gt; POSTROUTING</code>を通る．</li>
+
+<li><p>まず，<code>PREROUTING</code>にてWANからきたパケットをコンテナに転送する</p>
+
+<ul>
+<li><p><code>sudo iptables -vnL -t nat</code></p>
+
+<pre><code>Chain PREROUTING (policy ACCEPT 3424 packets, 328K bytes)
+pkts bytes target     prot opt in     out     source               destination
+155K 8069K DOCKER     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ADDRTYPE match dst-type LOCAL
+
+Chain DOCKER (2 references)
+ pkts bytes target     prot opt in     out     source               destination
+    0     0 RETURN     all  --  &lt;Dockerブリッジ&gt; *       0.0.0.0/0            0.0.0.0/0
+    0     0 RETURN     all  --  docker0 *       0.0.0.0/0            0.0.0.0/0
+    7   368 DNAT       tcp  --  !&lt;Dockerブリッジ&gt; *       0.0.0.0/0            0.0.0.0/0            tcp dpt:443 to:172.18.0.2:443
+    6   320 DNAT       tcp  --  !&lt;Dockerブリッジ&gt; *       0.0.0.0/0            0.0.0.0/0            tcp dpt:80 to:172.18.0.2:80
+</code></pre></li>
+
+<li><p>ローカルをウロウロしているパケット (ADDRTYPE match dst-type LOCAL) なら，DOCKERルールを適用する</p>
+
+<ul>
+<li>DOCKERチェインでは，
+
+<ul>
+<li>Dockerブリッジまたはdocker0ブリッジから来たパケットに関しては何もしない（RETURN）</li>
+<li>DNATにより，Dockerブリッジ以外(eth0つまりWANなど)から来た443/80ポートへのTCPパケットをすべて172.18.0.2:443/80に転送する</li>
+</ul></li>
+</ul></li>
+</ul></li>
+
+<li><p>次に，<code>FORWARD</code>チェインにてコンテナへのパケットをフィルタする</p>
+
+<ul>
+<li><code>sudo iptables -vnL</code></li>
+</ul>
+
+<pre><code>Chain FORWARD (policy DROP 0 packets, 0 bytes)
+ pkts bytes target     prot opt in     out     source               destination
+ 110K  179M DOCKER-USER  all  --  *      *       0.0.0.0/0            0.0.0.0/0
+ 110K  179M DOCKER-ISOLATION-STAGE-1  all  --  *      *       0.0.0.0/0            0.0.0.0/0
+ 4097  459K ACCEPT     all  --  *      &lt;Dockerブリッジ&gt;  0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED
+  821 43588 DOCKER     all  --  *      &lt;Dockerブリッジ&gt;  0.0.0.0/0            0.0.0.0/0
+ 3917 1085K ACCEPT     all  --  &lt;Dockerブリッジ&gt; !&lt;Dockerブリッジ&gt;  0.0.0.0/0            0.0.0.0/0
+    0     0 ACCEPT     all  --  &lt;Dockerブリッジ&gt; &lt;Dockerブリッジ&gt;  0.0.0.0/0            0.0.0.0/0
+ 139K  245M ACCEPT     all  --  *      docker0  0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED
+ 3086  157K DOCKER     all  --  *      docker0  0.0.0.0/0            0.0.0.0/0
+28904 4148K ACCEPT     all  --  docker0 !docker0  0.0.0.0/0            0.0.0.0/0
+    0     0 ACCEPT     all  --  docker0 docker0  0.0.0.0/0            0.0.0.0/0
+
+Chain DOCKER (2 references)
+ pkts bytes target     prot opt in     out     source               destination
+  134  6964 ACCEPT     tcp  --  !&lt;Dockerブリッジ&gt; &lt;Dockerブリッジ&gt;  0.0.0.0/0            172.18.0.2           tcp dpt:443
+  338 16904 ACCEPT     tcp  --  !&lt;Dockerブリッジ&gt; &lt;Dockerブリッジ&gt;  0.0.0.0/0            172.18.0.2           tcp dpt:80
+
+Chain DOCKER-ISOLATION-STAGE-1 (1 references)
+ pkts bytes target     prot opt in     out     source               destination
+ 3917 1085K DOCKER-ISOLATION-STAGE-2  all  --  &lt;Dockerブリッジ&gt; !&lt;Dockerブリッジ&gt;  0.0.0.0/0            0.0.0.0/0
+28904 4148K DOCKER-ISOLATION-STAGE-2  all  --  docker0 !docker0  0.0.0.0/0            0.0.0.0/0
+ 180K  251M RETURN     all  --  *      *       0.0.0.0/0            0.0.0.0/0
+
+Chain DOCKER-ISOLATION-STAGE-2 (2 references)
+ pkts bytes target     prot opt in     out     source               destination
+    0     0 DROP       all  --  *      &lt;Dockerブリッジ&gt;  0.0.0.0/0            0.0.0.0/0
+    0     0 DROP       all  --  *      docker0  0.0.0.0/0            0.0.0.0/0
+32821 5234K RETURN     all  --  *      *       0.0.0.0/0            0.0.0.0/0
+
+Chain DOCKER-USER (1 references)
+ pkts bytes target     prot opt in     out     source               destination
+ 180K  251M RETURN     all  --  *      *       0.0.0.0/0            0.0.0.0/0
+</code></pre>
+
+<ul>
+<li><code>DOCKER-USER</code>チェインは，何よりも先に適用されるルールなので，最も優先したいルールをユーザが自由に定義することができる．</li>
+<li><code>DOCKER-ISOLATION-STAGE-1</code>チェインでは，コンテナ間ネットワークに関するルールが定義される，</li>
+<li><Dockerブリッジ>に行く確立したパケット(ctstate RELATED,ESTABLISHED)はACCEPTする</li>
+<li><Dockerブリッジ>に行く未確立のパケットには<code>DOCKER</code>ルールを適用する
+
+<ul>
+<li><Dockerブリッジ>以外から来て<Dockerブリッジ>へ行く，送信先172.18.0.2:443/80なパケットをACCEPT</li>
+</ul></li>
+<li><Dockerブリッジ>からきて<Dockerブリッジ>以外へ行くパケットをACCEPT</li>
+<li><Dockerブリッジ>からきて<Dockerブリッジ>へ行くパケットをACCEPT</li>
+<li>docker0についても同様．</li>
+</ul></li>
+
+<li><p>最後に，<code>POSTROUTING</code>チェインを経てWANに出ていく</p>
+
+<ul>
+<li><p><code>sudo iptables -vnL -t nat</code></p>
+
+<pre><code>Chain POSTROUTING (policy ACCEPT 23 packets, 1364 bytes)
+ pkts bytes target     prot opt in     out     source               destination
+    6   418 MASQUERADE  all  --  *      !&lt;Dockerブリッジ&gt;  172.18.0.0/16        0.0.0.0/0
+   68  4149 MASQUERADE  all  --  *      !docker0  172.17.0.0/16        0.0.0.0/0
+    0     0 MASQUERADE  tcp  --  *      *       172.18.0.2           172.18.0.2           tcp dpt:443
+    0     0 MASQUERADE  tcp  --  *      *       172.18.0.2           172.18.0.2           tcp dpt:80
+</code></pre></li>
+
+<li><p>MASQUERADEで，Dockerブリッジ以外(eth0つまりWANなど)に行く172.18.0.0/16なパケットは，そのインターフェース(eth0など)のIPに変換する．</p></li>
+
+<li><p>MASQUERADEで，docker0以外(eth0つまりWANなど)に行く172.17.0.0/16なパケットは，そのインターフェース(eth0など)のIPに変換する．</p></li>
+
+<li><p>Dockerブリッジまたはdocker0に行く172.18.0.2なパケットは，送信先も172.18.0.2のまま．</p></li>
+</ul></li>
+</ul>
+
+<h1 id="コンテナ用のネットワークをつくる">コンテナ用のネットワークをつくる</h1>
+
+<ul>
+<li><code>docker run</code>で<code>--net</code>オプションを指定しない場合，または，docker-compose.ymlを利用しない場合はデフォルトのブリッジとして<code>docker0</code>が使われる．
+
+<ul>
+<li><code>--net=host</code>とすると，<code>docker0</code>やDockerブリッジを使わずにホストのネットワークを直接使うようになる．</li>
+<li>docker-compose.ymlを利用した場合は，ユニークなbridgeが生成される．<code>docker network ls</code>で確認できる．</li>
+</ul></li>
+<li>コンテナを立ち上げると自動でIPアドレスが振られるが，静的なIPアドレスを設定したい場合は，オリジナルのネットワークを定義することができる．
+
+<ul>
+<li><code>docker network create --driver=&lt;driver&gt; --subnet=&lt;subnet&gt; --gateway=&lt;gateway&gt; &lt;network name&gt;</code>
+
+<ul>
+<li>ネットワークが作成されると，<code>br-&lt;network id先頭12桁&gt;</code>というブリッジ名がつけられる．</li>
+</ul></li>
+<li><code>docker run --net=&lt;network name&gt;</code>によって，コンテナが使うネットワークを指定できる．</li>
+<li><code>docker network rm &lt;network name&gt;</code>によって，ネットワークを削除できる．</li>
+</ul></li>
+</ul>
+
+<h1 id="publishとexpose">publishとexpose</h1>
+
+<p><code>docker run</code>で<code>-p</code>(publish)オプションを指定したり，docker-compose.ymlで<code>ports</code>を指定すると，NATテーブルが自動で書き換えられる．これにより，WANとコンテナ間のアクセスが実現する．一方，セキュリティの観点から，80/443番ポートはpublishしたいが，DBコンテナとサーバーコンテナ間のポートはpublishしたくないなどと言った場合は，それぞれのコンテナを立ち上げるときに<code>--expose &lt;port&gt;</code>を指定することで，exposeなportはホスト内のみで有効となる．docker-compose.ymlなら<code>EXPOSE</code>がそれに該当する．</p>
+
+<h1 id="kubernetesのネットワーク構成">Kubernetesのネットワーク構成</h1>
+
+<p>あとで書く</p>
+
+    <div class="share">
+    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fdocker-network%2f&text=Docker%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%2fKubernetes%e3%81%ae%e3%83%8d%e3%83%83%e3%83%88%e3%83%af%e3%83%bc%e3%82%af%e6%a7%8b%e6%88%90 - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
+    <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fdocker-network%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
+    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fdocker-network%2f&title=Docker%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%2fKubernetes%e3%81%ae%e3%83%8d%e3%83%83%e3%83%88%e3%83%af%e3%83%bc%e3%82%af%e6%a7%8b%e6%88%90 - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
+</div>
+  </div>
+  <footer class="post-footer">
+    
+  </footer>
+</article>
+<footer class="footer">
+  <span>&copy; 2020 yasakura</span>
+</footer>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [['$','$'], ['\\(','\\)']],
+      processEscapes: true
+    },
+    linebreaks: {
+      automatic: true
+    }
+  });
+</script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+</body>
+</html>
+

@@ -2,22 +2,25 @@
 <html lang="ja">
 <head>
   
-  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-162790219-1"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-162790219-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-    gtag('config', 'UA-162790219-1');
-  </script>
+      gtag('config', 'UA-162790219-1');
+    </script>
+  
+
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   
-  <title>Dockerコンテナのライフサイクルとネットワーク構成 - yasakura</title>
+  <title>Dockerコンテナのライフサイクル - yasakura</title>
   
   <meta name="description" content="モチベーション  Dockerのライフサイクルを自分なりにまとめておきたい． Dockerコンテナが構成するネットワークについて知りたい．  Dockerのライフサイクル  docker runで，Dockerイメージを元にコンテナを起動する． docker stopで，コンテナを停止する． docker commitで，停止中のコンテナを新たなDockerイメージとしてとっておく． docker save/loadで，Dockerイメージを持ち運ぶ． docker startで，停止中のコンテナを再開する． docker rmで，停止中のコンテナを破棄する． docker rmiで，Dockerイメージを破棄する．  Dockerイメージを用意する  Dockerfileの書き方
- docker build -t &lt;image name&gt;:&lt;tag&gt; &lt;Dockerfileがあるディレクトリ&gt;によりDockerイメージがつくられる  &lt;tag&gt;にはimageのversionを設定するのが一般的．&lt;tag&gt;を省略した場合はlatestとされる．  docker pull &lt;image name&gt;でDockerイメージをもってくることができる．  DockerイメージはDocker Hubにて検索できる．  docker imagesで手元にあるDockerイメージ一覧を表示する．  docker images -qにより，DockerイメージID一覧を表示する．   Dockerイメージを元に，コンテナを立ち上げる  docker run -it --name &lt;container name&gt; &lt;image name&gt;:&lt;tag&gt; &lt;command&gt;  &lt;image name&gt;:&lt;tag&gt;から&lt;container name&gt;という名前のコンテナを立ち上げ，コンテナ内で&lt;command&gt;を実行する． -iはホストからコンテナへの標準入力を繋げるためのもの．-tはコンテナからホストへの標準出力を繋げるためのもの． -hオプションによって，ホスト名を指定できる． -dオプションによって，コンテナをバックグラウンドで実行できる． --rmフラグによって，コンテナがstopしたあとはコンテナを削除するようにする． --privilegedフラグによって，コンテナ内からホストのデバイスにアクセスすることができる．セキュリティには注意する．  --deviceフラグや--cap-addフラグによってデバイス単位で細かくアクセス権限を制御することができる．  Dockerイメージによっては，ずっと起動するものもあれば，&lt;command&gt;を一発実行してstopするものもある．  &lt;command&gt;に/bin/shを指定し，コンテナ内にshを立ち上げることで，コンテナを立ち上げたままにしておくことが多い．   docker ps  起動中のコンテナ一覧を表示する  docker attach &lt;container&gt;  コンテナにアタッチする．アタッチ後の振る舞いはDockerイメージによって異なり，コンテナの標準入出力が可能になる場合もあれば，何も起きない場合もある． アタッチしている状態で，ctrl&#43;pしctrl&#43;qすると，コンテナからデタッチすることができる．  docker exec -it &lt;container&gt; &lt;command&gt;  起動中のコンテナにコマンドを流し込むことができる． &lt;command&gt;に/bin/shを指定してコンテナ内にシェルを立ち上げることで，コンテナ内で作業することができる．   起動中のコンテナを停止させる  docker stop &lt;container&gt;  &lt;container&gt;を停止する．  docker ps -a  起動中または停止しているコンテナの一覧を表示する． docker ps -a -qで，コンテナIDの一覧を表示する．   停止したコンテナを立ち上げる  docker start &lt;container&gt;  コンテナをrestartさせる  docker restart &lt;container name&gt;で，docker stopとdocker startをまとめて実行してくれる，  停止中のコンテナをDockerイメージとして保存する  docker commit &lt;container&gt; &lt;image name&gt;:&lt;new tag&gt;  停止中の&lt;container&gt;から，&lt;image name&gt;:&lt;new tag&gt;というDockerイメージを作成する．   Dockerイメージをtarで固めて持ち運ぶ  docker save &lt;image name&gt;:&lt;tag&gt; &gt; &lt;filename&gt;で&lt;filename&gt;に&lt;image name&gt;:&lt;tag&gt;を書き出す docker load &lt; &lt;filename&gt;で読み込む docker imagesでイメージが読み込まれたことを確認 docker run -it &lt;filename&gt;  停止しているコンテナを破棄する  docker rm &lt;container&gt;  停止中のコンテナは，いつでも再開できるようにキャッシュされてるので，使わなくなったコンテナはdocker rmで破棄するようにする． docker rm -fで強制破棄． docker rm -f &#39;docker ps -a -q&#39;により，すべての停止中のコンテナを強制破棄することができる．   ローカルのDockerイメージを破棄する  docker rmi &lt;image&gt;  docker rmi &#39;docker images -q&#39;により，全てのDockerイメージを破棄する．   コンテナとホスト間でファイルをコピーする  docker cp &lt;CONTAINER ID&gt;:&lt;source@container&gt; &lt;target@host&gt;  コンテナからホストにファイルをコピーする  docker cp &lt;source@host&gt; &lt;CONTAINER ID&gt;:&lt;target@container&gt;  ホストからコンテナにファイルをコピーする   Dockerfileの書き方 Dockerfileとは，docker buildのための手順書のようなもの．Dockerfileを元にオリジナルのDockerイメージをつくることができる．">
+ docker build -t &lt;image name&gt;:&lt;tag&gt; &lt;Dockerfileがあるディレクトリ&gt;によりDockerイメージがつくられる  &lt;tag&gt;にはimageのversionを設定するのが一般的．&lt;tag&gt;を省略した場合はlatestとされる．  docker pull &lt;image name&gt;でDockerイメージをもってくることができる．  DockerイメージはDocker Hubにて検索できる．  docker imagesで手元にあるDockerイメージ一覧を表示する．  docker images -qにより，DockerイメージID一覧を表示する．   Dockerイメージを元に，コンテナを立ち上げる  docker run -it --name &lt;container name&gt; &lt;image name&gt;:&lt;tag&gt; &lt;command&gt;  &lt;image name&gt;:&lt;tag&gt;から&lt;container name&gt;という名前のコンテナを立ち上げ，コンテナ内で&lt;command&gt;を実行する． -iはホストからコンテナへの標準入力を繋げるためのもの．-tはコンテナからホストへの標準出力を繋げるためのもの． -hオプションによって，ホスト名を指定できる． -dオプションによって，コンテナをバックグラウンドで実行できる． -p &lt;host&gt;:&lt;container&gt;オプションによって，ホストのポートとコンテナのポートをつなげる．この時，iptablesが書き換えられ，ホスト側のポートがWANに曝されるので注意．  -pでなく，--expose &lt;port&gt;フラグを指定すると，リンクしたコンテナから&lt;container name&gt;:&lt;exposed port&gt;でアクセスすることができる．また，iptablesは変更されない．  --rmフラグによって，コンテナがstopしたあとはコンテナを削除するようにする． --privilegedフラグによって，コンテナ内からホストのデバイスにアクセスすることができる．セキュリティには注意する．  --deviceフラグや--cap-addフラグによってデバイス単位で細かくアクセス権限を制御することができる．  --link &lt;container&gt;:&lt;nickname&gt;を指定することで，&lt;container&gt;へアクセスする際のホスト名として利用できる．  例えば，hogeという名前のコンテナが立ち上がっている環境で，--link hoge:hgを指定して新たなコンテナを立ち上げたとすると，そのコンテナからはcurl http://hogeというような形でアクセスすることができる．  Dockerイメージによっては，ずっと起動するものもあれば，&lt;command&gt;を一発実行してstopするものもある．  &lt;command&gt;に/bin/shを指定し，コンテナ内にshを立ち上げることで，コンテナを立ち上げたままにしておくことが多い．   docker ps  起動中のコンテナ一覧を表示する  docker attach &lt;container&gt;  コンテナにアタッチする．アタッチ後の振る舞いはDockerイメージによって異なり，コンテナの標準入出力が可能になる場合もあれば，何も起きない場合もある． アタッチしている状態で，ctrl&#43;pしctrl&#43;qすると，コンテナからデタッチすることができる．  docker exec -it &lt;container&gt; &lt;command&gt;  起動中のコンテナにコマンドを流し込むことができる． &lt;command&gt;に/bin/shを指定してコンテナ内にシェルを立ち上げることで，コンテナ内で作業することができる．   起動中のコンテナを停止させる  docker stop &lt;container&gt;  &lt;container&gt;を停止する．  docker ps -a  起動中または停止しているコンテナの一覧を表示する． docker ps -a -qで，コンテナIDの一覧を表示する．   停止したコンテナを立ち上げる  docker start &lt;container&gt;  コンテナをrestartさせる  docker restart &lt;container name&gt;で，docker stopとdocker startをまとめて実行してくれる，  停止中のコンテナをDockerイメージとして保存する  docker commit &lt;container&gt; &lt;image name&gt;:&lt;new tag&gt;  停止中の&lt;container&gt;から，&lt;image name&gt;:&lt;new tag&gt;というDockerイメージを作成する．   Dockerイメージをtarで固めて持ち運ぶ  docker save &lt;image name&gt;:&lt;tag&gt; &gt; &lt;filename&gt;で&lt;filename&gt;に&lt;image name&gt;:&lt;tag&gt;を書き出す docker load &lt; &lt;filename&gt;で読み込む docker imagesでイメージが読み込まれたことを確認 docker run -it &lt;filename&gt;  停止しているコンテナを破棄する  docker rm &lt;container&gt;  停止中のコンテナは，いつでも再開できるようにキャッシュされてるので，使わなくなったコンテナはdocker rmで破棄するようにする． docker rm -fで強制破棄． docker rm -f &#39;docker ps -a -q&#39;により，すべての停止中のコンテナを強制破棄することができる．   ローカルのDockerイメージを破棄する  docker rmi &lt;image&gt;  docker rmi &#39;docker images -q&#39;により，全てのDockerイメージを破棄する．   コンテナとホスト間でファイルをコピーする  docker cp &lt;CONTAINER ID&gt;:&lt;source@container&gt; &lt;target@host&gt;  コンテナからホストにファイルをコピーする  docker cp &lt;source@host&gt; &lt;CONTAINER ID&gt;:&lt;target@container&gt;  ホストからコンテナにファイルをコピーする   Dockerfileの書き方 Dockerfileとは，docker buildのための手順書のようなもの．Dockerfileを元にオリジナルのDockerイメージをつくることができる．">
   
   <link href=/css/style.css rel="stylesheet">
   <link href=/css/font.css rel="stylesheet">
@@ -25,7 +28,6 @@
   <link rel="icon" href="https://yasakura.meimg/favicon.ico">
   
   <link rel="alternate" type="application/atom+xml" href="https://yasakura.meindex.xml" title="yasakura">
-  
 </head>
 <body>
   <header class="header">
@@ -38,15 +40,17 @@
   </header>
 <article class="post post-view">
   <header class="post-header">
-    <p class="post-meta">2020.8.9</p>
-    <h1 class="post-title">Dockerコンテナのライフサイクルとネットワーク構成</h1>
+    
+    <p class="post-meta">2020.8.13</p>
+    
+    <h1 class="post-title">Dockerコンテナのライフサイクル</h1>
     
   </header>
   <div class="post-content">
     <div class="share">
-    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fhow-to-use-docker%2f&text=Docker%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%e3%81%ae%e3%83%a9%e3%82%a4%e3%83%95%e3%82%b5%e3%82%a4%e3%82%af%e3%83%ab%e3%81%a8%e3%83%8d%e3%83%83%e3%83%88%e3%83%af%e3%83%bc%e3%82%af%e6%a7%8b%e6%88%90 - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
+    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fhow-to-use-docker%2f&text=Docker%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%e3%81%ae%e3%83%a9%e3%82%a4%e3%83%95%e3%82%b5%e3%82%a4%e3%82%af%e3%83%ab - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
     <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fhow-to-use-docker%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
-    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fhow-to-use-docker%2f&title=Docker%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%e3%81%ae%e3%83%a9%e3%82%a4%e3%83%95%e3%82%b5%e3%82%a4%e3%82%af%e3%83%ab%e3%81%a8%e3%83%8d%e3%83%83%e3%83%88%e3%83%af%e3%83%bc%e3%82%af%e6%a7%8b%e6%88%90 - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
+    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fhow-to-use-docker%2f&title=Docker%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%e3%81%ae%e3%83%a9%e3%82%a4%e3%83%95%e3%82%b5%e3%82%a4%e3%82%af%e3%83%ab - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
 </div>
     
 
@@ -100,11 +104,21 @@
 <li><code>-i</code>はホストからコンテナへの標準入力を繋げるためのもの．<code>-t</code>はコンテナからホストへの標準出力を繋げるためのもの．</li>
 <li><code>-h</code>オプションによって，ホスト名を指定できる．</li>
 <li><code>-d</code>オプションによって，コンテナをバックグラウンドで実行できる．</li>
+<li><code>-p &lt;host&gt;:&lt;container&gt;</code>オプションによって，ホストのポートとコンテナのポートをつなげる．この時，iptablesが書き換えられ，ホスト側のポートがWANに曝されるので注意．
+
+<ul>
+<li><code>-p</code>でなく，<code>--expose &lt;port&gt;</code>フラグを指定すると，リンクしたコンテナから<code>&lt;container name&gt;:&lt;exposed port&gt;</code>でアクセスすることができる．また，iptablesは変更されない．</li>
+</ul></li>
 <li><code>--rm</code>フラグによって，コンテナがstopしたあとはコンテナを削除するようにする．</li>
 <li><code>--privileged</code>フラグによって，コンテナ内からホストのデバイスにアクセスすることができる．セキュリティには注意する．
 
 <ul>
 <li><code>--device</code>フラグや<code>--cap-add</code>フラグによってデバイス単位で細かくアクセス権限を制御することができる．</li>
+</ul></li>
+<li><code>--link &lt;container&gt;:&lt;nickname&gt;</code>を指定することで，<code>&lt;container&gt;</code>へアクセスする際のホスト名として利用できる．
+
+<ul>
+<li>例えば，hogeという名前のコンテナが立ち上がっている環境で，<code>--link hoge:hg</code>を指定して新たなコンテナを立ち上げたとすると，そのコンテナからは<code>curl http://hoge</code>というような形でアクセスすることができる．</li>
 </ul></li>
 <li>Dockerイメージによっては，ずっと起動するものもあれば，<code>&lt;command&gt;</code>を一発実行してstopするものもある．
 
@@ -254,7 +268,7 @@ EXPOSE 80 443
 <li><code>RUN</code>にコンテナで実行したいコマンドを指定する</li>
 <li><code>WORKDIR</code>でホストと共有するディレクトリを設定する</li>
 <li><code>ADD &lt;src&gt; &lt;dest&gt;</code>でホストの<code>&lt;src&gt;</code>ファイルをコンテナ内の<code>&lt;dest&gt;</code>にコピーする</li>
-<li><code>EXPOSE</code>で特定のポートをコンテナ外にだしておく</li>
+<li><code>EXPOSE</code>でコンテナの特定のポートを開けておく．<code>docker run -p</code>時にホストのポートとコンテナのポートを紐付けることでアクセス可能になる．</li>
 <li>より細かいことは<a href="https://docs.docker.jp/engine/reference/builder.html">Dockerfile リファレンス</a>を参照する．</li>
 </ul>
 
@@ -295,8 +309,8 @@ services:
 
   db:
     image: mysql:5.7
-    ports:
-      - 99999:9999
+    expose:
+      - 9999
     volumes:
       - ./mysql/data:/var/lib/mysql
       - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf
@@ -324,9 +338,10 @@ services:
 <li><code>tty: true</code>により，<code>docker run</code>の<code>-it</code>オプションに相当する設定がされる．</li>
 <li><code>volumes</code>には<code>&lt;ホスト側のパス&gt;:&lt;コンテナ内のパス&gt;</code>を指定する．これにより，ホスト側のディレクトリがコンテナ内のディレクトリと共有される．</li>
 <li><code>environment</code>には，コンテナ内の環境変数を指定する．</li>
-<li><code>ports</code>には<code>&lt;ホスト側のポート番号&gt;:&lt;DockerfileでEXPOSEしたポート番号&gt;</code>を指定する．</li>
+<li><code>ports</code>には<code>&lt;ホスト側のポート番号&gt;:&lt;DockerfileでEXPOSEしたポート番号&gt;</code>を指定する．iptablesが変更させるので，ホスト側のポートが外部に曝されるので注意．</li>
+<li><code>expose</code>にポートを指定することで，リンクしたコンテナから<code>&lt;container name&gt;:&lt;exposed port&gt;</code>でアクセスすることができる．iptablesは変更しない．</li>
 <li><code>links</code>には<code>&lt;サービス名&gt;:&lt;コンテナ内からみたサービスのホスト名&gt;</code>を指定する．</li>
-<li><code>depends_on</code>には，サービスの起動に必要な別のサービスを指定する．これにより，コンテナが起動する順序が保証される．
+<li><code>depends_on</code>には，サービスの起動に必要な別のサービスを指定する．これにより，コンテナが起動する順序が保証される．<code>depends_on</code>を指定すると，<code>links</code>を指定する必要はなさそう．
 
 <ul>
 <li>起動する順序は保証されるが，そのコンテナがアクティブかどうかは<code>depends_on</code>で保証されないので，<a href="https://docs.docker.com/compose/startup-order/">wait-for-it.sh</a>などで細かく制御する必要がある．</li>
@@ -359,144 +374,10 @@ services:
 </ul></li>
 </ul>
 
-<h1 id="ホストとdockerコンテナ間のネットワーク">ホストとDockerコンテナ間のネットワーク</h1>
-
-<ul>
-<li><code>eth0（ホスト） - docker0 (または仮想bridge) - veth - eth0（コンテナ）</code>という構成になっている
-
-<ul>
-<li><code>docker run</code>で<code>--net</code>オプションを指定しない場合，または，docker-compose.ymlを利用しない場合はデフォルトのブリッジとして<code>docker0</code>が使われる．
-
-<ul>
-<li>コンテナを起動すると，勝手にiptablesを書き換えるので注意する．</li>
-<li><code>--net=host</code>とすると，<code>docker0</code>や仮想bridgeを使わずにホストのネットワークを直接使うようになる．</li>
-<li>docker-compose.ymlを利用した場合は，ユニークなbridgeが生成される．<code>docker network ls</code>で確認できる．</li>
-</ul></li>
-<li>bridgeとコンテナはvethでつながっている．
-
-<ul>
-<li><code>ifconfig</code>または<code>ip a</code>でvethを確認できる</li>
-</ul></li>
-<li>コンテナのIPアドレスなどは<code>docker inspect &lt;container name/id&gt;</code>で確認できる．</li>
-</ul></li>
-<li>詳しくは<a href="https://success.docker.com/article/networking">Docker Swarm Reference Architecture: Exploring Scalable, Portable Docker Container Networks</a></li>
-</ul>
-
-<h2 id="コンテナへのパケットがiptablesによってどのようにフィルタされ-どのように外に出ていくかを知る">コンテナへのパケットがiptablesによってどのようにフィルタされ，どのように外に出ていくかを知る</h2>
-
-<ul>
-<li>コンテナでない，ホスト上のプロセスがパケットを扱う場合は，基本的に，<code>PREROUTING &gt; INPUT &gt; プロセス &gt; OUTPUT &gt; POSTROUTING</code>を通る．</li>
-<li>一方，コンテナは仮想ブリッジを介してホストとパケットをやり取りするため，<code>PREROUTING &gt; FORWARD &gt; POSTROUTING</code>を通る．</li>
-
-<li><p>まず，<code>PREROUTING</code>にてWANからきたパケットをコンテナに転送する</p>
-
-<ul>
-<li><p><code>sudo iptables -vnL -t nat</code></p>
-
-<pre><code>Chain PREROUTING (policy ACCEPT 3424 packets, 328K bytes)
-pkts bytes target     prot opt in     out     source               destination
-155K 8069K DOCKER     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ADDRTYPE match dst-type LOCAL
-
-Chain DOCKER (2 references)
- pkts bytes target     prot opt in     out     source               destination
-    0     0 RETURN     all  --  &lt;仮想bridge&gt; *       0.0.0.0/0            0.0.0.0/0
-    0     0 RETURN     all  --  docker0 *       0.0.0.0/0            0.0.0.0/0
-    7   368 DNAT       tcp  --  !&lt;仮想bridge&gt; *       0.0.0.0/0            0.0.0.0/0            tcp dpt:443 to:172.18.0.2:443
-    6   320 DNAT       tcp  --  !&lt;仮想bridge&gt; *       0.0.0.0/0            0.0.0.0/0            tcp dpt:80 to:172.18.0.2:80
-</code></pre></li>
-
-<li><p>ローカルをウロウロしているパケット (ADDRTYPE match dst-type LOCAL) なら，DOCKERルールを適用する</p>
-
-<ul>
-<li>DOCKERチェインでは，
-
-<ul>
-<li>仮想ブリッジまたはdocker0ブリッジから来たパケットに関しては何もしない（RETURN）</li>
-<li>DNATにより，仮想ブリッジ以外(eth0つまりWANなど)から来た443/80ポートへのTCPパケットをすべて172.18.0.2:443/80に転送する</li>
-</ul></li>
-</ul></li>
-</ul></li>
-
-<li><p>次に，<code>FORWARD</code>チェインにてコンテナへのパケットをフィルタする</p>
-
-<ul>
-<li><code>sudo iptables -vnL</code></li>
-</ul>
-
-<pre><code>Chain FORWARD (policy DROP 0 packets, 0 bytes)
- pkts bytes target     prot opt in     out     source               destination
- 110K  179M DOCKER-USER  all  --  *      *       0.0.0.0/0            0.0.0.0/0
- 110K  179M DOCKER-ISOLATION-STAGE-1  all  --  *      *       0.0.0.0/0            0.0.0.0/0
- 4097  459K ACCEPT     all  --  *      &lt;仮想bridge&gt;  0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED
-  821 43588 DOCKER     all  --  *      &lt;仮想bridge&gt;  0.0.0.0/0            0.0.0.0/0
- 3917 1085K ACCEPT     all  --  &lt;仮想bridge&gt; !&lt;仮想bridge&gt;  0.0.0.0/0            0.0.0.0/0
-    0     0 ACCEPT     all  --  &lt;仮想bridge&gt; &lt;仮想bridge&gt;  0.0.0.0/0            0.0.0.0/0
- 139K  245M ACCEPT     all  --  *      docker0  0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED
- 3086  157K DOCKER     all  --  *      docker0  0.0.0.0/0            0.0.0.0/0
-28904 4148K ACCEPT     all  --  docker0 !docker0  0.0.0.0/0            0.0.0.0/0
-    0     0 ACCEPT     all  --  docker0 docker0  0.0.0.0/0            0.0.0.0/0
-
-Chain DOCKER (2 references)
- pkts bytes target     prot opt in     out     source               destination
-  134  6964 ACCEPT     tcp  --  !&lt;仮想bridge&gt; &lt;仮想bridge&gt;  0.0.0.0/0            172.18.0.2           tcp dpt:443
-  338 16904 ACCEPT     tcp  --  !&lt;仮想bridge&gt; &lt;仮想bridge&gt;  0.0.0.0/0            172.18.0.2           tcp dpt:80
-
-Chain DOCKER-ISOLATION-STAGE-1 (1 references)
- pkts bytes target     prot opt in     out     source               destination
- 3917 1085K DOCKER-ISOLATION-STAGE-2  all  --  &lt;仮想bridge&gt; !&lt;仮想bridge&gt;  0.0.0.0/0            0.0.0.0/0
-28904 4148K DOCKER-ISOLATION-STAGE-2  all  --  docker0 !docker0  0.0.0.0/0            0.0.0.0/0
- 180K  251M RETURN     all  --  *      *       0.0.0.0/0            0.0.0.0/0
-
-Chain DOCKER-ISOLATION-STAGE-2 (2 references)
- pkts bytes target     prot opt in     out     source               destination
-    0     0 DROP       all  --  *      &lt;仮想bridge&gt;  0.0.0.0/0            0.0.0.0/0
-    0     0 DROP       all  --  *      docker0  0.0.0.0/0            0.0.0.0/0
-32821 5234K RETURN     all  --  *      *       0.0.0.0/0            0.0.0.0/0
-
-Chain DOCKER-USER (1 references)
- pkts bytes target     prot opt in     out     source               destination
- 180K  251M RETURN     all  --  *      *       0.0.0.0/0            0.0.0.0/0
-</code></pre>
-
-<ul>
-<li><code>DOCKER-USER</code>チェインは，何よりも先に適用されるルールなので，最も優先したいルールをユーザが自由に定義することができる．</li>
-<li><code>DOCKER-ISOLATION-STAGE-1</code>チェインでは，コンテナ間ネットワークに関するルールが定義される，</li>
-<li>&lt;仮想bridge&gt;に行く確立したパケット(ctstate RELATED,ESTABLISHED)はACCEPTする</li>
-<li>&lt;仮想bridge&gt;に行く未確立のパケットには<code>DOCKER</code>ルールを適用する
-
-<ul>
-<li>&lt;仮想bridge&gt;以外から来て&lt;仮想bridge&gt;へ行く，送信先172.18.0.2:443/80なパケットをACCEPT</li>
-</ul></li>
-<li>&lt;仮想bridge&gt;からきて&lt;仮想bridge&gt;以外へ行くパケットをACCEPT</li>
-<li>&lt;仮想bridge&gt;からきて&lt;仮想bridge&gt;へ行くパケットをACCEPT</li>
-<li>docker0についても同様．</li>
-</ul></li>
-
-<li><p>最後に，<code>POSTROUTING</code>チェインを経てWANに出ていく</p>
-
-<ul>
-<li><p><code>sudo iptables -vnL -t nat</code></p>
-
-<pre><code>Chain POSTROUTING (policy ACCEPT 23 packets, 1364 bytes)
- pkts bytes target     prot opt in     out     source               destination
-    6   418 MASQUERADE  all  --  *      !&lt;仮想ブリッジ&gt;  172.18.0.0/16        0.0.0.0/0
-   68  4149 MASQUERADE  all  --  *      !docker0  172.17.0.0/16        0.0.0.0/0
-    0     0 MASQUERADE  tcp  --  *      *       172.18.0.2           172.18.0.2           tcp dpt:443
-    0     0 MASQUERADE  tcp  --  *      *       172.18.0.2           172.18.0.2           tcp dpt:80
-</code></pre></li>
-
-<li><p>MASQUERADEで，仮想ブリッジ以外(eth0つまりWANなど)に行く送信元172.18.0.0/16なパケットは，そのインターフェース(eth0など)のIPに変換する．</p></li>
-
-<li><p>MASQUERADEで，docker0以外(eth0つまりWANなど)に行く送信元172.17.0.0/16なパケットは，そのインターフェース(eth0など)のIPに変換する．</p></li>
-
-<li><p>仮想ブリッジまたはdocker0に行く送信元172.18.0.2なパケットは，送信先も172.18.0.2のまま．</p></li>
-</ul></li>
-</ul>
-
     <div class="share">
-    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fhow-to-use-docker%2f&text=Docker%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%e3%81%ae%e3%83%a9%e3%82%a4%e3%83%95%e3%82%b5%e3%82%a4%e3%82%af%e3%83%ab%e3%81%a8%e3%83%8d%e3%83%83%e3%83%88%e3%83%af%e3%83%bc%e3%82%af%e6%a7%8b%e6%88%90 - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
+    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fhow-to-use-docker%2f&text=Docker%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%e3%81%ae%e3%83%a9%e3%82%a4%e3%83%95%e3%82%b5%e3%82%a4%e3%82%af%e3%83%ab - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
     <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fhow-to-use-docker%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
-    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fhow-to-use-docker%2f&title=Docker%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%e3%81%ae%e3%83%a9%e3%82%a4%e3%83%95%e3%82%b5%e3%82%a4%e3%82%af%e3%83%ab%e3%81%a8%e3%83%8d%e3%83%83%e3%83%88%e3%83%af%e3%83%bc%e3%82%af%e6%a7%8b%e6%88%90 - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
+    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fhow-to-use-docker%2f&title=Docker%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%e3%81%ae%e3%83%a9%e3%82%a4%e3%83%95%e3%82%b5%e3%82%a4%e3%82%af%e3%83%ab - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
 </div>
   </div>
   <footer class="post-footer">
