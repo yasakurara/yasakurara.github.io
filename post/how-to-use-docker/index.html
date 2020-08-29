@@ -2,16 +2,6 @@
 <html lang="ja">
 <head>
   
-    
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-162790219-1"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'UA-162790219-1');
-    </script>
-  
 
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -19,8 +9,8 @@
   
   <title>Dockerコンテナのライフサイクル - yasakura</title>
   
-  <meta name="description" content="モチベーション  Dockerのライフサイクルを自分なりにまとめておきたい． Dockerコンテナが構成するネットワークについて知りたい．  Dockerのライフサイクル  docker runで，Dockerイメージを元にコンテナを起動する． docker stopで，コンテナを停止する． docker commitで，停止中のコンテナを新たなDockerイメージとしてとっておく． docker save/loadで，Dockerイメージを持ち運ぶ． docker startで，停止中のコンテナを再開する． docker rmで，停止中のコンテナを破棄する． docker rmiで，Dockerイメージを破棄する．  Dockerイメージを用意する  Dockerfileの書き方
- docker build -t &lt;image name&gt;:&lt;tag&gt; &lt;Dockerfileがあるディレクトリ&gt;によりDockerイメージがつくられる  &lt;tag&gt;にはimageのversionを設定するのが一般的．&lt;tag&gt;を省略した場合はlatestとされる．  docker pull &lt;image name&gt;でDockerイメージをもってくることができる．  DockerイメージはDocker Hubにて検索できる．  docker imagesで手元にあるDockerイメージ一覧を表示する．  docker images -qにより，DockerイメージID一覧を表示する．   Dockerイメージを元に，コンテナを立ち上げる  docker run -it --name &lt;container name&gt; &lt;image name&gt;:&lt;tag&gt; &lt;command&gt;  &lt;image name&gt;:&lt;tag&gt;から&lt;container name&gt;という名前のコンテナを立ち上げ，コンテナ内で&lt;command&gt;を実行する． -iはホストからコンテナへの標準入力を繋げるためのもの．-tはコンテナからホストへの標準出力を繋げるためのもの． -hオプションによって，ホスト名を指定できる． -dオプションによって，コンテナをバックグラウンドで実行できる． -p &lt;host&gt;:&lt;container&gt;オプションによって，ホストのポートとコンテナのポートをつなげる．この時，iptablesが書き換えられ，ホスト側のポートがWANに曝されるので注意．  -pでなく，--expose &lt;port&gt;フラグを指定すると，リンクしたコンテナから&lt;container name&gt;:&lt;exposed port&gt;でアクセスすることができる．また，iptablesは変更されない．  --rmフラグによって，コンテナがstopしたあとはコンテナを削除するようにする． --privilegedフラグによって，コンテナ内からホストのデバイスにアクセスすることができる．セキュリティには注意する．  --deviceフラグや--cap-addフラグによってデバイス単位で細かくアクセス権限を制御することができる．  --link &lt;container&gt;:&lt;nickname&gt;を指定することで，&lt;container&gt;へアクセスする際のホスト名として利用できる．  例えば，hogeという名前のコンテナが立ち上がっている環境で，--link hoge:hgを指定して新たなコンテナを立ち上げたとすると，そのコンテナからはcurl http://hogeというような形でアクセスすることができる．  Dockerイメージによっては，ずっと起動するものもあれば，&lt;command&gt;を一発実行してstopするものもある．  &lt;command&gt;に/bin/shを指定し，コンテナ内にshを立ち上げることで，コンテナを立ち上げたままにしておくことが多い．   docker ps  起動中のコンテナ一覧を表示する  docker attach &lt;container&gt;  コンテナにアタッチする．アタッチ後の振る舞いはDockerイメージによって異なり，コンテナの標準入出力が可能になる場合もあれば，何も起きない場合もある． アタッチしている状態で，ctrl&#43;pしctrl&#43;qすると，コンテナからデタッチすることができる．  docker exec -it &lt;container&gt; &lt;command&gt;  起動中のコンテナにコマンドを流し込むことができる． &lt;command&gt;に/bin/shを指定してコンテナ内にシェルを立ち上げることで，コンテナ内で作業することができる．   起動中のコンテナを停止させる  docker stop &lt;container&gt;  &lt;container&gt;を停止する．  docker ps -a  起動中または停止しているコンテナの一覧を表示する． docker ps -a -qで，コンテナIDの一覧を表示する．   停止したコンテナを立ち上げる  docker start &lt;container&gt;  コンテナをrestartさせる  docker restart &lt;container name&gt;で，docker stopとdocker startをまとめて実行してくれる，  停止中のコンテナをDockerイメージとして保存する  docker commit &lt;container&gt; &lt;image name&gt;:&lt;new tag&gt;  停止中の&lt;container&gt;から，&lt;image name&gt;:&lt;new tag&gt;というDockerイメージを作成する．   Dockerイメージをtarで固めて持ち運ぶ  docker save &lt;image name&gt;:&lt;tag&gt; &gt; &lt;filename&gt;で&lt;filename&gt;に&lt;image name&gt;:&lt;tag&gt;を書き出す docker load &lt; &lt;filename&gt;で読み込む docker imagesでイメージが読み込まれたことを確認 docker run -it &lt;filename&gt;  停止しているコンテナを破棄する  docker rm &lt;container&gt;  停止中のコンテナは，いつでも再開できるようにキャッシュされてるので，使わなくなったコンテナはdocker rmで破棄するようにする． docker rm -fで強制破棄． docker rm -f &#39;docker ps -a -q&#39;により，すべての停止中のコンテナを強制破棄することができる．   ローカルのDockerイメージを破棄する  docker rmi &lt;image&gt;  docker rmi &#39;docker images -q&#39;により，全てのDockerイメージを破棄する．   コンテナとホスト間でファイルをコピーする  docker cp &lt;CONTAINER ID&gt;:&lt;source@container&gt; &lt;target@host&gt;  コンテナからホストにファイルをコピーする  docker cp &lt;source@host&gt; &lt;CONTAINER ID&gt;:&lt;target@container&gt;  ホストからコンテナにファイルをコピーする   Dockerfileの書き方 Dockerfileとは，docker buildのための手順書のようなもの．Dockerfileを元にオリジナルのDockerイメージをつくることができる．">
+  <meta name="description" content="モチベーション  Dockerのライフサイクルについてまとめておきたい Dockerfileの書き方についてまとめておきたい docker-composeについてまとめておきたい  Dockerのライフサイクル  docker runで，Dockerイメージを元にコンテナを起動する． docker stopで，コンテナを停止する． docker commitで，停止中のコンテナを新たなDockerイメージとしてとっておく． docker save/loadで，Dockerイメージを持ち運ぶ． docker startで，停止中のコンテナを再開する． docker rmで，停止中のコンテナを破棄する． docker rmiで，Dockerイメージを破棄する．  Dockerイメージを用意する  Dockerfileの書き方
+ docker build -t &lt;image name&gt;:&lt;tag&gt; &lt;Dockerfileがあるディレクトリ&gt;によりDockerイメージがつくられる  &lt;tag&gt;にはimageのversionを設定するのが一般的．&lt;tag&gt;を省略した場合はlatestとされる．  docker pull &lt;image name&gt;でDockerイメージをもってくることができる．  DockerイメージはDocker Hubにて検索できる．  docker imagesで手元にあるDockerイメージ一覧を表示する．  docker images -qにより，DockerイメージID一覧を表示する．   Dockerイメージを元に，コンテナを立ち上げる  docker run -it --name &lt;container name&gt; &lt;image name&gt;:&lt;tag&gt; &lt;command&gt;  &lt;image name&gt;:&lt;tag&gt;から&lt;container name&gt;という名前のコンテナを立ち上げ，コンテナ内で&lt;command&gt;を実行する． -iはホストからコンテナへの標準入力を繋げるためのもの．-tはコンテナからホストへの標準出力を繋げるためのもの． -hオプションによって，ホスト名を指定できる． -dオプションによって，コンテナをバックグラウンドで実行できる． -p &lt;host&gt;:&lt;container&gt;オプションによって，ホストのポートとコンテナのポートをつなげる．この時，iptablesが書き換えられ，ホスト側のポートがWANに曝されるので注意．  -pでなく，--expose &lt;port&gt;フラグを指定すると，リンクしたコンテナから&lt;container name&gt;:&lt;exposed port&gt;でアクセスすることができる．また，iptablesは変更されない．  --rmフラグによって，コンテナがstopしたあとはコンテナを削除するようにする． --privilegedフラグによって，コンテナ内からホストのデバイスにアクセスすることができる．セキュリティには注意する．  --deviceフラグや--cap-addフラグによってデバイス単位で細かくアクセス権限を制御することができる．  --link &lt;container&gt;:&lt;nickname&gt;を指定することで，&lt;container&gt;へアクセスする際のホスト名として利用できる．  例えば，hogeという名前のコンテナが立ち上がっている環境で，--link hoge:hgを指定して新たなコンテナを立ち上げたとすると，そのコンテナからはcurl http://hogeというような形でアクセスすることができる．  Dockerイメージによっては，ずっと起動するものもあれば，&lt;command&gt;を一発実行してstopするものもある．  &lt;command&gt;に/bin/shを指定し，コンテナ内にshを立ち上げることで，コンテナを立ち上げたままにしておくことが多い．   docker ps  起動中のコンテナ一覧を表示する  docker attach &lt;container&gt;  コンテナにアタッチする．アタッチ後の振る舞いはDockerイメージによって異なり，コンテナの標準入出力が可能になる場合もあれば，何も起きない場合もある． アタッチしている状態で，ctrl&#43;pしctrl&#43;qすると，コンテナからデタッチすることができる．  docker exec -it &lt;container&gt; &lt;command&gt;  起動中のコンテナにコマンドを流し込むことができる． &lt;command&gt;に/bin/shを指定してコンテナ内にシェルを立ち上げることで，コンテナ内で作業することができる．   DockerコンテナのPID=1問題 docker runで指定した&lt;commnad&gt;は，PID=1のプロセスとして実行される．PID=1なプロセスはカーネルから特別扱いされるため，プロセス自体がシグナルをハンドルするように実装されていなければ，シグナルは無視されてしまう．">
   
   <link href=/css/style.css rel="stylesheet">
   <link href=/css/font.css rel="stylesheet">
@@ -57,8 +47,9 @@
 <h1 id="モチベーション">モチベーション</h1>
 
 <ul>
-<li>Dockerのライフサイクルを自分なりにまとめておきたい．</li>
-<li>Dockerコンテナが構成するネットワークについて知りたい．</li>
+<li>Dockerのライフサイクルについてまとめておきたい</li>
+<li>Dockerfileの書き方についてまとめておきたい</li>
+<li>docker-composeについてまとめておきたい</li>
 </ul>
 
 <h1 id="dockerのライフサイクル">Dockerのライフサイクル</h1>
@@ -145,6 +136,28 @@
 </ul></li>
 </ul>
 
+<h2 id="dockerコンテナのpid-1問題">DockerコンテナのPID=1問題</h2>
+
+<p><code>docker run</code>で指定した<code>&lt;commnad&gt;</code>は，PID=1のプロセスとして実行される．PID=1なプロセスはカーネルから特別扱いされるため，プロセス自体がシグナルをハンドルするように実装されていなければ，シグナルは無視されてしまう．</p>
+
+<p>例えば，<code>docker kill -s TERM &lt;container&gt;</code>を実行することで，PID=1のプロセスにSIGTERMを投げることができるが，PID=1のプロセスのシグナルのハンドルの仕方によって振る舞いが異なる．</p>
+
+<p>PID=1のプロセスがシグナルをハンドルするように実装するのもよいが，プロセスがPID=1以外で実行されれば，シグナルを素直に受け付けるので，<code>&lt;command&gt;</code>で指定したプロセスをPID=1以外にするためには，<code>docker run</code>を実行する際に，<code>--init</code>オプションを指定すると良い．</p>
+
+<pre><code># docker run -it centos bash
+[root@a31d57ca765c /]# ps -aux
+USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root         1  1.5  0.1  12020  3348 pts/0    Ss   13:38   0:00 bash   &lt;======== `bash`がPID=1で実行されている
+root        14  0.0  0.1  47508  3520 pts/0    R+   13:38   0:00 ps -aux
+
+# docker run -it --init centos bash
+[root@52ec324240f8 /]# ps -axu
+USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root         1  1.0  0.0    996     4 pts/0    Ss   13:39   0:00 /sbin/docker-init -- bash
+root         7  0.0  0.1  12020  3336 pts/0    S    13:39   0:00 bash   &lt;======== `bash`がPID=1以外で実行されている
+root        16  0.0  0.1  44596  3388 pts/0    R+   13:39   0:00 ps -axu
+</code></pre>
+
 <h1 id="起動中のコンテナを停止させる">起動中のコンテナを停止させる</h1>
 
 <ul>
@@ -217,12 +230,12 @@
 <h1 id="コンテナとホスト間でファイルをコピーする">コンテナとホスト間でファイルをコピーする</h1>
 
 <ul>
-<li><code>docker cp &lt;CONTAINER ID&gt;:&lt;source@container&gt; &lt;target@host&gt;</code>
+<li><code>docker cp &lt;container&gt;:&lt;source@container&gt; &lt;target@host&gt;</code>
 
 <ul>
 <li>コンテナからホストにファイルをコピーする</li>
 </ul></li>
-<li><code>docker cp &lt;source@host&gt; &lt;CONTAINER ID&gt;:&lt;target@container&gt;</code>
+<li><code>docker cp &lt;source@host&gt; &lt;container&gt;:&lt;target@container&gt;</code>
 
 <ul>
 <li>ホストからコンテナにファイルをコピーする</li>
