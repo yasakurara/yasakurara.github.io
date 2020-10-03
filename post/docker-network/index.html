@@ -2,12 +2,22 @@
 <html lang="ja">
 <head>
   
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-162790219-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-162790219-1');
+    </script>
+  
 
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   
-  <title>Dockerコンテナ/Kubernetesのネットワーク構成 - yasakura</title>
+  <title>Dockerコンテナのネットワーク構成 - yasakura</title>
   
   <meta name="description" content="モチベーション  Dockerコンテナのネットワークを理解するための足がかりとして，netnsについてまとめたい． Dockerコンテナが構成するネットワークについてまとめたい． -pオプションで何も考えずにポートを外に出すのは危険だよと言いたい  OSI参照モデルで役割を把握しておく OSI参照モデルを覚える必要は無いと思うが，どのレイヤーがどのような役割を行っているのかを理解しておく必要はあると思う．
    レイヤー 呼称 例     L7 アプリケーション層 HTTP,FTP,DNS,SNMP   L6 プレゼンテーション層 HTTP,FTP,DNS,SNMP   L5 セッション層 HTTP,FTP,DNS,SNMP,TCP   L4 トランスポート層 TCP,UDP   L3 インターネット層 IP,ICMP,ARP   L2 リンク層 Ethernet,Wi-Fi   L1 物理層 UTP,STP     L2はブリッジ周辺  Ethernetヘッダの制御．IPパケットに，MACアドレスなどを埋め込んだEthernetヘッダをつける/とる． ブリッジはこの辺．  L3はルーター周辺  IPヘッダの制御．TCPセグメントやICMPセグメントにIPヘッダをつける/とる．  pingやtracerouteはL3で処理される． 経由するルータの数をTTL(Time To Live)として指定することで，TTL=0になるとそのパケットは破棄される．  192.">
@@ -33,14 +43,14 @@
     
     <p class="post-meta">2020.8.13</p>
     
-    <h1 class="post-title">Dockerコンテナ/Kubernetesのネットワーク構成</h1>
+    <h1 class="post-title">Dockerコンテナのネットワーク構成</h1>
     
   </header>
   <div class="post-content">
     <div class="share">
-    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fdocker-network%2f&text=Docker%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%2fKubernetes%e3%81%ae%e3%83%8d%e3%83%83%e3%83%88%e3%83%af%e3%83%bc%e3%82%af%e6%a7%8b%e6%88%90 - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
+    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fdocker-network%2f&text=Docker%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%e3%81%ae%e3%83%8d%e3%83%83%e3%83%88%e3%83%af%e3%83%bc%e3%82%af%e6%a7%8b%e6%88%90 - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
     <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fdocker-network%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
-    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fdocker-network%2f&title=Docker%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%2fKubernetes%e3%81%ae%e3%83%8d%e3%83%83%e3%83%88%e3%83%af%e3%83%bc%e3%82%af%e6%a7%8b%e6%88%90 - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
+    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fdocker-network%2f&title=Docker%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%e3%81%ae%e3%83%8d%e3%83%83%e3%83%88%e3%83%af%e3%83%bc%e3%82%af%e6%a7%8b%e6%88%90 - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
 </div>
     
 
@@ -728,9 +738,9 @@ Chain DOCKER-USER (1 references)
 <p>あとで書く</p>
 
     <div class="share">
-    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fdocker-network%2f&text=Docker%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%2fKubernetes%e3%81%ae%e3%83%8d%e3%83%83%e3%83%88%e3%83%af%e3%83%bc%e3%82%af%e6%a7%8b%e6%88%90 - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
+    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fdocker-network%2f&text=Docker%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%e3%81%ae%e3%83%8d%e3%83%83%e3%83%88%e3%83%af%e3%83%bc%e3%82%af%e6%a7%8b%e6%88%90 - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
     <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fdocker-network%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
-    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fdocker-network%2f&title=Docker%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%2fKubernetes%e3%81%ae%e3%83%8d%e3%83%83%e3%83%88%e3%83%af%e3%83%bc%e3%82%af%e6%a7%8b%e6%88%90 - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
+    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fdocker-network%2f&title=Docker%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%e3%81%ae%e3%83%8d%e3%83%83%e3%83%88%e3%83%af%e3%83%bc%e3%82%af%e6%a7%8b%e6%88%90 - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
 </div>
   </div>
   <footer class="post-footer">
