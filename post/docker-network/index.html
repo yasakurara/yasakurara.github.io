@@ -53,6 +53,38 @@
     <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fdocker-network%2f&title=Docker%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%e3%81%ae%e3%83%8d%e3%83%83%e3%83%88%e3%83%af%e3%83%bc%e3%82%af%e6%a7%8b%e6%88%90 - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
 </div>
     
+<h1>もくじ</h1>
+<nav id="TableOfContents">
+<ul>
+<li><a href="#モチベーション">モチベーション</a></li>
+<li><a href="#osi参照モデルで役割を把握しておく">OSI参照モデルで役割を把握しておく</a>
+<ul>
+<li><a href="#l2はブリッジ周辺">L2はブリッジ周辺</a></li>
+<li><a href="#l3はルーター周辺">L3はルーター周辺</a></li>
+<li><a href="#l4はソケット周辺">L4はソケット周辺</a></li>
+<li><a href="#l7-l6-l5はアプリケーション周辺">L7,L6,L5はアプリケーション周辺</a></li>
+</ul></li>
+<li><a href="#つまり-サーバー-クライアントアプリケーションはl7-l6-l5-l4らへん">つまり，サーバー/クライアントアプリケーションはL7,L6,L5,L4らへん</a>
+<ul>
+<li><a href="#サーバー側">サーバー側</a></li>
+<li><a href="#クライアント側">クライアント側</a></li>
+</ul></li>
+<li><a href="#ifconfigとかiptablesとかで見ているのはl3-l2らへん">ifconfigとかiptablesとかで見ているのはL3,L2らへん</a></li>
+<li><a href="#network-namespace-netns-でホスト内のネットワークを分離する">Network Namespace(netns)でホスト内のネットワークを分離する</a>
+<ul>
+<li><a href="#network-namespaceをつくってみる">Network Namespaceをつくってみる</a></li>
+</ul></li>
+<li><a href="#コンテナがデフォルトで構成するネットワーク">コンテナがデフォルトで構成するネットワーク</a>
+<ul>
+<li><a href="#コンテナへのパケットがiptablesによってどのようにフィルタされ-どのように外に出ていくかを知る">コンテナへのパケットがiptablesによってどのようにフィルタされ，どのように外に出ていくかを知る</a></li>
+</ul></li>
+<li><a href="#コンテナ用のネットワークをつくる">コンテナ用のネットワークをつくる</a></li>
+<li><a href="#publishとexpose">publishとexpose</a></li>
+<li><a href="#kubernetesのネットワーク構成">Kubernetesのネットワーク構成</a></li>
+</ul>
+</nav>
+
+    
 
 <h1 id="モチベーション">モチベーション</h1>
 

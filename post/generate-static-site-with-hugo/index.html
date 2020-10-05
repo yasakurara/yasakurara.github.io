@@ -19,11 +19,10 @@
   
   <title>Hugoで静的サイトをジェネる - yasakura</title>
   
-  <meta name="description" content=" モチベーション  ブログを書きたい デザインに凝りたい WordPressなどのCMSで管理するほどでもない StaticGenで流行ってそうなもののうち，HugoならGo言語に触れるための良い機会になるのではないかと思った  プレビューしながら執筆or開発する hugo server --watch -D --port &lt;port&gt; --bind 0.0.0.0 --baseURL=&lt;local machine&#39;s IP address&gt;   コードを変更するごとに自動でリロードさせるためには，--watchをつける．
+  <meta name="description" content="モチベーション  ブログを書きたい デザインを自由にカスタマイズしたい WordPressなどのCMSで管理するほどでもない StaticGenの上位にHugoがある  記事を新規作成する hugo new post/&lt;article name&gt;.md   プロジェクトディレクトリにあるarchetypes/のdefault.mdを元に新しいエントリがcontent/以下に作成される．  リアルタイムでプレビューしながら記事を執筆orテーマをカスタマイズする hugo server --watch -D --port &lt;port&gt; --bind 0.0.0.0 --baseURL=&lt;local machine&#39;s IP address&gt;   コードを変更するごとに自動でリロードさせるためには，--watchをつける．
  Draft記事を表示させるためには，-Dをつける．
- --bindを指定しない場合は，127.0.0.1にbindされる．127.0.0.1へのbindだと，hugo serverを実行しているローカルマシンからのアクセスhttp://localhost:&lt;port&gt;のみに制限されてしまう．0.0.0.0にbindすることで，LAN内にあるローカルマシン以外からはhttp://&lt;local machine&#39;s IP address&gt;:&lt;port&gt;でアクセスできるようになる．  記事を新規作成する hugo new post/&lt;article name&gt;.md  Themeのカスタマイズ .Params.xxxはarticleのfront-matterから参照される
-.Site.Params.xxxはconfig.tomlから参照される
-静的サイトをジェネる  HUGO_ENV=production hugo  public/に静的サイトが生成される Google Analyticsなどはproductionで有効になるように実装してあるので，HUGO_ENV=productionと環境変数を指定する．  theme内で以下のような実装があるなら必要．  {{ if eq (getenv &quot;HUGO_ENV&quot;) &quot;production&quot; | or (eq .Site.Params.env &quot;production&quot;) }}{{ end }}     ">
+ --bindを指定しない場合は，127.0.0.1にbindされる．127.0.0.1へのbindだと，hugo serverを実行しているローカルマシンからのアクセスhttp://localhost:&lt;port&gt;のみに制限されてしまう．0.0.0.0にbindすることで，LAN内にあるローカルマシン以外（スマホなど）からはhttp://&lt;local machine&#39;s IP address&gt;:&lt;port&gt;でアクセスできるようになる．  Themeのカスタマイズ ユーザが指定したパラメータを呼び出す  .Params.xxxはarticleのfront-matterから参照される
+ .Site.Params.xxxはconfig.tomlから参照される  リストコンテンツの順番を制御できるページネーションを実装する {{ $pages := where .Pages &#34;.Params.type&#34; &#34;!=&#34; &#34;about&#34; }} {{ $sorted := ($pages.ByParam &#34;lastmod&#34;).Reverse }} {{ $paginator := .Paginate $sorted (index .">
   
   <link href=/css/style.css rel="stylesheet">
   <link href=/css/font.css rel="stylesheet">
@@ -44,7 +43,7 @@
 <article class="post post-view">
   <header class="post-header">
     
-    <p class="post-meta">2020.4.1</p>
+    <p class="post-meta">2020.10.5</p>
     
     <h1 class="post-title">Hugoで静的サイトをジェネる</h1>
     
@@ -56,25 +55,30 @@
     <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fgenerate-static-site-with-hugo%2f&title=Hugo%e3%81%a7%e9%9d%99%e7%9a%84%e3%82%b5%e3%82%a4%e3%83%88%e3%82%92%e3%82%b8%e3%82%a7%e3%83%8d%e3%82%8b - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
 </div>
     
+<h1>もくじ</h1>
+<nav id="TableOfContents">
+<ul>
+<li><a href="#モチベーション">モチベーション</a></li>
+<li><a href="#記事を新規作成する">記事を新規作成する</a></li>
+<li><a href="#リアルタイムでプレビューしながら記事を執筆orテーマをカスタマイズする">リアルタイムでプレビューしながら記事を執筆orテーマをカスタマイズする</a></li>
+<li><a href="#themeのカスタマイズ">Themeのカスタマイズ</a>
+<ul>
+<li><a href="#ユーザが指定したパラメータを呼び出す">ユーザが指定したパラメータを呼び出す</a></li>
+<li><a href="#リストコンテンツの順番を制御できるページネーションを実装する">リストコンテンツの順番を制御できるページネーションを実装する</a></li>
+</ul></li>
+<li><a href="#静的サイトをジェネる">静的サイトをジェネる</a></li>
+</ul>
+</nav>
+
+    
 
 <h1 id="モチベーション">モチベーション</h1>
 
 <ul>
 <li>ブログを書きたい</li>
-<li>デザインに凝りたい</li>
+<li>デザインを自由にカスタマイズしたい</li>
 <li>WordPressなどのCMSで管理するほどでもない</li>
-<li><a href="https://www.staticgen.com/">StaticGen</a>で流行ってそうなもののうち，<a href="https://gohugo.io/">Hugo</a>ならGo言語に触れるための良い機会になるのではないかと思った</li>
-</ul>
-
-<h1 id="プレビューしながら執筆or開発する">プレビューしながら執筆or開発する</h1>
-
-<pre><code>hugo server --watch -D --port &lt;port&gt; --bind 0.0.0.0 --baseURL=&lt;local machine's IP address&gt;
-</code></pre>
-
-<ul>
-<li>コードを変更するごとに自動でリロードさせるためには，<code>--watch</code>をつける．<br /></li>
-<li>Draft記事を表示させるためには，<code>-D</code>をつける．<br /></li>
-<li><code>--bind</code>を指定しない場合は，127.0.0.1にbindされる．127.0.0.1へのbindだと，<code>hugo server</code>を実行しているローカルマシンからのアクセス<code>http://localhost:&lt;port&gt;</code>のみに制限されてしまう．0.0.0.0にbindすることで，LAN内にあるローカルマシン以外からは<code>http://&lt;local machine's IP address&gt;:&lt;port&gt;</code>でアクセスできるようになる．</li>
+<li><a href="https://www.staticgen.com/">StaticGen</a>の上位に<a href="https://gohugo.io/">Hugo</a>がある</li>
 </ul>
 
 <h1 id="記事を新規作成する">記事を新規作成する</h1>
@@ -82,27 +86,64 @@
 <pre><code>hugo new post/&lt;article name&gt;.md
 </code></pre>
 
+<ul>
+<li>プロジェクトディレクトリにある<code>archetypes/</code>の<code>default.md</code>を元に新しいエントリが<code>content/</code>以下に作成される．</li>
+</ul>
+
+<h1 id="リアルタイムでプレビューしながら記事を執筆orテーマをカスタマイズする">リアルタイムでプレビューしながら記事を執筆orテーマをカスタマイズする</h1>
+
+<pre><code>hugo server --watch -D --port &lt;port&gt; --bind 0.0.0.0 --baseURL=&lt;local machine's IP address&gt;
+</code></pre>
+
+<ul>
+<li>コードを変更するごとに自動でリロードさせるためには，<code>--watch</code>をつける．<br /></li>
+<li>Draft記事を表示させるためには，<code>-D</code>をつける．<br /></li>
+<li><code>--bind</code>を指定しない場合は，127.0.0.1にbindされる．127.0.0.1へのbindだと，<code>hugo server</code>を実行しているローカルマシンからのアクセス<code>http://localhost:&lt;port&gt;</code>のみに制限されてしまう．0.0.0.0にbindすることで，LAN内にあるローカルマシン以外（スマホなど）からは<code>http://&lt;local machine's IP address&gt;:&lt;port&gt;</code>でアクセスできるようになる．</li>
+</ul>
+
 <h1 id="themeのカスタマイズ">Themeのカスタマイズ</h1>
 
-<p><code>.Params.xxx</code>はarticleのfront-matterから参照される<br />
-<code>.Site.Params.xxx</code>はconfig.tomlから参照される</p>
+<h2 id="ユーザが指定したパラメータを呼び出す">ユーザが指定したパラメータを呼び出す</h2>
+
+<ul>
+<li><code>.Params.xxx</code>はarticleのfront-matterから参照される<br /></li>
+<li><code>.Site.Params.xxx</code>はconfig.tomlから参照される</li>
+</ul>
+
+<h2 id="リストコンテンツの順番を制御できるページネーションを実装する">リストコンテンツの順番を制御できるページネーションを実装する</h2>
+<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">{{ $pages := where .Pages &#34;.Params.type&#34; &#34;!=&#34; &#34;about&#34; }}
+{{ $sorted := ($pages.ByParam &#34;lastmod&#34;).Reverse }}
+{{ $paginator := .Paginate $sorted (index .Site.Params &#34;paginate&#34; | default 100) }}
+
+{{ if gt $paginator.TotalPages 0 }}
+  {{ range $index, $page := $paginator.Pages }}
+    <span style="color:#111">&lt;</span><span style="color:#f92672">article</span> <span style="color:#75af00">class</span><span style="color:#f92672">=</span><span style="color:#d88200">&#34;post post-entry&#34;</span><span style="color:#111">&gt;</span>
+      <span style="color:#111">&lt;</span><span style="color:#f92672">a</span> <span style="color:#75af00">class</span><span style="color:#f92672">=</span><span style="color:#d88200">&#34;post-link&#34;</span> <span style="color:#75af00">href</span><span style="color:#f92672">=</span><span style="color:#d88200">&#34;{{ .Permalink }}&#34;</span><span style="color:#111">&gt;</span>
+        <span style="color:#111">&lt;</span><span style="color:#f92672">header</span> <span style="color:#75af00">class</span><span style="color:#f92672">=</span><span style="color:#d88200">&#34;post-header&#34;</span><span style="color:#111">&gt;</span>
+          <span style="color:#111">&lt;</span><span style="color:#f92672">p</span> <span style="color:#75af00">class</span><span style="color:#f92672">=</span><span style="color:#d88200">&#34;post-meta&#34;</span><span style="color:#111">&gt;</span>{{ .Lastmod.Format &#34;2006.1.2&#34; }}<span style="color:#111">&lt;/</span><span style="color:#f92672">p</span><span style="color:#111">&gt;</span>
+          <span style="color:#111">&lt;</span><span style="color:#f92672">h2</span> <span style="color:#75af00">class</span><span style="color:#f92672">=</span><span style="color:#d88200">&#34;post-title&#34;</span><span style="color:#111">&gt;</span>{{ .Title }}<span style="color:#111">&lt;/</span><span style="color:#f92672">h2</span><span style="color:#111">&gt;</span>
+        <span style="color:#111">&lt;/</span><span style="color:#f92672">header</span><span style="color:#111">&gt;</span>
+        <span style="color:#111">&lt;</span><span style="color:#f92672">footer</span> <span style="color:#75af00">class</span><span style="color:#f92672">=</span><span style="color:#d88200">&#34;post-footer&#34;</span><span style="color:#111">&gt;</span>
+          
+        <span style="color:#111">&lt;/</span><span style="color:#f92672">footer</span><span style="color:#111">&gt;</span>
+      <span style="color:#111">&lt;/</span><span style="color:#f92672">a</span><span style="color:#111">&gt;</span>
+    <span style="color:#111">&lt;/</span><span style="color:#f92672">article</span><span style="color:#111">&gt;</span>
+  {{ end }}
+{{ end }}</code></pre></div>
+<ul>
+<li>font-matterにて指定された，<code>type</code>が<code>about</code>ならリストに表示しないようにする</li>
+<li>font-matterで指定された<code>lastmod</code>順にソートする</li>
+<li>config.tomlにて指定された<code>pagenate</code>を１ページで表示する最大値とする．<code>pagenate</code>が指定されていない場合は<code>100</code>をdefaultとして用いる</li>
+</ul>
 
 <h1 id="静的サイトをジェネる">静的サイトをジェネる</h1>
 
 <ul>
-<li><code>HUGO_ENV=production hugo</code>
-
-<ul>
-<li><code>public/</code>に静的サイトが生成される</li>
-<li>Google Analyticsなどはproductionで有効になるように実装してあるので，<code>HUGO_ENV=production</code>と環境変数を指定する．
-
-<ul>
-<li>theme内で以下のような実装があるなら必要．
+<li><code>HUGO_ENV=production hugo</code>によって，<code>public/</code>に静的サイトが生成される</li>
+<li>Google Analyticsなどはproductionで有効になるように実装されていることが多いので，<code>HUGO_ENV=production</code>と環境変数を指定する．例えば，theme内で以下のような実装があるなら<code>HUGO_ENV=production</code>が必要．
 <code>
 {{ if eq (getenv &quot;HUGO_ENV&quot;) &quot;production&quot; | or (eq .Site.Params.env &quot;production&quot;)  }}{{ end }}
 </code></li>
-</ul></li>
-</ul></li>
 </ul>
 
     <div class="share">

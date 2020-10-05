@@ -141,11 +141,10 @@ $$ a_1\boldsymbol{e_1}+a_2\boldsymbol{e_2}+\dots+a_n\boldsymbol{e_n}　\tag{1} $
       <pubDate>Wed, 01 Apr 2020 00:00:00 +0900</pubDate>
       
       <guid>https://yasakura.me/post/generate-static-site-with-hugo/</guid>
-      <description> モチベーション  ブログを書きたい デザインに凝りたい WordPressなどのCMSで管理するほどでもない StaticGenで流行ってそうなもののうち，HugoならGo言語に触れるための良い機会になるのではないかと思った  プレビューしながら執筆or開発する hugo server --watch -D --port &amp;lt;port&amp;gt; --bind 0.0.0.0 --baseURL=&amp;lt;local machine&#39;s IP address&amp;gt;   コードを変更するごとに自動でリロードさせるためには，--watchをつける．
+      <description>モチベーション  ブログを書きたい デザインを自由にカスタマイズしたい WordPressなどのCMSで管理するほどでもない StaticGenの上位にHugoがある  記事を新規作成する hugo new post/&amp;lt;article name&amp;gt;.md   プロジェクトディレクトリにあるarchetypes/のdefault.mdを元に新しいエントリがcontent/以下に作成される．  リアルタイムでプレビューしながら記事を執筆orテーマをカスタマイズする hugo server --watch -D --port &amp;lt;port&amp;gt; --bind 0.0.0.0 --baseURL=&amp;lt;local machine&#39;s IP address&amp;gt;   コードを変更するごとに自動でリロードさせるためには，--watchをつける．
  Draft記事を表示させるためには，-Dをつける．
- --bindを指定しない場合は，127.0.0.1にbindされる．127.0.0.1へのbindだと，hugo serverを実行しているローカルマシンからのアクセスhttp://localhost:&amp;lt;port&amp;gt;のみに制限されてしまう．0.0.0.0にbindすることで，LAN内にあるローカルマシン以外からはhttp://&amp;lt;local machine&#39;s IP address&amp;gt;:&amp;lt;port&amp;gt;でアクセスできるようになる．  記事を新規作成する hugo new post/&amp;lt;article name&amp;gt;.md  Themeのカスタマイズ .Params.xxxはarticleのfront-matterから参照される
-.Site.Params.xxxはconfig.tomlから参照される
-静的サイトをジェネる  HUGO_ENV=production hugo  public/に静的サイトが生成される Google Analyticsなどはproductionで有効になるように実装してあるので，HUGO_ENV=productionと環境変数を指定する．  theme内で以下のような実装があるなら必要．  {{ if eq (getenv &amp;quot;HUGO_ENV&amp;quot;) &amp;quot;production&amp;quot; | or (eq .Site.Params.env &amp;quot;production&amp;quot;) }}{{ end }}     </description>
+ --bindを指定しない場合は，127.0.0.1にbindされる．127.0.0.1へのbindだと，hugo serverを実行しているローカルマシンからのアクセスhttp://localhost:&amp;lt;port&amp;gt;のみに制限されてしまう．0.0.0.0にbindすることで，LAN内にあるローカルマシン以外（スマホなど）からはhttp://&amp;lt;local machine&#39;s IP address&amp;gt;:&amp;lt;port&amp;gt;でアクセスできるようになる．  Themeのカスタマイズ ユーザが指定したパラメータを呼び出す  .Params.xxxはarticleのfront-matterから参照される
+ .Site.Params.xxxはconfig.tomlから参照される  リストコンテンツの順番を制御できるページネーションを実装する {{ $pages := where .Pages &amp;#34;.Params.type&amp;#34; &amp;#34;!=&amp;#34; &amp;#34;about&amp;#34; }} {{ $sorted := ($pages.ByParam &amp;#34;lastmod&amp;#34;).Reverse }} {{ $paginator := .Paginate $sorted (index .</description>
     </item>
     
   </channel>

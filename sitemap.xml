@@ -14,12 +14,12 @@
   
   <url>
     <loc>https://yasakura.me/post/how-to-use-git/</loc>
-    <lastmod>2020-08-13T00:00:00+09:00</lastmod>
+    <lastmod>2020-10-05T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://yasakura.me/post/</loc>
-    <lastmod>2020-08-13T00:00:00+09:00</lastmod>
+    <lastmod>2020-10-05T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -30,7 +30,7 @@
   
   <url>
     <loc>https://yasakura.me/</loc>
-    <lastmod>2020-08-13T00:00:00+09:00</lastmod>
+    <lastmod>2020-10-05T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -66,12 +66,12 @@
   
   <url>
     <loc>https://yasakura.me/post/generate-static-site-with-hugo/</loc>
-    <lastmod>2020-04-01T00:00:00+09:00</lastmod>
+    <lastmod>2020-10-05T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://yasakura.me/about/</loc>
-    <lastmod>2020-03-28T00:00:00+09:00</lastmod>
+    <lastmod>2020-10-05T00:00:00+00:00</lastmod>
   </url>
   
   <url>

@@ -54,6 +54,23 @@ from sklearn.datasets import make_moons import matplotlib.pyplot as plt from mat
     <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fclassification-and-regression-with-decision-tree%2f&title=%e6%b1%ba%e5%ae%9a%e6%9c%a8%e3%81%a7%e5%88%86%e9%a1%9e%e3%81%a8%e5%9b%9e%e5%b8%b0%e3%82%92%e8%a1%8c%e3%81%86 - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
 </div>
     
+<h1>もくじ</h1>
+<nav id="TableOfContents">
+<ul>
+<li><a href="#モチベーション">モチベーション</a></li>
+<li><a href="#scikit-learnのdecisiontreeclassifierで分類する">scikit-learnのDecisionTreeClassifierで分類する</a></li>
+<li><a href="#エントロピー-で-情報のあいまいさ-を表現する">「エントロピー」で「情報のあいまいさ」を表現する</a></li>
+<li><a href="#エントロピーの大小を基準にして決定木を構築する">エントロピーの大小を基準にして決定木を構築する</a></li>
+<li><a href="#ジニ不純度で決定木を構築する">ジニ不純度で決定木を構築する</a></li>
+<li><a href="#scikit-learnのdecisiontreeregressorで回帰する">scikit-learnのDecisionTreeRegressorで回帰する</a></li>
+<li><a href="#平均二乗誤差を基準にして回帰木を構築する">平均二乗誤差を基準にして回帰木を構築する</a></li>
+<li><a href="#平均絶対誤差を基準にして回帰木を構築する">平均絶対誤差を基準にして回帰木を構築する</a></li>
+<li><a href="#回帰木では外挿-extrapolate-ができないことに注意する">回帰木では外挿(extrapolate)ができないことに注意する</a></li>
+<li><a href="#appendix-決定木-ノード-を可視化するために必要なもの">Appendix. 決定木（ノード）を可視化するために必要なもの</a></li>
+</ul>
+</nav>
+
+    
 
 <h1 id="モチベーション">モチベーション</h1>
 

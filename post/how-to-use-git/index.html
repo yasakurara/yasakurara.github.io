@@ -43,7 +43,7 @@ Host &lt;nickname&gt; HostName github.com IdentityFile &lt;秘密鍵へのパス
 <article class="post post-view">
   <header class="post-header">
     
-    <p class="post-meta">2020.8.13</p>
+    <p class="post-meta">2020.10.5</p>
     
     <h1 class="post-title">Gitをやっていく</h1>
     
@@ -54,6 +54,67 @@ Host &lt;nickname&gt; HostName github.com IdentityFile &lt;秘密鍵へのパス
     <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fhow-to-use-git%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
     <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fhow-to-use-git%2f&title=Git%e3%82%92%e3%82%84%e3%81%a3%e3%81%a6%e3%81%84%e3%81%8f - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
 </div>
+    
+<h1>もくじ</h1>
+<nav id="TableOfContents">
+<ul>
+<li><a href="#モチベーション">モチベーション</a></li>
+<li><a href="#repositoryを用意する">Repositoryを用意する</a>
+<ul>
+<li><a href="#local-repositoryから始める">Local Repositoryから始める</a></li>
+<li><a href="#remote-repositoryから始める">Remote Repositoryから始める</a></li>
+</ul></li>
+<li><a href="#repositoryの初期設定をする">Repositoryの初期設定をする</a>
+<ul>
+<li><a href="#ユーザ情報を設定する">ユーザ情報を設定する</a></li>
+<li><a href="#デフォルトのエディタやmerge-tool-diff-toolを設定する">デフォルトのエディタやMerge tool, Diff toolを設定する</a></li>
+<li><a href="#オリジナルのサブコマンドを設定する">オリジナルのサブコマンドを設定する</a></li>
+<li><a href="#設定値の確認">設定値の確認</a></li>
+<li><a href="#gitで管理したくないファイルを指定する">Gitで管理したくないファイルを指定する</a></li>
+</ul></li>
+<li><a href="#リモートリポジトリにはニックネームが付いている">リモートリポジトリにはニックネームが付いている</a></li>
+<li><a href="#コミットのいろいろな呼ばれ方">コミットのいろいろな呼ばれ方</a></li>
+<li><a href="#ブランチのいろいろな呼ばれ方">ブランチのいろいろな呼ばれ方</a></li>
+<li><a href="#リモートブランチをリモート追跡ブランチに取り込む">リモートブランチをリモート追跡ブランチに取り込む</a></li>
+<li><a href="#特定のコミットをカレントブランチに取り込む">特定のコミットをカレントブランチに取り込む</a></li>
+<li><a href="#リモートブランチをカレントブランチに取り込む">リモートブランチをカレントブランチに取り込む</a></li>
+<li><a href="#特定のコミットに移動する">特定のコミットに移動する</a></li>
+<li><a href="#カレントブランチの状態を確認する">カレントブランチの状態を確認する</a></li>
+<li><a href="#変更したものをとりあえずひとまとめにする">変更したものをとりあえずひとまとめにする</a></li>
+<li><a href="#変更を確定する">変更を確定する</a></li>
+<li><a href="#あるコミット時点のファイルをみる">あるコミット時点のファイルをみる</a></li>
+<li><a href="#変更履歴-コミットログ-をみる">変更履歴（コミットログ）をみる</a></li>
+<li><a href="#差分をみる">差分をみる</a></li>
+<li><a href="#特定のコミットをカレントブランチに反映させる">特定のコミットをカレントブランチに反映させる</a></li>
+<li><a href="#枝を付け替える">枝を付け替える</a>
+<ul>
+<li><a href="#git-rebase-start-end"><code>git rebase &lt;start&gt; &lt;end&gt;</code></a></li>
+<li><a href="#git-rebase-i-start-end"><code>git rebase -i &lt;start&gt; &lt;end&gt;</code></a></li>
+<li><a href="#git-rebase-onto-target-start-end"><code>git rebase --onto &lt;target&gt; &lt;start&gt; &lt;end&gt;</code></a></li>
+</ul></li>
+<li><a href="#特定のブランチをリモート追跡ブランチとリモートブランチに反映する">特定のブランチをリモート追跡ブランチとリモートブランチに反映する</a></li>
+<li><a href="#変更を戻す">変更を戻す</a>
+<ul>
+<li><a href="#git-reset"><code>git reset</code></a></li>
+<li><a href="#git-reflog"><code>git reflog</code></a></li>
+</ul></li>
+<li><a href="#コミットにタグを付ける">コミットにタグを付ける</a></li>
+<li><a href="#ファイルを削除する">ファイルを削除する</a></li>
+<li><a href="#ワークツリーの内容をまるっと取り置きする">ワークツリーの内容をまるっと取り置きする</a></li>
+<li><a href="#リポジトリに依存関係を持たす">リポジトリに依存関係を持たす</a>
+<ul>
+<li><a href="#あるリポジトリをsubmoduleとして追加する">あるリポジトリをsubmoduleとして追加する</a></li>
+<li><a href="#submoduleを持っているrepositoryをcloneする">submoduleを持っているrepositoryをcloneする</a></li>
+</ul></li>
+<li><a href="#そもそもgitはどのように差分を管理しているか">そもそもGitはどのように差分を管理しているか</a>
+<ul>
+<li><a href="#blob-tree-commitオブジェクトを関連付けて差分管理している">blob/tree/commitオブジェクトを関連付けて差分管理している</a></li>
+<li><a href="#git-add-と-git-commit-で何をやっているか"><code>git add</code>と<code>git commit</code>で何をやっているか</a></li>
+<li><a href="#通常のコミットとマージコミットの違い">通常のコミットとマージコミットの違い</a></li>
+</ul></li>
+</ul>
+</nav>
+
     
 
 <h1 id="モチベーション">モチベーション</h1>
@@ -199,6 +260,23 @@ echo &quot;.DS_Store&quot; &gt;&gt; ~/.gitignore_global
 <li><p><code>git ls-files -io --exclude-standard</code>で，excludesfileにて無視されているファイル一覧を確認できる．</p></li>
 </ul>
 
+<h1 id="リモートリポジトリにはニックネームが付いている">リモートリポジトリにはニックネームが付いている</h1>
+
+<p>リモートリポジトリには，ニックネームがついている．例えば，cloneしてきたローカルリポジトリにて，<code>git config -l</code>または<code>git remote -v</code>を実行すると，以下のように，リモートリポジトリが<code>origin</code>と名付けられていることが確認できる．</p>
+
+<pre><code># git config -l でconfigを直接見る
+remote.origin.url=git@github.com:&lt;ユーザ名&gt;/&lt;リポジトリ名&gt;.git
+remote.origin.fetch=+refs/heads/*:refs/remotes/origin/*
+
+# git remote -v でリモートリポジトリ一覧をみる
+origin	git@github.com:&lt;ユーザ名&gt;/&lt;リポジトリ名&gt;.git (fetch)
+origin	git@github.com:&lt;ユーザ名&gt;/&lt;リポジトリ名&gt;.git (push)
+</code></pre>
+
+<p>一方，<code>git init</code>で作成したローカルリポジトリに，任意のリモートリポジトリのニックネームを設定するには，<code>git remote add &lt;nickname&gt; https://github.com/&lt;ユーザ名&gt;/&lt;リポジトリ名&gt;.git</code>を実行する．</p>
+
+<p>ここで設定された/されているリモートリポジトリのニックネーム（たとえば<code>origin</code>など）は，<code>git push origin master</code>や<code>git pull origin master</code>などのコマンドで利用される．</p>
+
 <h1 id="コミットのいろいろな呼ばれ方">コミットのいろいろな呼ばれ方</h1>
 
 <ul>
@@ -225,24 +303,7 @@ echo &quot;.DS_Store&quot; &gt;&gt; ~/.gitignore_global
 </ul></li>
 </ul>
 
-<h1 id="リモートリポジトリにはニックネームが付いている">リモートリポジトリにはニックネームが付いている</h1>
-
-<p>リモートリポジトリには，ニックネームがついている．例えば，cloneしてきたローカルリポジトリにて，<code>git config -l</code>または<code>git remote -v</code>を実行すると，以下のように，リモートリポジトリが<code>origin</code>と名付けられていることが確認できる．</p>
-
-<pre><code># git config -l でconfigを直接見る
-remote.origin.url=git@github.com:&lt;ユーザ名&gt;/&lt;リポジトリ名&gt;.git
-remote.origin.fetch=+refs/heads/*:refs/remotes/origin/*
-
-# git remote -v でリモートリポジトリ一覧をみる
-origin	git@github.com:&lt;ユーザ名&gt;/&lt;リポジトリ名&gt;.git (fetch)
-origin	git@github.com:&lt;ユーザ名&gt;/&lt;リポジトリ名&gt;.git (push)
-</code></pre>
-
-<p>一方，<code>git init</code>で作成したローカルリポジトリに，任意のリモートリポジトリのニックネームを設定するには，<code>git remote add &lt;nickname&gt; https://github.com/&lt;ユーザ名&gt;/&lt;リポジトリ名&gt;.git</code>を実行する．</p>
-
-<p>ここで設定された/されているリモートリポジトリのニックネーム（たとえば<code>origin</code>など）は，<code>git push origin master</code>や<code>git pull origin master</code>などのコマンドで利用される．</p>
-
-<h1 id="作業ブランチ-上流ブランチ-リモート追跡ブランチ-カレントブランチ">作業ブランチ，上流ブランチ，リモート追跡ブランチ，カレントブランチ</h1>
+<h1 id="ブランチのいろいろな呼ばれ方">ブランチのいろいろな呼ばれ方</h1>
 
 <p><code>origin</code>が以下のようなブランチを持っているとすると，</p>
 

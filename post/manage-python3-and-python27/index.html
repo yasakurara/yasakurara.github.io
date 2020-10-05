@@ -52,6 +52,17 @@
     <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27%2f&title=python2%e3%81%a8python3%e3%82%92%e5%85%b1%e5%ad%98%e3%81%95%e3%81%9b%e3%82%8b - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
 </div>
     
+<h1>もくじ</h1>
+<nav id="TableOfContents">
+<ul>
+<li><a href="#モチベーション">モチベーション</a></li>
+<li><a href="#venvでsandboxをつくる">venvでsandboxをつくる</a></li>
+<li><a href="#venv下にあるパッケージを確認する">venv下にあるパッケージを確認する</a></li>
+<li><a href="#venvを解除する">venvを解除する</a></li>
+</ul>
+</nav>
+
+    
 
 <h1 id="モチベーション">モチベーション</h1>
 
@@ -61,7 +72,7 @@
 <li>プロジェクトごとにDockerコンテナを立ち上げるような，大げさな管理はしたくない．</li>
 </ul>
 
-<h2 id="venvでsandboxをつくる">venvでsandboxをつくる</h2>
+<h1 id="venvでsandboxをつくる">venvでsandboxをつくる</h1>
 
 <pre><code>$ python -V
 Python 2.7.10
@@ -75,12 +86,12 @@ $ . venv/bin/activate
 Python 3.7.3
 </code></pre>
 
-<h2 id="venv下にあるパッケージを確認する">venv下にあるパッケージを確認する</h2>
+<h1 id="venv下にあるパッケージを確認する">venv下にあるパッケージを確認する</h1>
 
 <pre><code>(venv) $ pip freeze
 </code></pre>
 
-<h2 id="venvを解除する">venvを解除する</h2>
+<h1 id="venvを解除する">venvを解除する</h1>
 
 <pre><code>(venv) $ deactivate
 $ python -V
