@@ -17,15 +17,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   
-  <title>Python2.XとPython3.Xを共存させる - yasakura</title>
+  <title>How to manage Python2.X, 3.X and packages every project - yasakura</title>
   
-  <meta name="description" content="モチベーション  Python2.X系とPython3.X系やpipとpip3を共存させて，必要に応じて切り替えて使いたい． Pythonのマイナーバージョンを細かく切り替えたい． pipでパッケージをインストールすると環境が汚れてしまうのでプロジェクトごとにパッケージを管理したい． 「プロジェクトごとにDockerコンテナを立ち上げてそこでPythonを実行する」というような大げさな管理はしたくない．  pyenvでPythonのバージョンを切り替える  デフォルトのPythonのバージョンを確認する
-$ python --version Python 2.7.16 brewでpyenvをインストールする
-$ brew install pyenv PATHなどを設定する
-export PYENV_ROOT=&#34;${HOME}/.pyenv&#34; export PATH=${PYENV_ROOT}/bin:$PATH eval &#34;$(pyenv init -)&#34; pyenvで使用可能なPythonのバージョン一覧を確認する
-$ pyenv install -l Available versions: 2.1.3 2.2.3 2.3.7 : : 任意のバージョンをインストールする
-$ pyenv install 3.9.0 : Installed Python-3.9.0 to /Users/xxxx/.pyenv/versions/3.9.0 切替可能なバージョンを確認する
-$ pyenv versions \* system (set by /Users/xxxx/.pyenv/version) 3.9.0  システム全体のPythonバージョンを切り替える $ pyenv global 3.9.0 $ pyenv versions system \* 3.">
+  <meta name="description" content="Motivation  want to switch major version of Python (i.e. between Python2.X and Python3.X). want to switch minor version of Python (i.e. between Python3.A and Python3.B). want to isolate some packages for every project. don&rsquo;t want to construct in vain a new docker container for each Python project.  How to switch any version of Python with pyenv Installation  Confirm the default Python version.
+$ python --version Python 2.">
   
   <link href=/css/style.css rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;900&display=swap" rel="stylesheet">
@@ -48,7 +43,7 @@ $ pyenv versions \* system (set by /Users/xxxx/.pyenv/version) 3.9.0  システ�
     
     <p class="post-meta">2021.1.2</p>
     
-    <h1 class="post-title">Python2.XとPython3.Xを共存させる</h1>
+    <h1 class="post-title">How to manage Python2.X, 3.X and packages every project</h1>
     <ul class="post-author">
       <li>
         <a href="https://twitter.com/yasakurara"><svg id="twitter-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><style>.cls-1{fill:none;}.cls-2{fill:#1da1f2;}</style></defs><title>Twitter_Logo_Blue</title><rect class="cls-1" width="400" height="400"/><path class="cls-2" d="M153.62,301.59c94.34,0,145.94-78.16,145.94-145.94,0-2.22,0-4.43-.15-6.63A104.36,104.36,0,0,0,325,122.47a102.38,102.38,0,0,1-29.46,8.07,51.47,51.47,0,0,0,22.55-28.37,102.79,102.79,0,0,1-32.57,12.45,51.34,51.34,0,0,0-87.41,46.78A145.62,145.62,0,0,1,92.4,107.81a51.33,51.33,0,0,0,15.88,68.47A50.91,50.91,0,0,1,85,169.86c0,.21,0,.43,0,.65a51.31,51.31,0,0,0,41.15,50.28,51.21,51.21,0,0,1-23.16.88,51.35,51.35,0,0,0,47.92,35.62,102.92,102.92,0,0,1-63.7,22A104.41,104.41,0,0,1,75,278.55a145.21,145.21,0,0,0,78.62,23"/></svg>@yasakurara</a>
@@ -62,9 +57,9 @@ $ pyenv versions \* system (set by /Users/xxxx/.pyenv/version) 3.9.0  システ�
     </ul>
     
     <div class="share">
-    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27%2f&text=Python2.X%e3%81%a8Python3.X%e3%82%92%e5%85%b1%e5%ad%98%e3%81%95%e3%81%9b%e3%82%8b - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
-    <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
-    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27%2f&title=Python2.X%e3%81%a8Python3.X%e3%82%92%e5%85%b1%e5%ad%98%e3%81%95%e3%81%9b%e3%82%8b - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
+    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27-and-packages-en%2f&text=How%20to%20manage%20Python2.X%2c%203.X%20and%20packages%20every%20project - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
+    <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27-and-packages-en%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
+    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27-and-packages-en%2f&title=How%20to%20manage%20Python2.X%2c%203.X%20and%20packages%20every%20project - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
 </div>
   </header>
   <div class="post-content">
@@ -72,44 +67,47 @@ $ pyenv versions \* system (set by /Users/xxxx/.pyenv/version) 3.9.0  システ�
 <h1>Table of Contents</h1>
 <nav id="TableOfContents">
 <ul>
-<li><a href="#モチベーション">モチベーション</a></li>
-<li><a href="#pyenvでpythonのバージョンを切り替える">pyenvでPythonのバージョンを切り替える</a>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#how-to-switch-any-version-of-python-with-pyenv">How to switch any version of Python with pyenv</a>
 <ul>
-<li><a href="#システム全体のpythonバージョンを切り替える">システム全体のPythonバージョンを切り替える</a></li>
-<li><a href="#特定のディレクトリ内のみに特定のpythonバージョンを設定する">特定のディレクトリ内のみに特定のPythonバージョンを設定する</a></li>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#switch-the-global-python-version">Switch the global Python version</a></li>
+<li><a href="#switch-the-local-python-version">Switch the local Python version</a></li>
 </ul></li>
-<li><a href="#venvでパッケージを分離する">venvでパッケージを分離する</a></li>
-<li><a href="#pip-freeze-と-pip-list-の違い"><code>pip freeze</code>と<code>pip list</code>の違い</a></li>
+<li><a href="#isolate-some-packages-with-venv">Isolate some packages with venv</a></li>
+<li><a href="#what-s-the-difference-between-pip-freeze-and-pip-list">What&rsquo;s the difference between <code>pip freeze</code> and <code>pip list</code> ?</a></li>
 </ul>
 </nav>
 
     
 
-<h1 id="モチベーション">モチベーション</h1>
+<h1 id="motivation">Motivation</h1>
 
 <ul>
-<li>Python2.X系とPython3.X系やpipとpip3を共存させて，必要に応じて切り替えて使いたい．</li>
-<li>Pythonのマイナーバージョンを細かく切り替えたい．</li>
-<li>pipでパッケージをインストールすると環境が汚れてしまうのでプロジェクトごとにパッケージを管理したい．</li>
-<li>「プロジェクトごとにDockerコンテナを立ち上げてそこでPythonを実行する」というような大げさな管理はしたくない．</li>
+<li>want to switch major version of Python (i.e. between Python2.X and Python3.X).</li>
+<li>want to switch minor version of Python (i.e. between Python3.A and Python3.B).</li>
+<li>want to isolate some packages for every project.</li>
+<li>don&rsquo;t want to construct in vain a new docker container for each Python project.</li>
 </ul>
 
-<h1 id="pyenvでpythonのバージョンを切り替える">pyenvでPythonのバージョンを切り替える</h1>
+<h1 id="how-to-switch-any-version-of-python-with-pyenv">How to switch any version of Python with pyenv</h1>
+
+<h2 id="installation">Installation</h2>
 
 <ol>
-<li><p>デフォルトのPythonのバージョンを確認する</p>
+<li><p>Confirm the default Python version.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ python --version
 Python <span style="color:#ae81ff">2</span>.7.16</code></pre></div></li>
 
-<li><p><code>brew</code>で<a href="https://github.com/pyenv/pyenv">pyenv</a>をインストールする</p>
+<li><p>Install <a href="https://github.com/pyenv/pyenv">pyenv</a> by <code>brew</code> on macOS.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ brew install pyenv</code></pre></div></li>
 
-<li><p>PATHなどを設定する</p>
+<li><p>Define the environment variable and add <code>pyenv init</code> to your shell.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">export PYENV_ROOT<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>HOME<span style="color:#e6db74">}</span><span style="color:#e6db74">/.pyenv&#34;</span>
 export PATH<span style="color:#f92672">=</span><span style="color:#e6db74">${</span>PYENV_ROOT<span style="color:#e6db74">}</span>/bin:$PATH
 eval <span style="color:#e6db74">&#34;</span><span style="color:#66d9ef">$(</span>pyenv init -<span style="color:#66d9ef">)</span><span style="color:#e6db74">&#34;</span></code></pre></div></li>
 
-<li><p>pyenvで使用可能なPythonのバージョン一覧を確認する</p>
+<li><p>See installable Python versions on pyenv.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ pyenv install -l
 Available versions:
 <span style="color:#ae81ff">2</span>.1.3
@@ -118,18 +116,20 @@ Available versions:
 :
 :</code></pre></div></li>
 
-<li><p>任意のバージョンをインストールする</p>
+<li><p>Install a specific Python version.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ pyenv install <span style="color:#ae81ff">3</span>.9.0
 :
 Installed Python-3.9.0 to /Users/xxxx/.pyenv/versions/3.9.0</code></pre></div></li>
 
-<li><p>切替可能なバージョンを確認する</p>
+<li><p>See the current Python version and installed versions.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ pyenv versions
-<span style="color:#ae81ff">\*</span> system <span style="color:#f92672">(</span>set by /Users/xxxx/.pyenv/version<span style="color:#f92672">)</span>
+<span style="color:#ae81ff">\*</span> system <span style="color:#f92672">(</span>set by /Users/xxxx/.pyenv/version<span style="color:#f92672">)</span>  &lt;<span style="color:#f92672">===</span> current Python version.
   <span style="color:#ae81ff">3</span>.9.0</code></pre></div></li>
 </ol>
 
-<h2 id="システム全体のpythonバージョンを切り替える">システム全体のPythonバージョンを切り替える</h2>
+<h2 id="switch-the-global-python-version">Switch the global Python version</h2>
+
+<p>Switch to the specific version from the current version as a global configuration.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ pyenv global <span style="color:#ae81ff">3</span>.9.0
 
 $ pyenv versions
@@ -141,7 +141,9 @@ Python <span style="color:#ae81ff">3</span>.9.0
 
 $ pip -V
 pip <span style="color:#ae81ff">20</span>.2.3 from /Users/xxxx/.pyenv/versions/3.9.0/lib/python3.9/site-packages/pip <span style="color:#f92672">(</span>python <span style="color:#ae81ff">3</span>.9<span style="color:#f92672">)</span></code></pre></div>
-<h2 id="特定のディレクトリ内のみに特定のpythonバージョンを設定する">特定のディレクトリ内のみに特定のPythonバージョンを設定する</h2>
+<h2 id="switch-the-local-python-version">Switch the local Python version</h2>
+
+<p>Apply specific Python version to a specific directory.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ mkdir sandbox; cd sandbox
 
 $ pyenv versions 
@@ -162,30 +164,30 @@ $ pyenv versions
 
 $ python --version
 Python <span style="color:#ae81ff">3</span>.9.0</code></pre></div>
-<h1 id="venvでパッケージを分離する">venvでパッケージを分離する</h1>
+<h1 id="isolate-some-packages-with-venv">Isolate some packages with venv</h1>
 
 <ol>
-<li><p>pyenvでPythonを任意のバージョンに切り替える</p></li>
+<li><p>Switch to a specific Python version with pyenv.</p></li>
 
-<li><p>インストール済みのパッケージを確認する</p>
+<li><p>See installed packages.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ pip list
 Package    Version
 ---------- -------
 pip        <span style="color:#ae81ff">20</span>.3.3
 setuptools <span style="color:#ae81ff">49</span>.2.1</code></pre></div></li>
 
-<li><p>仮想環境<code>&lt;target directory&gt;</code>を作成する．</p>
+<li><p>Create a virtual environment.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ python -m venv &lt;target directory&gt;
 
 $ ls &lt;target directory&gt;
 bin     include     lib     pyvenv.cfg</code></pre></div></li>
 
-<li><p>仮想環境を実行する</p>
+<li><p>Activate the virtual environment.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ source &lt;target directory&gt;/bin/activate
 
 <span style="color:#f92672">(</span>target directory name<span style="color:#f92672">)</span> $</code></pre></div></li>
 
-<li><p>何かしらのパッケージをインストールし，仮想環境にパッケージがインストールされたことを確認する</p>
+<li><p>Install a package and confirm that it has been installed in the virtual environment.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ pip install selenium
 :
 Successfully installed selenium...
@@ -194,21 +196,21 @@ $ pip freeze
 selenium<span style="color:#f92672">==</span><span style="color:#ae81ff">3</span>.141.0
 urllib3<span style="color:#f92672">==</span><span style="color:#ae81ff">1</span>.26.2</code></pre></div></li>
 
-<li><p>仮想環境を終了する</p>
+<li><p>Deactivate the virtual environment.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell"><span style="color:#f92672">(</span>target directory name<span style="color:#f92672">)</span> $ deactivate
 
 $</code></pre></div></li>
 
-<li><p>元の環境と仮想環境のパッケージが分離されていることを確認する</p>
+<li><p>Some packages have been isolated between the original environment and the virtual environment.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ pip freeze
 $</code></pre></div></li>
 </ol>
 
-<h1 id="pip-freeze-と-pip-list-の違い"><code>pip freeze</code>と<code>pip list</code>の違い</h1>
+<h1 id="what-s-the-difference-between-pip-freeze-and-pip-list">What&rsquo;s the difference between <code>pip freeze</code> and <code>pip list</code> ?</h1>
 
 <ul>
-<li><code>pip list</code>は，その環境にインストールされているパッケージをすべて出力する．一方，<code>pip freeze</code>は，<code>setuptools</code>などの内部的なパッケージ群は出力せず，ユーザが本来必要としているパッケージ名とそのバージョンの一覧を出力する．</li>
-<li><code>pip freeze &gt; requirements.txt</code>にて，パッケージ名とバージョン一覧を<code>requirements.txt</code>に書き出し，<code>pip install -r requirements.txt</code>を実行することで，パッケージ一覧を一括でインストールすることができる．</li>
+<li><code>pip list</code> shows the list of package names and versions in the environment and <code>pip freeze</code> shows them but leaves out some internal packages like a <code>setuptools</code>.</li>
+<li><code>pip freeze &gt; requirements.txt</code> outputs the list of packages names vs versions to <code>requirements.txt</code> and they can be installed in bulk by <code>pip install -r requirements.txt</code>.</li>
 </ul>
 
   </div>
@@ -221,9 +223,9 @@ $</code></pre></div></li>
     </ul>
     
     <div class="share">
-    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27%2f&text=Python2.X%e3%81%a8Python3.X%e3%82%92%e5%85%b1%e5%ad%98%e3%81%95%e3%81%9b%e3%82%8b - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
-    <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
-    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27%2f&title=Python2.X%e3%81%a8Python3.X%e3%82%92%e5%85%b1%e5%ad%98%e3%81%95%e3%81%9b%e3%82%8b - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
+    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27-and-packages-en%2f&text=How%20to%20manage%20Python2.X%2c%203.X%20and%20packages%20every%20project - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
+    <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27-and-packages-en%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
+    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27-and-packages-en%2f&title=How%20to%20manage%20Python2.X%2c%203.X%20and%20packages%20every%20project - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
 </div>
   </footer>
 </article>

@@ -19,15 +19,13 @@
   
   <title>対角化の恩恵を授かる - yasakura</title>
   
-  <meta name="description" content="モチベーション  行列を用いた座標変換をおさらいしたい 対角化で行列計算を楽にしたい  線形独立と線形従属 線形独立と線形従属 is 何？ 列ベクトル$\boldsymbol{e}_k (k=1,2,\dots,n)$を$\forall l_j \in \mathbb {R} (j=1,2,\dots,m)$を用いて以下のようにおいてみる．つまり，$\boldsymbol{e}_k \in \mathbb {R}^m$．
-$$ \boldsymbol{e}_k= \begin{pmatrix} l_{1k}\\ l_{2k}\\ \vdots\\ l_{mk} \end{pmatrix} $$  次に，列ベクトル集合$\lbrace \boldsymbol{e_1}, \boldsymbol{e_2}, \dots, \boldsymbol{e_n} \rbrace$と$\forall a_k \in \mathbb {R} (k=1,2,\dots,n)$を用いて，以下のような線形和をつくる．
-$$ a_1\boldsymbol{e_1}&#43;a_2\boldsymbol{e_2}&#43;\dots&#43;a_n\boldsymbol{e_n}　\tag{1} $$  (1)式を0にできるような，$a_k$が複数あるなら，$\lbrace \boldsymbol{e_1}, \boldsymbol{e_2}, \dots, \boldsymbol{e_n} \rbrace$は線形従属であると言う．ベクトルをうまく組み合わせれば，一つの輪をつくることができるイメージ．
-一方，(1)式を0にするには$a_k=0 (k=1,2,\dots,n)$が必要である場合，$\lbrace \boldsymbol{e_1}, \boldsymbol{e_2}, \dots, \boldsymbol{e_n} \rbrace$は線形独立であると言う．つまり，ベクトルを組み合わせても輪がつくれないイメージ．
-線形独立と線形独立を判別する方法 (1)式=0とおくと，(1)式から $a_1l_{j1}&#43;a_2l_{j2}&#43;\dots&#43;a_nl_{jn}=0$ という式がm本できる．つまり，n(=m)次の連立方程式となる．
-列ベクトル集合$\lbrace {e_1}, {e_2}, \dots, {e_n} \rbrace$を合体させてm x nの正方行列とすると，(2)式のように整理できる．">
+  <meta name="description" content="モチベーション  行列を用いた座標変換をおさらいしたい 対角化で行列計算を楽にしたい  線形独立と線形従属 線形独立と線形従属 is 何？ 列ベクトル $\boldsymbol{e}_k (k=1,2,\dots,n)$を$\forall l_j \in \mathbb {R} (j=1,2,\dots,m)$ を用いて以下のようにおいてみる．つまり， $\boldsymbol{e}_k \in \mathbb {R}^m$ ．
+$$ \boldsymbol{e}_k= \begin{pmatrix} l_{1k}\\ l_{2k}\\ \vdots\\ l_{mk} \end{pmatrix} $$  次に，列ベクトル集合 $\lbrace \boldsymbol{e_1}, \boldsymbol{e_2}, \dots, \boldsymbol{e_n} \rbrace$と$\forall a_k \in \mathbb {R} (k=1,2,\dots,n)$ を用いて，以下のような線形和をつくる．
+$$ a_1\boldsymbol{e_1}&#43;a_2\boldsymbol{e_2}&#43;\dots&#43;a_n\boldsymbol{e_n}　\tag{1} $$  (1)式を0にできるような， $a_k$ が複数あるなら， $\lbrace \boldsymbol{e_1}, \boldsymbol{e_2}, \dots, \boldsymbol{e_n} \rbrace$ は線形従属であると言う．ベクトルをうまく組み合わせれば，一つの輪をつくることができるイメージ．
+一方，(1)式を0にするには $a_k=0 (k=1,2,\dots,n)$ が必要である場合， $\lbrace \boldsymbol{e_1}, \boldsymbol{e_2}, \dots, \boldsymbol{e_n} \rbrace$ は線形独立であると言う．つまり，ベクトルを組み合わせても輪がつくれないイメージ．">
   
   <link href=/css/style.css rel="stylesheet">
-  <link href=/css/font.css rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;900&display=swap" rel="stylesheet">
   
   <link rel="icon" href="https://yasakura.me/img/favicon.ico">
   
@@ -38,7 +36,7 @@ $$ a_1\boldsymbol{e_1}&#43;a_2\boldsymbol{e_2}&#43;\dots&#43;a_n\boldsymbol{e_n}
     <div class="title"><a href="https://yasakura.me/">yasakura</a></div>
     <nav id="navigation">
       <ul class="menu">
-        <li><a href="https://yasakura.me//about/">ABOUT</a></li>
+        <li><a href="https://yasakura.me//about/">ABOUT ME</a></li>
       </ul>
     </nav>
   </header>
@@ -48,16 +46,21 @@ $$ a_1\boldsymbol{e_1}&#43;a_2\boldsymbol{e_2}&#43;\dots&#43;a_n\boldsymbol{e_n}
     <p class="post-meta">2020.4.1</p>
     
     <h1 class="post-title">対角化の恩恵を授かる</h1>
+    <ul class="post-author">
+      <li>
+        <a href="https://twitter.com/yasakurara"><svg id="twitter-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><style>.cls-1{fill:none;}.cls-2{fill:#1da1f2;}</style></defs><title>Twitter_Logo_Blue</title><rect class="cls-1" width="400" height="400"/><path class="cls-2" d="M153.62,301.59c94.34,0,145.94-78.16,145.94-145.94,0-2.22,0-4.43-.15-6.63A104.36,104.36,0,0,0,325,122.47a102.38,102.38,0,0,1-29.46,8.07,51.47,51.47,0,0,0,22.55-28.37,102.79,102.79,0,0,1-32.57,12.45,51.34,51.34,0,0,0-87.41,46.78A145.62,145.62,0,0,1,92.4,107.81a51.33,51.33,0,0,0,15.88,68.47A50.91,50.91,0,0,1,85,169.86c0,.21,0,.43,0,.65a51.31,51.31,0,0,0,41.15,50.28,51.21,51.21,0,0,1-23.16.88,51.35,51.35,0,0,0,47.92,35.62,102.92,102.92,0,0,1-63.7,22A104.41,104.41,0,0,1,75,278.55a145.21,145.21,0,0,0,78.62,23"/></svg>@yasakurara</a>
+      </li>
+    </ul>
     
-  </header>
-  <div class="post-content">
     <div class="share">
     <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fdiagonalization%2f&text=%e5%af%be%e8%a7%92%e5%8c%96%e3%81%ae%e6%81%a9%e6%81%b5%e3%82%92%e6%8e%88%e3%81%8b%e3%82%8b - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
     <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fdiagonalization%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
     <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fdiagonalization%2f&title=%e5%af%be%e8%a7%92%e5%8c%96%e3%81%ae%e6%81%a9%e6%81%b5%e3%82%92%e6%8e%88%e3%81%8b%e3%82%8b - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
 </div>
+  </header>
+  <div class="post-content">
     
-<h1>もくじ</h1>
+<h1>Table of Contents</h1>
 <nav id="TableOfContents">
 <ul>
 <li><a href="#モチベーション">モチベーション</a></li>
@@ -94,7 +97,7 @@ $$ a_1\boldsymbol{e_1}&#43;a_2\boldsymbol{e_2}&#43;\dots&#43;a_n\boldsymbol{e_n}
 
 <h2 id="線形独立と線形従属-is-何">線形独立と線形従属 is 何？</h2>
 
-<p>列ベクトル$\boldsymbol{e}_k (k=1,2,\dots,n)$を$\forall l_j \in \mathbb {R} (j=1,2,\dots,m)$を用いて以下のようにおいてみる．つまり，$\boldsymbol{e}_k \in \mathbb {R}^m$．</p>
+<p>列ベクトル $\boldsymbol{e}_k (k=1,2,\dots,n)$を$\forall l_j \in \mathbb {R} (j=1,2,\dots,m)$ を用いて以下のようにおいてみる．つまり， $\boldsymbol{e}_k \in \mathbb {R}^m$ ．</p>
 
 <div class="mathjax">
 $$
@@ -108,7 +111,7 @@ $$
 $$
 </div>
 
-<p>次に，列ベクトル集合$\lbrace \boldsymbol{e_1}, \boldsymbol{e_2}, \dots, \boldsymbol{e_n} \rbrace$と$\forall a_k \in \mathbb {R} (k=1,2,\dots,n)$を用いて，以下のような線形和をつくる．</p>
+<p>次に，列ベクトル集合 $\lbrace \boldsymbol{e_1}, \boldsymbol{e_2}, \dots, \boldsymbol{e_n} \rbrace$と$\forall a_k \in \mathbb {R} (k=1,2,\dots,n)$ を用いて，以下のような線形和をつくる．</p>
 
 <div class="mathjax">
 $$
@@ -116,15 +119,15 @@ a_1\boldsymbol{e_1}+a_2\boldsymbol{e_2}+\dots+a_n\boldsymbol{e_n}　\tag{1}
 $$
 </div>
 
-<p>(1)式を0にできるような，$a_k$が複数あるなら，$\lbrace \boldsymbol{e_1}, \boldsymbol{e_2}, \dots, \boldsymbol{e_n} \rbrace$は<strong>線形従属</strong>であると言う．ベクトルをうまく組み合わせれば，一つの輪をつくることができるイメージ．</p>
+<p>(1)式を0にできるような， $a_k$ が複数あるなら， $\lbrace \boldsymbol{e_1}, \boldsymbol{e_2}, \dots, \boldsymbol{e_n} \rbrace$ は<strong>線形従属</strong>であると言う．ベクトルをうまく組み合わせれば，一つの輪をつくることができるイメージ．</p>
 
-<p>一方，(1)式を0にするには$a_k=0 (k=1,2,\dots,n)$が必要である場合，$\lbrace \boldsymbol{e_1}, \boldsymbol{e_2}, \dots, \boldsymbol{e_n} \rbrace$は<strong>線形独立</strong>であると言う．つまり，ベクトルを組み合わせても輪がつくれないイメージ．</p>
+<p>一方，(1)式を0にするには $a_k=0 (k=1,2,\dots,n)$ が必要である場合， $\lbrace \boldsymbol{e_1}, \boldsymbol{e_2}, \dots, \boldsymbol{e_n} \rbrace$ は<strong>線形独立</strong>であると言う．つまり，ベクトルを組み合わせても輪がつくれないイメージ．</p>
 
 <h2 id="線形独立と線形独立を判別する方法">線形独立と線形独立を判別する方法</h2>
 
 <p>(1)式=0とおくと，(1)式から $a_1l_{j1}+a_2l_{j2}+\dots+a_nl_{jn}=0$ という式がm本できる．つまり，n(=m)次の連立方程式となる．</p>
 
-<p>列ベクトル集合$\lbrace {e_1}, {e_2}, \dots, {e_n} \rbrace$を合体させてm x nの正方行列とすると，(2)式のように整理できる．</p>
+<p>列ベクトル集合 $\lbrace {e_1}, {e_2}, \dots, {e_n} \rbrace$ を合体させてm x nの正方行列とすると，(2)式のように整理できる．</p>
 
 <div class="mathjax">
 $$
@@ -149,13 +152,13 @@ $$
 $$
 </div>
 
-<p>ここで，正方行列の<strong>行列式が0以外なら</strong>（＝正則行列であるなら），逆行列を持てるので，$a_k=0 (k=1,2,\dots,n)$が唯一の解になる．つまり，列ベクトル$\lbrace \boldsymbol{e_1}, \boldsymbol{e_2}, \dots, \boldsymbol{e_n} \rbrace$はそれぞれ<strong>線形独立</strong>であると判断できる．</p>
+<p>ここで，正方行列の<strong>行列式が0以外なら</strong>（＝正則行列であるなら），逆行列を持てるので， $a_k=0 (k=1,2,\dots,n)$ が唯一の解になる．つまり，列ベクトル $\lbrace \boldsymbol{e_1}, \boldsymbol{e_2}, \dots, \boldsymbol{e_n} \rbrace$ はそれぞれ<strong>線形独立</strong>であると判断できる．</p>
 
-<p>一方，正方行列の<strong>行列式が0なら</strong>，逆行列が存在しないので，$a_k=0 (k=1,2,\dots,n)$以外にも解があることになる．つまり，列ベクトル$\lbrace \boldsymbol{e_1}, \boldsymbol{e_2}, \dots, \boldsymbol{e_n} \rbrace$はそれぞれ<strong>線形従属</strong>であると判断できる．</p>
+<p>一方，正方行列の<strong>行列式が0なら</strong>，逆行列が存在しないので， $a_k=0 (k=1,2,\dots,n)$ 以外にも解があることになる．つまり，列ベクトル $\lbrace \boldsymbol{e_1}, \boldsymbol{e_2}, \dots, \boldsymbol{e_n} \rbrace$ はそれぞれ<strong>線形従属</strong>であると判断できる．</p>
 
 <h2 id="基底と座標変換">基底と座標変換</h2>
 
-<p>$e_1$と$e_2$を以下のようにおいてみる．</p>
+<p>$e_1$ と $e_2$ を以下のようにおいてみる．</p>
 
 <div class="mathjax">
 $$
@@ -167,9 +170,9 @@ $$
 
 <p>これらが線形独立であることは自明だろう．</p>
 
-<p>この線形独立な$e_1,e_2$（<strong>基底</strong>という）を組み合わせると，あるベクトル空間をつくることができる．今回は$e_1,e_2 \in \mathbb{R^2}$としたので，２次元のベクトル空間ができることになる．</p>
+<p>この線形独立な $e_1,e_2$ （<strong>基底</strong>という）を組み合わせると，あるベクトル空間をつくることができる．今回は $e_1,e_2 \in \mathbb{R^2}$ としたので，２次元のベクトル空間ができることになる．</p>
 
-<p>例えば，$a_1,a_2\in \mathbb{R}$を用いると，以下のような２次元ベクトルを表現できる．</p>
+<p>例えば， $a_1,a_2\in \mathbb{R}$ を用いると，以下のような２次元ベクトルを表現できる．</p>
 
 <div class="mathjax">
 $$
@@ -195,9 +198,9 @@ a_1
 $$
 </div>
 
-<p>特に，今回用意した$e_1,e_2$は，それぞれ直交（内積が０）しており，かつ，それぞれの大きさが１なので，正規直交基底と呼ばれる．これは，$e_1$をx軸の単位ベクトル，$e_2$をy軸の単位ベクトルとしたデカルト座標系と見立てることができる．</p>
+<p>特に，今回用意した $e_1,e_2$ は，それぞれ直交（内積が０）しており，かつ，それぞれの大きさが１なので，正規直交基底と呼ばれる．これは， $e_1$ をx軸の単位ベクトル， $e_2$ をy軸の単位ベクトルとしたデカルト座標系と見立てることができる．</p>
 
-<p>ここで，(3)式のベクトルに，以下の正方行列$\boldsymbol{A}$を左から掛けてみる．</p>
+<p>ここで，(3)式のベクトルに，以下の正方行列 $\boldsymbol{A}$ を左から掛けてみる．</p>
 
 <div class="mathjax">
 $$
@@ -239,8 +242,8 @@ a_1
 $$
 </div>
 
-<p>$\boldsymbol{A}$の各列ベクトルで基底を乗っ取ることができた．
-仮に，$b_1=0, b_2=1, c_1=-1, c_2=0$とすると，</p>
+<p>$\boldsymbol{A}$ の各列ベクトルで基底を乗っ取ることができた．
+仮に， $b_1=0, b_2=1, c_1=-1, c_2=0$ とすると，</p>
 
 <div class="mathjax">
 $$
@@ -272,9 +275,9 @@ a_1
 $$
 </div>
 
-<p>と整理でき，$a_1$が$e_2$に移り，$a_2$が$-e_1$に移ったことから，行列Aによって(3)式のベクトルが反時計回りに90度回転したと解釈できる．</p>
+<p>と整理でき， $a_1$ が $e_2$ に移り， $a_2$ が $-e_1$ に移ったことから，行列Aによって(3)式のベクトルが反時計回りに90度回転したと解釈できる．</p>
 
-<p>これは，基底ベクトルを以下の$e_3$と$e_4$のようにおいたことと同等である．</p>
+<p>これは，基底ベクトルを以下の $e_3$ と $e_4$ のようにおいたことと同等である．</p>
 
 <div class="mathjax">
 $$
@@ -291,11 +294,11 @@ e_3=
 $$
 </div>
 
-<p>この基底によりつくられる２次元ベクトルは，(3)式の$e_2$方向を$e_3$軸とし，$-e_1$方向を$e_4$軸とした座標系上の２次元ベクトルと見立てることができる．</p>
+<p>この基底によりつくられる２次元ベクトルは，(3)式の $e_2$ 方向を $e_3$ 軸とし， $-e_1$ 方向を $e_4$ 軸とした座標系上の２次元ベクトルと見立てることができる．</p>
 
 <p>&hellip;</p>
 
-<p>反時計回りに$\theta$の回転といえば以下の式．基底を三角関数で乗っ取っていることになる．</p>
+<p>反時計回りに $\theta$ の回転といえば以下の式．基底を三角関数で乗っ取っていることになる．</p>
 
 <div class="mathjax">
 $$
@@ -307,7 +310,7 @@ $$
 $$
 </div>
 
-<p>$x$要素だけ取り出したい場合は，以下の行列を使うと良い．$e_1$軸への正射影を実現していることになる．</p>
+<p>$x$ 要素だけ取り出したい場合は，以下の行列を使うと良い． $e_1$ 軸への正射影を実現していることになる．</p>
 
 <div class="mathjax">
 $$
@@ -323,7 +326,7 @@ $$
 
 <h2 id="固有値の求め方">固有値の求め方</h2>
 
-<p>$M \times M$の正方行列$\boldsymbol{A}$について，固有値問題は i=1,2,&hellip;,Mを用いて以下のように定義される．</p>
+<p>$M \times M$ の正方行列 $\boldsymbol{A}$ について，固有値問題は i=1,2,&hellip;,Mを用いて以下のように定義される．</p>
 
 <div class="mathjax">
 $$
@@ -331,8 +334,7 @@ $$
 $$
 </div>
 
-<p>ここで，$\boldsymbol{u_i}$は固有ベクトル，$\lambda_i$は固有値である．上式はM次の単位行列$\boldsymbol{I}$
-を用いて，以下のように整理することができる．</p>
+<p>ここで， $\boldsymbol{u_i}$ は固有ベクトル， $\lambda_i$ は固有値である．上式はM次の単位行列 $\boldsymbol{I}$ を用いて，以下のように整理することができる．</p>
 
 <div class="mathjax">
 $$
@@ -340,7 +342,7 @@ $$
 $$
 </div>
 
-<p>固有値問題では，自明解$\boldsymbol{u_i} = 0$以外の解を求めたいというモチベーションなので，$\boldsymbol{A} - \lambda_i \boldsymbol{I}$が逆行列を持たないようにする必要がある．行列式を0にすれば逆行列を持たないので，以下の固有方程式を解くことで，固有値を求めることができる．</p>
+<p>固有値問題では，自明解 $\boldsymbol{u_i} = 0$ 以外の解を求めたいというモチベーションなので， $\boldsymbol{A} - \lambda_i \boldsymbol{I}$ が逆行列を持たないようにする必要がある．行列式を0にすれば逆行列を持たないので，以下の固有方程式を解くことで，固有値を求めることができる．</p>
 
 <div class="mathjax">
 $$
@@ -373,9 +375,9 @@ $$
 $$
 </div>
 
-<p>行列Aの固有方程式により，固有値$\lambda_1=-1$(重解)と$\lambda_2=5$が得られる．</p>
+<p>行列Aの固有方程式により，固有値 $\lambda_1=-1$ (重解)と $\lambda_2=5$ が得られる．</p>
 
-<p>固有値$\lambda_1$の固有ベクトルを$\boldsymbol{u_1}^{T} = (u_{11}, u_{12}, u_{13})$とすると，固有ベクトル$\boldsymbol{u_1}$は以下を満たす必要がある．</p>
+<p>固有値 $\lambda_1$ の固有ベクトルを $\boldsymbol{u_1}^{T} = (u_{11}, u_{12}, u_{13})$ とすると，固有ベクトル $\boldsymbol{u_1}$ は以下を満たす必要がある．</p>
 
 <div class="mathjax">
 $$
@@ -383,7 +385,7 @@ u_{11} + u_{12} + 2 u_{13} = 0
 $$
 </div>
 
-<p>ここで，$u_{12}=s, u_{13}=t$とおくと，$u_{11}=-s-2t$なので，固有ベクトル$\boldsymbol{u_1}$は以下となる．</p>
+<p>ここで， $u_{12}=s, u_{13}=t$ とおくと， $u_{11}=-s-2t$ なので，固有ベクトル $\boldsymbol{u_1}$ は以下となる．</p>
 
 <div class="mathjax">
 $$
@@ -412,7 +414,7 @@ t
 $$
 </div>
 
-<p>$s$と$t$は自由に選んでも良いので，固有値$\lambda_1=-1$(重解)の固有ベクトル$\boldsymbol{u_1}$は以下の２つとなる．</p>
+<p>$s$ と $t$ は自由に選んでも良いので，固有値 $\lambda_1=-1$ (重解)の固有ベクトル $\boldsymbol{u_1}$ は以下の２つとなる．</p>
 
 <div class="mathjax">
 $$
@@ -437,13 +439,13 @@ $$
 <h1 id="実対称行列">実対称行列</h1>
 
 <ul>
-<li>対称行列；n次正方行列Aについて，${}^t \boldsymbol{A} = \boldsymbol{A}$を満たすもの</li>
+<li>対称行列；n次正方行列Aについて， ${}^t \boldsymbol{A} = \boldsymbol{A}$ を満たすもの</li>
 <li>実対称行列；Aのすべての成分が実数である対称行列</li>
 </ul>
 
 <p>行列Aが実対称行列の場合には，その固有値は必ず実数となり，固有ベクトルも実数の範囲で存在する．</p>
 
-<p>実対称行列の固有ベクトル$\boldsymbol{u_i}$は，以下のような，正規直交(=正規化済みの異なる固有ベクトル同士の内積が0)を満たす．</p>
+<p>実対称行列の固有ベクトル $\boldsymbol{u_i}$ は，以下のような，正規直交(=正規化済みの異なる固有ベクトル同士の内積が0)を満たす．</p>
 
 <div class="mathjax">
 $$
@@ -476,9 +478,9 @@ $$
 <p>グラム・シュミットの直交化の手続きは，n個の線形独立なベクトル$\boldsymbol{u_k}$を用いて，</p>
 
 <ol>
-<li>$\boldsymbol{u_1}$を正規化したものが１つ目の正規直交基底$\boldsymbol{v_1}$になる．</li>
-<li>$\boldsymbol{v} = \boldsymbol{u_2} - (\boldsymbol{u_2} \cdot \boldsymbol{v_1}) \boldsymbol{v_1}$を計算．</li>
-<li>$\boldsymbol{v}$を正規化したものが２つ目の正規直交基底$\boldsymbol{v_2}$となる．</li>
+<li>$\boldsymbol{u_1}$ を正規化したものが１つ目の正規直交基底 $\boldsymbol{v_1}$ になる．</li>
+<li>$\boldsymbol{v} = \boldsymbol{u_2} - (\boldsymbol{u_2} \cdot \boldsymbol{v_1}) \boldsymbol{v_1}$ を計算．</li>
+<li>$\boldsymbol{v}$ を正規化したものが２つ目の正規直交基底 $\boldsymbol{v_2}$ となる．</li>
 <li>次数ぶんだけ繰り返して正規直交基底を求めていく．</li>
 </ol>
 
@@ -491,7 +493,7 @@ $$
 <li>直交行列の転置行列と逆行列はそれぞれ等しい．</li>
 </ul>
 
-<p>実対称行列Aについて固有ベクトルを求め，各固有ベクトルから正規直交基底を求め，正規直交基底を並べた直交行列をPとすると，以下により，対角成分以外が0な対角行列$\boldsymbol{\Lambda}$を導くことができる．これを対角化という．</p>
+<p>実対称行列Aについて固有ベクトルを求め，各固有ベクトルから正規直交基底を求め，正規直交基底を並べた直交行列をPとすると，以下により，対角成分以外が0な対角行列 $\boldsymbol{\Lambda}$ を導くことができる．これを対角化という．</p>
 
 <div class="mathjax">
 $$
@@ -503,9 +505,9 @@ $$
 
 <h1 id="正定値と負定値">正定値と負定値</h1>
 
-<p>行列$A$がすべての非零ベクトル$\boldsymbol{w}$に対して，$\boldsymbol{w}^{T} A \boldsymbol{w} &gt; 0$を満たすとき，$A$は<strong>正定値行列</strong>と呼ばれ，$A \succ 0$と表す．</p>
+<p>行列$A$がすべての非零ベクトル $\boldsymbol{w}$ に対して， $\boldsymbol{w}^{T} A \boldsymbol{w} &gt; 0$ を満たすとき， $A$ は<strong>正定値行列</strong>と呼ばれ， $A \succ 0$ と表す．</p>
 
-<p>$A$がn次の実対称行列であるとすると，直交行列Pが存在するので，$P^T A P = \Lambda$と対角化できる．ここで，$\boldsymbol{u}=P^T \boldsymbol{w}$で変換すると，$P^T=P^{-1}$に注意して，以下のように整理することができる．これは二次形式の標準化（主軸変換）の例であり，<strong>対角化による恩恵</strong>である．</p>
+<p>$A$ がn次の実対称行列であるとすると，直交行列Pが存在するので， $P^T A P = \Lambda$ と対角化できる．ここで， $\boldsymbol{u}=P^T \boldsymbol{w}$ で変換すると， $P^T=P^{-1}$ に注意して，以下のように整理することができる．これは二次形式の標準化（主軸変換）の例であり，<strong>対角化による恩恵</strong>である．</p>
 
 <div class="mathjax">
 $$
@@ -513,28 +515,43 @@ $$
 $$
 </div>
 
-<p>これより，実対称行列Aのすべての固有値が正であれば，対角行列$\Lambda$の対角成分が正になり，$\boldsymbol{u}^T \Lambda \boldsymbol{u}$が常に正になるので，行列Aは正定値行列である．</p>
+<p>これより，実対称行列Aのすべての固有値が正であれば，対角行列 $\Lambda$ の対角成分が正になり， $\boldsymbol{u}^T \Lambda \boldsymbol{u}$ が常に正になるので，行列Aは正定値行列である．</p>
 
-<p>また，行列$A$がすべての非零ベクトル$\boldsymbol{w}$に対して，$\boldsymbol{w}^{T} A \boldsymbol{w} \geq 0$を満たすとき，$A$は<strong>半正定値行列</strong>と呼ばれ，$A \succeq 0$と表す．行列$A$のすべての固有値が0以上であれば，行列$A$は半正定値である．</p>
+<p>また，行列 $A$ がすべての非零ベクトル $\boldsymbol{w}$ に対して， $\boldsymbol{w}^{T} A \boldsymbol{w} \geq 0$ を満たすとき， $A$ は<strong>半正定値行列</strong>と呼ばれ， $A \succeq 0$ と表す．行列 $A$ のすべての固有値が0以上であれば，行列 $A$ は半正定値である．</p>
 
 <p>更に，負定値・半不定値も定義することができ，固有値が負か0以下であることがそれぞれの条件である．</p>
 
 <h1 id="対角化と座標変換">対角化と座標変換</h1>
 
-<p>つづく</p>
+<p>つづくかも</p>
 
+  </div>
+  <footer class="post-footer">
+    
     <div class="share">
     <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fdiagonalization%2f&text=%e5%af%be%e8%a7%92%e5%8c%96%e3%81%ae%e6%81%a9%e6%81%b5%e3%82%92%e6%8e%88%e3%81%8b%e3%82%8b - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
     <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fdiagonalization%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
     <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fdiagonalization%2f&title=%e5%af%be%e8%a7%92%e5%8c%96%e3%81%ae%e6%81%a9%e6%81%b5%e3%82%92%e6%8e%88%e3%81%8b%e3%82%8b - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
 </div>
-  </div>
-  <footer class="post-footer">
-    
   </footer>
 </article>
+
+
+<div class="post-widget">
+  <div class="twitter-widget">
+    <a class="twitter-timeline" data-lang="en" data-width="300" href="https://twitter.com/yasakurara?ref_src=twsrc%5Etfw">Tweets by yasakurara</a>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </div>
+</div>
+
+
 <footer class="footer">
-  <span>&copy; 2020 yasakura</span>
+  <nav>
+    <ul>
+      <li><a href="https://yasakura.me//terms/">Terms of Use</a></li>
+    </ul>
+  </nav>
+  <span>&copy; 2021 yasakura</span>
 </footer>
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({

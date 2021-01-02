@@ -19,16 +19,15 @@
   
   <title>関数の最大値または最小値を機械的に求める - yasakura</title>
   
-  <meta name="description" content="勉強中のため，この記事は書きかけであり，随時更新するつもり．．．
+  <meta name="description" content="おことわり 勉強中のため随時更新中です
 モチベーション 関数の最大値または最小値を機械的に求めるためにはどうしたらよいかを知る
-シュワルツの不等式 $$ |\boldsymbol{x}^T\boldsymbol{y}| \leq \|\boldsymbol{x}\| \|\boldsymbol{y} \| $$  $\boldsymbol{x}$と$\boldsymbol{y}$が1次従属となる場合に等号が成立する．これは，内積$\vec{a} \cdot \vec{b} = |\vec{a}| |\vec{b}| \cos \theta$をイメージするとわかりやすい．
-Rolleの定理 rolle theorem $f(x)$が$[a,b]$で連続，$(a,b)$で微分可能，$f(a)=f(b)$を満たすとき，$f&rsquo;(c) = 0$ となる $a &lt; c &lt; b$ が存在する．
-平均値の定理 mean-value theorem $f(x)$が$[a,b]$で連続，$(a,b)$で微分可能なとき，$\frac{f(b)-f(a)}{b-a} = f&rsquo;(c)$ となる $a &lt; c &lt; b$ が存在する．
-テイラーの定理による関数の近似 1階微分可能な関数の近似（ラグランジュの剰余項） 関数$f:\mathbb{ R }^n \to \mathbb{R}$が１階微分可能のとき，$\boldsymbol{x_0,\delta} \in \mathbb{R}$に対して実数$c \in (0,1)$が存在する．
-$$ f(\boldsymbol{x_0}&#43;\boldsymbol{\delta}) = f(\boldsymbol{x_0}) &#43; \nabla f(\boldsymbol{x_0}&#43;c\boldsymbol{\delta})^T \boldsymbol{\delta} $$  上式を整理すると，以下のように，左辺の変化量を満たす$f$の勾配が$(\boldsymbol{x}, \boldsymbol{x} &#43; \boldsymbol{\delta})$の範囲内に存在すると解釈できる．これは平均値の定理である．$\boldsymbol{\delta}$が非常に小さければ，微分の定義そのものであるが，$\boldsymbol{\delta}$は実数全体を取りうるので，微分の定義とは異なることに注意．">
+シュワルツの不等式 $$ |\boldsymbol{x}^T\boldsymbol{y}| \leq \|\boldsymbol{x}\| \|\boldsymbol{y} \| $$  $\boldsymbol{x}$ と $\boldsymbol{y}$ が1次従属となる場合に等号が成立する．これは，内積 $\vec{a} \cdot \vec{b} = |\vec{a}| |\vec{b}| \cos \theta$ をイメージするとわかりやすい．
+Rolleの定理 rolle theorem $f(x)$ が $[a,b]$ で連続， $(a,b)$ で微分可能， $f(a)=f(b)$ を満たすとき， $f&rsquo;(c) = 0$ となる $a &lt; c &lt; b$ が存在する．
+平均値の定理 mean-value theorem $f(x)$ が $[a,b]$ で連続， $(a,b)$ で微分可能なとき， $\frac{f(b)-f(a)}{b-a} = f&rsquo;(c)$ となる $a &lt; c &lt; b$ が存在する．
+テイラーの定理による関数の近似 1階微分可能な関数の近似（ラグランジュの剰余項） 関数 $f:\mathbb{ R }^n \to \mathbb{R}$ が１階微分可能のとき， $\boldsymbol{x_0,\delta} \in \mathbb{R}$ に対して実数 $c \in (0,1)$ が存在する．">
   
   <link href=/css/style.css rel="stylesheet">
-  <link href=/css/font.css rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;900&display=swap" rel="stylesheet">
   
   <link rel="icon" href="https://yasakura.me/img/favicon.ico">
   
@@ -39,7 +38,7 @@ $$ f(\boldsymbol{x_0}&#43;\boldsymbol{\delta}) = f(\boldsymbol{x_0}) &#43; \nabl
     <div class="title"><a href="https://yasakura.me/">yasakura</a></div>
     <nav id="navigation">
       <ul class="menu">
-        <li><a href="https://yasakura.me//about/">ABOUT</a></li>
+        <li><a href="https://yasakura.me//about/">ABOUT ME</a></li>
       </ul>
     </nav>
   </header>
@@ -49,18 +48,24 @@ $$ f(\boldsymbol{x_0}&#43;\boldsymbol{\delta}) = f(\boldsymbol{x_0}) &#43; \nabl
     <p class="post-meta">2020.4.1</p>
     
     <h1 class="post-title">関数の最大値または最小値を機械的に求める</h1>
+    <ul class="post-author">
+      <li>
+        <a href="https://twitter.com/yasakurara"><svg id="twitter-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><style>.cls-1{fill:none;}.cls-2{fill:#1da1f2;}</style></defs><title>Twitter_Logo_Blue</title><rect class="cls-1" width="400" height="400"/><path class="cls-2" d="M153.62,301.59c94.34,0,145.94-78.16,145.94-145.94,0-2.22,0-4.43-.15-6.63A104.36,104.36,0,0,0,325,122.47a102.38,102.38,0,0,1-29.46,8.07,51.47,51.47,0,0,0,22.55-28.37,102.79,102.79,0,0,1-32.57,12.45,51.34,51.34,0,0,0-87.41,46.78A145.62,145.62,0,0,1,92.4,107.81a51.33,51.33,0,0,0,15.88,68.47A50.91,50.91,0,0,1,85,169.86c0,.21,0,.43,0,.65a51.31,51.31,0,0,0,41.15,50.28,51.21,51.21,0,0,1-23.16.88,51.35,51.35,0,0,0,47.92,35.62,102.92,102.92,0,0,1-63.7,22A104.41,104.41,0,0,1,75,278.55a145.21,145.21,0,0,0,78.62,23"/></svg>@yasakurara</a>
+      </li>
+    </ul>
     
-  </header>
-  <div class="post-content">
     <div class="share">
     <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fhow-to-solve-numerical-min-max%2f&text=%e9%96%a2%e6%95%b0%e3%81%ae%e6%9c%80%e5%a4%a7%e5%80%a4%e3%81%be%e3%81%9f%e3%81%af%e6%9c%80%e5%b0%8f%e5%80%a4%e3%82%92%e6%a9%9f%e6%a2%b0%e7%9a%84%e3%81%ab%e6%b1%82%e3%82%81%e3%82%8b - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
     <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fhow-to-solve-numerical-min-max%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
     <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fhow-to-solve-numerical-min-max%2f&title=%e9%96%a2%e6%95%b0%e3%81%ae%e6%9c%80%e5%a4%a7%e5%80%a4%e3%81%be%e3%81%9f%e3%81%af%e6%9c%80%e5%b0%8f%e5%80%a4%e3%82%92%e6%a9%9f%e6%a2%b0%e7%9a%84%e3%81%ab%e6%b1%82%e3%82%81%e3%82%8b - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
 </div>
+  </header>
+  <div class="post-content">
     
-<h1>もくじ</h1>
+<h1>Table of Contents</h1>
 <nav id="TableOfContents">
 <ul>
+<li><a href="#おことわり">おことわり</a></li>
 <li><a href="#モチベーション">モチベーション</a></li>
 <li><a href="#シュワルツの不等式">シュワルツの不等式</a></li>
 <li><a href="#rolleの定理-rolle-theorem">Rolleの定理 rolle theorem</a></li>
@@ -93,7 +98,9 @@ $$ f(\boldsymbol{x_0}&#43;\boldsymbol{\delta}) = f(\boldsymbol{x_0}) &#43; \nabl
 
     
 
-<p>勉強中のため，この記事は書きかけであり，随時更新するつもり．．．</p>
+<h1 id="おことわり">おことわり</h1>
+
+<p>勉強中のため随時更新中です</p>
 
 <h1 id="モチベーション">モチベーション</h1>
 
@@ -107,17 +114,17 @@ $$
 $$
 </div>
 
-<p>$\boldsymbol{x}$と$\boldsymbol{y}$が1次従属となる場合に等号が成立する．これは，内積$\vec{a} \cdot \vec{b} = |\vec{a}| |\vec{b}| \cos \theta$をイメージするとわかりやすい．</p>
+<p>$\boldsymbol{x}$ と $\boldsymbol{y}$ が1次従属となる場合に等号が成立する．これは，内積 $\vec{a} \cdot \vec{b} = |\vec{a}| |\vec{b}| \cos \theta$ をイメージするとわかりやすい．</p>
 
 <h1 id="rolleの定理-rolle-theorem">Rolleの定理 rolle theorem</h1>
 
-<p>$f(x)$が$[a,b]$で連続，$(a,b)$で微分可能，$f(a)=f(b)$を満たすとき，$f&rsquo;(c) = 0$ となる $a &lt; c &lt; b$ が存在する．</p>
+<p>$f(x)$ が $[a,b]$ で連続， $(a,b)$ で微分可能， $f(a)=f(b)$ を満たすとき， $f&rsquo;(c) = 0$ となる $a &lt; c &lt; b$ が存在する．</p>
 
 <p><img src="/img/rolle.svg" alt="rolle" /></p>
 
 <h1 id="平均値の定理-mean-value-theorem">平均値の定理 mean-value theorem</h1>
 
-<p>$f(x)$が$[a,b]$で連続，$(a,b)$で微分可能なとき，$\frac{f(b)-f(a)}{b-a} = f&rsquo;(c)$ となる $a &lt; c &lt; b$ が存在する．</p>
+<p>$f(x)$ が $[a,b]$ で連続， $(a,b)$ で微分可能なとき， $\frac{f(b)-f(a)}{b-a} = f&rsquo;(c)$ となる $a &lt; c &lt; b$ が存在する．</p>
 
 <p><img src="/img/mean_value.svg" alt="mean_value" /></p>
 
@@ -125,7 +132,7 @@ $$
 
 <h2 id="1階微分可能な関数の近似-ラグランジュの剰余項">1階微分可能な関数の近似（ラグランジュの剰余項）</h2>
 
-<p>関数$f:\mathbb{ R }^n \to \mathbb{R}$が１階微分可能のとき，$\boldsymbol{x_0,\delta} \in \mathbb{R}$に対して実数$c \in (0,1)$が存在する．</p>
+<p>関数 $f:\mathbb{ R }^n \to \mathbb{R}$ が１階微分可能のとき， $\boldsymbol{x_0,\delta} \in \mathbb{R}$ に対して実数 $c \in (0,1)$ が存在する．</p>
 
 <div class="mathjax">
 $$
@@ -135,7 +142,7 @@ $$
 
 <p><img src="/img/taylor1.svg" alt="taylor1" /></p>
 
-<p>上式を整理すると，以下のように，左辺の変化量を満たす$f$の勾配が$(\boldsymbol{x}, \boldsymbol{x} + \boldsymbol{\delta})$の範囲内に存在すると解釈できる．これは<strong>平均値の定理</strong>である．$\boldsymbol{\delta}$が非常に小さければ，微分の定義そのものであるが，$\boldsymbol{\delta}$は実数全体を取りうるので，微分の定義とは異なることに注意．</p>
+<p>上式を整理すると，以下のように，左辺の変化量を満たす$f$の勾配が $(\boldsymbol{x}, \boldsymbol{x} + \boldsymbol{\delta})$ の範囲内に存在すると解釈できる．これは<strong>平均値の定理</strong>である． $\boldsymbol{\delta}$ が非常に小さければ，微分の定義そのものであるが， $\boldsymbol{\delta}$ は実数全体を取りうるので，微分の定義とは異なることに注意．</p>
 
 <div class="mathjax">
 $$
@@ -145,7 +152,7 @@ $$
 
 <h2 id="2階微分可能な関数の近似-ラグランジュの剰余項">2階微分可能な関数の近似（ラグランジュの剰余項）</h2>
 
-<p>$\boldsymbol{x_0}$から$\boldsymbol{\delta}$だけずれた点の値$f(\boldsymbol{x_0}+\boldsymbol{\delta})$を，ずれ$\boldsymbol{\delta}$の2次式で近似してみたい．つまり，$f(\boldsymbol{x_0}+\boldsymbol{\delta}) = f(\boldsymbol{x_0}) + \nabla f(\boldsymbol{x_0})^T \boldsymbol{\delta} + R \boldsymbol{\delta}^2$で近似してみる．</p>
+<p>$\boldsymbol{x_0}$ から $\boldsymbol{\delta}$ だけずれた点の値 $f(\boldsymbol{x_0}+\boldsymbol{\delta})$ を，ずれ $\boldsymbol{\delta}$ の2次式で近似してみたい．つまり， $f(\boldsymbol{x_0}+\boldsymbol{\delta}) = f(\boldsymbol{x_0}) + \nabla f(\boldsymbol{x_0})^T \boldsymbol{\delta} + R \boldsymbol{\delta}^2$ で近似してみる．</p>
 
 <p>係数RはRolleの定理を用いることで求めることができる．Rolleの定理を適用しやすいように，以下のような$F(x)$を定義する．</p>
 
@@ -155,7 +162,7 @@ F(x) = - f(\boldsymbol{x_0}+\boldsymbol{x}) + f(\boldsymbol{x_0}) + \nabla f(\bo
 $$
 </div>
 
-<p>$F(0)=0$は明らかである．$F(δ)=F(0)=0$とすれば，$F&rsquo;(h)=0$となるhが$0 &lt; h &lt; δ$の範囲で存在することになる（Rolleの定理）．</p>
+<p>$F(0)=0$ は明らかである． $F(δ)=F(0)=0$ とすれば， $F&rsquo;(h)=0$ となるhが $0 &lt; h &lt; δ$ の範囲で存在することになる（Rolleの定理）．</p>
 
 <div class="mathjax">
 $$
@@ -179,13 +186,13 @@ f(\boldsymbol{x_0}+\boldsymbol{\delta}) = f(\boldsymbol{x_0}) + \nabla f(\boldsy
 $$
 </div>
 
-<p>図形的な意味を考察する．以下の左図のように$\boldsymbol{x_0}$の勾配を用いることで，$f(\boldsymbol{x_0}) + \nabla f(\boldsymbol{x_0})^T \boldsymbol{\delta}$を求めることができるが，$f(\boldsymbol{x_0}+\boldsymbol{\delta})$までには，緑太線ぶんの誤差が生じている．緑太線の長さは，右図のように，元の$f(x)$から$f(\boldsymbol{x_0}) + \nabla f(\boldsymbol{x_0})^T \boldsymbol{\delta}$を引くことで求まる．これを$F(x) = f(x) - (f(\boldsymbol{x_0}) + \nabla f(\boldsymbol{x_0})^T \boldsymbol{\delta})$とおく．</p>
+<p>図形的な意味を考察する．以下の左図のように $\boldsymbol{x_0}$ の勾配を用いることで， $f(\boldsymbol{x_0}) + \nabla f(\boldsymbol{x_0})^T \boldsymbol{\delta}$ を求めることができるが， $f(\boldsymbol{x_0}+\boldsymbol{\delta})$ までには，緑太線ぶんの誤差が生じている．緑太線の長さは，右図のように，元の $f(x)$ から $f(\boldsymbol{x_0}) + \nabla f(\boldsymbol{x_0})^T \boldsymbol{\delta}$ を引くことで求まる．これを $F(x) = f(x) - (f(\boldsymbol{x_0}) + \nabla f(\boldsymbol{x_0})^T \boldsymbol{\delta})$ とおく．</p>
 
 <p><img src="/img/taylors.svg" alt="taylors" /></p>
 
-<p>右図において，$x_0$から緑太線の頂上を結ぶ直線の傾きは$\frac{f(x) - (f(\boldsymbol{x_0}) + \nabla f(\boldsymbol{x_0})^T \boldsymbol{\delta})}{\delta}$であり，また，平均値の定理より，$\frac{f(x) - (f(\boldsymbol{x_0}) + \nabla f(\boldsymbol{x_0})^T \boldsymbol{\delta})}{\delta}　= \nabla F(\boldsymbol{x_0} + h \boldsymbol{\delta})$ となるような$0 &lt; h &lt; 1$が存在する．</p>
+<p>右図において， $x_0$ から緑太線の頂上を結ぶ直線の傾きは $\frac{f(x) - (f(\boldsymbol{x_0}) + \nabla f(\boldsymbol{x_0})^T \boldsymbol{\delta})}{\delta}$ であり，また，平均値の定理より， $\frac{f(x) - (f(\boldsymbol{x_0}) + \nabla f(\boldsymbol{x_0})^T \boldsymbol{\delta})}{\delta}　= \nabla F(\boldsymbol{x_0} + h \boldsymbol{\delta})$ となるような $0 &lt; h &lt; 1$ が存在する．</p>
 
-<p>これより，緑太線の長さは，$\nabla F(\boldsymbol{x_0} + h \boldsymbol{\delta}) \boldsymbol{\delta}$で求まるので，$F(x) = f(x) - (f(\boldsymbol{x_0}) + \nabla f(\boldsymbol{x_0})^T \boldsymbol{\delta})$を$\boldsymbol{\delta}$で微分して，</p>
+<p>これより，緑太線の長さは， $\nabla F(\boldsymbol{x_0} + h \boldsymbol{\delta}) \boldsymbol{\delta}$ で求まるので， $F(x) = f(x) - (f(\boldsymbol{x_0}) + \nabla f(\boldsymbol{x_0})^T \boldsymbol{\delta})$ を $\boldsymbol{\delta}$ で微分して，</p>
 
 <div class="mathjax">
 $$
@@ -217,7 +224,7 @@ f(x) - f(a) = \int_a^x f'(t) dt
 $$
 </div>
 
-<p>を用いることで，$x$から$\delta$だけずれた点$f(x+\delta)$の値を以下のように求めることができる．</p>
+<p>を用いることで， $x$ から $\delta$ だけずれた点 $f(x+\delta)$ の値を以下のように求めることができる．</p>
 
 <div class="mathjax">
 $$
@@ -225,7 +232,7 @@ f(x + \delta) = f(x) + \int_x^{x+\delta} f'(t) dt
 $$
 </div>
 
-<p>$t=x+c\delta$とすると，$c \in (0,1)$において，</p>
+<p>$t=x+c\delta$ とすると， $c \in (0,1)$ において，</p>
 
 <div class="mathjax">
 $$
@@ -235,7 +242,7 @@ $$
 
 <p>と整理することができる．</p>
 
-<p>勾配$\nabla f(\boldsymbol{x}+\boldsymbol{\delta})$などについても同様に表現することができ，2階微分可能な関数$f$について，</p>
+<p>勾配 $\nabla f(\boldsymbol{x}+\boldsymbol{\delta})$ などについても同様に表現することができ，2階微分可能な関数$f$について，</p>
 
 <div class="mathjax">
 $$
@@ -247,7 +254,7 @@ $$
 
 <h1 id="凸関数の定義">凸関数の定義</h1>
 
-<p>関数$f:\mathbb{ R }^n \to \mathbb{R} \cup \lbrace \infty \rbrace$に対して実行定義域$dom(f)$を</p>
+<p>関数 $f:\mathbb{ R }^n \to \mathbb{R} \cup \lbrace \infty \rbrace$ に対して実行定義域 $dom(f)$ を</p>
 
 <div class="mathjax">
 $$
@@ -255,7 +262,7 @@ dom(f) = \lbrace \boldsymbol{x} \in \mathbb{R}^n | f(\boldsymbol{x}) < \infty \r
 $$
 </div>
 
-<p>と定義し任意の$\boldsymbol{u,v} \in dom(f)$と$\lambda \in [0,1]$に対して，</p>
+<p>と定義し任意の $\boldsymbol{u,v} \in dom(f)$ と $\lambda \in [0,1]$ に対して，</p>
 
 <div class="mathjax">
 $$
@@ -263,11 +270,11 @@ f((1-\lambda)\boldsymbol{u} + \lambda \boldsymbol{v}) \leq (1-\lambda)f(\boldsym
 $$
 </div>
 
-<p>が成り立つとき，$f$を凸関数という．</p>
+<p>が成り立つとき， $f$ を凸関数という．</p>
 
 <p><img src="/img/convex_function.svg" alt="convex_function" /></p>
 
-<p>また，$\boldsymbol{u} \neq \boldsymbol{v}$と$0 &lt; \lambda &lt; 1$に対して以下が成り立つとき，$f$を狭義凸関数という．</p>
+<p>また， $\boldsymbol{u} \neq \boldsymbol{v}$ と $0 &lt; \lambda &lt; 1$ に対して以下が成り立つとき， $f$ を狭義凸関数という．</p>
 
 <div class="mathjax">
 $$
@@ -277,7 +284,7 @@ $$
 
 <h1 id="勾配を用いた凸関数の表現">勾配を用いた凸関数の表現</h1>
 
-<p>$S$を閉凸集合とし，$f:S \to \mathbb{R}$を微分可能な関数とする．このとき，$f$が凸関数であることと，$\boldsymbol{x} \neq \boldsymbol{y}$である任意の$\boldsymbol{x,y} \in S$に対して次式が成り立つことは同値である．</p>
+<p>$S$ を閉凸集合とし， $f:S \to \mathbb{R}$ を微分可能な関数とする．このとき， $f$ が凸関数であることと， $\boldsymbol{x} \neq \boldsymbol{y}$ である任意の $\boldsymbol{x,y} \in S$ に対して次式が成り立つことは同値である．</p>
 
 <div class="mathjax">
 $$
@@ -287,7 +294,7 @@ $$
 
 <h1 id="リプシッツ連続">リプシッツ連続</h1>
 
-<p>関数$f$が以下を満たすとき，リプシッツ連続であるという．一階微分の絶対値が有限であるという性質．</p>
+<p>関数 $f$ が以下を満たすとき，リプシッツ連続であるという．一階微分の絶対値が有限であるという性質．</p>
 
 <div class="mathjax">
 $$
@@ -297,7 +304,7 @@ $$
 
 <h1 id="γ-平滑">γ-平滑</h1>
 
-<p>勾配$\nabla f$がリプシッツ連続を満たすとき，関数$f$はγ-平滑であるという．二階微分の絶対値が有限であるという性質．</p>
+<p>勾配 $\nabla f$ がリプシッツ連続を満たすとき，関数 $f$ はγ-平滑であるという．二階微分の絶対値が有限であるという性質．</p>
 
 <div class="mathjax">
 $$
@@ -307,7 +314,7 @@ $$
 
 <h1 id="関数値の上下界">関数値の上下界</h1>
 
-<p>γ-平滑な関数$f:\mathbb{R}^n \to \mathbb{R}$に対して，次の不等式が成り立つ．</p>
+<p>γ-平滑な関数 $f:\mathbb{R}^n \to \mathbb{R}$ に対して，次の不等式が成り立つ．</p>
 
 <div class="mathjax">
 $$
@@ -315,7 +322,7 @@ f(\boldsymbol{y}) \leq f(\boldsymbol{x}) + \nabla f(\boldsymbol{x})^{ \mathrm{ T
 $$
 </div>
 
-<p>$f$が凸関数である場合，次の不等式が成り立つ．</p>
+<p>$f$ が凸関数である場合，次の不等式が成り立つ．</p>
 
 <div class="mathjax">
 $$
@@ -325,7 +332,7 @@ $$
 
 <h1 id="エピグラフ">エピグラフ</h1>
 
-<p>関数$f:\mathbb{R}^n \to \mathbb{R} \cup \lbrace \infty \rbrace$のエピグラフ$epi(f)\subset \mathbb{R}^{n+1}$を以下のように定義する．エピグラフは，関数$f$の上側の領域を指すものである．$f(\boldsymbol{x})=\infty$となる$\boldsymbol{x}$に対しては，$(\boldsymbol{x},t) \notin epi(f), t \in \mathbb{R}$となる．</p>
+<p>関数 $f:\mathbb{R}^n \to \mathbb{R} \cup \lbrace \infty \rbrace$ のエピグラフ $epi(f)\subset \mathbb{R}^{n+1}$ を以下のように定義する．エピグラフは，関数 $f$ の上側の領域を指すものである． $f(\boldsymbol{x})=\infty$ となる $\boldsymbol{x}$ に対しては， $(\boldsymbol{x},t) \notin epi(f), t \in \mathbb{R}$ となる．</p>
 
 <div class="mathjax">
 $$
@@ -333,16 +340,16 @@ epi(f)=\lbrace (\boldsymbol{x} ,t) \in \mathbb{R}^n \times \mathbb{R} | f(x) \ge
 $$
 </div>
 
-<p>$f$が凸関数であることと$epi(f)$が凸集合であることは同値である．凸関数$f$のエピグラフが空集合でないとき，$f$を真凸関数という．</p>
+<p>$f$ が凸関数であることと $epi(f)$ が凸集合であることは同値である．凸関数 $f$ のエピグラフが空集合でないとき， $f$ を真凸関数という．</p>
 
-<p>$epi(f)$が閉集合のとき，$f$を閉凸関数という．</p>
+<p>$epi(f)$ が閉集合のとき， $f$ を閉凸関数という．</p>
 
 <h1 id="共役関数">共役関数</h1>
 
-<p>関数$f$が微分可能であるなら，すべての点における接線を求めることで，接平面を定めることができる．
+<p>関数 $f$ が微分可能であるなら，すべての点における接線を求めることで，接平面を定めることができる．
 凸関数の場合，各点における接線はそれぞれユニークであるため，接平面の情報から関数を復元することが可能である．</p>
 
-<p>真凸関数$f$に対して，共役関数$f^*$を以下のように定義する．$sup$は上限を表す．</p>
+<p>真凸関数$f$に対して，共役関数 $f^*$ を以下のように定義する． $sup$ は上限を表す．</p>
 
 <div class="mathjax">
 $$
@@ -350,58 +357,58 @@ f^*(\boldsymbol{s})=sup \lbrace \boldsymbol{s}^T \boldsymbol{x} - f(\boldsymbol{
 $$
 </div>
 
-<p>図形的な意味を調べてみる．$\boldsymbol{s}^T \boldsymbol{x} - f(\boldsymbol{x})$の上限を求めることは，$f(\boldsymbol{x}) - \boldsymbol{s}^T \boldsymbol{x}$の下限を求めることと等価である．$f(\boldsymbol{x}) - \boldsymbol{s}^T \boldsymbol{x}$が微分可能であるとすると，$ \nabla f(\boldsymbol{x}) - \boldsymbol{s}^T = 0$を満たす必要がある．よって，$s$は$f(x)$の勾配である．下図は$x=x^*$における接線から求まる$-f^*(s)$を表したものである．</p>
+<p>図形的な意味を調べてみる． $\boldsymbol{s}^T \boldsymbol{x} - f(\boldsymbol{x})$ の上限を求めることは， $f(\boldsymbol{x}) - \boldsymbol{s}^T \boldsymbol{x}$ の下限を求めることと等価である． $f(\boldsymbol{x}) - \boldsymbol{s}^T \boldsymbol{x}$ が微分可能であるとすると， $ \nabla f(\boldsymbol{x}) - \boldsymbol{s}^T = 0$ を満たす必要がある．よって， $s$ は $f(x)$ の勾配である．下図は $x=x^*$ における接線から求まる $-f^*(s)$ を表したものである．</p>
 
 <p><img src="/img/conjugate_function.svg" alt="conjugate_function" /></p>
 
-<p>左図の青線は$y=f(x)=\frac{1}{2} x^2$であり，橙線は各$x$における接線を表し，切片をxでマークしたものである．また，右図は$y=f(x)$の接線の勾配$s$と共役関数の負の値$-f^*(s)$の関係を表したものである．</p>
+<p>左図の青線は $y=f(x)=\frac{1}{2} x^2$ であり，橙線は各 $x$ における接線を表し，切片をxでマークしたものである．また，右図は $y=f(x)$ の接線の勾配$s$と共役関数の負の値 $-f^*(s)$ の関係を表したものである．</p>
 
-<p><strong>$f(x)$が閉真凸関数であるとき$f^*(s)$も閉真凸関数となり，$f^*(s)$から$f(x)$を完全に復元できる．</strong>これを双対な関係という．</p>
+<p><strong>$f(x)$ が閉真凸関数であるとき $f^*(s)$ も閉真凸関数となり， $f^*(s)$ から $f(x)$ を完全に復元できる．</strong>これを双対な関係という．</p>
 
 <p><img src="/img/conjugate_function.gif" alt="conjugate_function_animation" /></p>
-<div class="highlight"><pre style="color:#272822;background-color:#fafafa;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">%</span><span style="color:#111">matplotlib</span> <span style="color:#111">notebook</span>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">%</span>matplotlib notebook
 
-<span style="color:#f92672">import</span> <span style="color:#111">numpy</span> <span style="color:#f92672">as</span> <span style="color:#111">np</span>
-<span style="color:#f92672">import</span> <span style="color:#111">matplotlib.pyplot</span> <span style="color:#f92672">as</span> <span style="color:#111">plt</span>
-<span style="color:#f92672">import</span> <span style="color:#111">matplotlib.animation</span> <span style="color:#f92672">as</span> <span style="color:#111">animation</span>
+<span style="color:#f92672">import</span> numpy <span style="color:#f92672">as</span> np
+<span style="color:#f92672">import</span> matplotlib.pyplot <span style="color:#f92672">as</span> plt
+<span style="color:#f92672">import</span> matplotlib.animation <span style="color:#f92672">as</span> animation
 
-<span style="color:#00a8c8">def</span> <span style="color:#75af00">update</span><span style="color:#111">(</span><span style="color:#111">i</span><span style="color:#111">,</span> <span style="color:#111">x</span><span style="color:#111">,</span> <span style="color:#111">f</span><span style="color:#111">,</span> <span style="color:#111">f_grad</span><span style="color:#111">,</span> <span style="color:#111">ax1</span><span style="color:#111">,</span> <span style="color:#111">ax2</span><span style="color:#111">):</span>
-    <span style="color:#111">ax1</span><span style="color:#f92672">.</span><span style="color:#111">cla</span><span style="color:#111">()</span>
-    <span style="color:#111">ax1</span><span style="color:#f92672">.</span><span style="color:#111">plot</span><span style="color:#111">(</span><span style="color:#111">x</span><span style="color:#111">,</span> <span style="color:#111">f</span><span style="color:#111">)</span>
-    <span style="color:#111">ax1</span><span style="color:#f92672">.</span><span style="color:#111">plot</span><span style="color:#111">(</span><span style="color:#111">x</span><span style="color:#111">,</span> <span style="color:#111">f_grad</span><span style="color:#111">[</span><span style="color:#111">i</span><span style="color:#111">]</span> <span style="color:#f92672">*</span> <span style="color:#111">x</span> <span style="color:#f92672">+</span> <span style="color:#111">(</span><span style="color:#111">f</span><span style="color:#111">[</span><span style="color:#111">i</span><span style="color:#111">]</span> <span style="color:#f92672">-</span> <span style="color:#111">f_grad</span><span style="color:#111">[</span><span style="color:#111">i</span><span style="color:#111">]</span> <span style="color:#f92672">*</span> <span style="color:#111">x</span><span style="color:#111">[</span><span style="color:#111">i</span><span style="color:#111">]))</span>
-    <span style="color:#111">ax1</span><span style="color:#f92672">.</span><span style="color:#111">plot</span><span style="color:#111">(</span><span style="color:#ae81ff">0</span><span style="color:#111">,</span> <span style="color:#111">f</span><span style="color:#111">[</span><span style="color:#111">i</span><span style="color:#111">]</span> <span style="color:#f92672">-</span> <span style="color:#111">f_grad</span><span style="color:#111">[</span><span style="color:#111">i</span><span style="color:#111">]</span> <span style="color:#f92672">*</span> <span style="color:#111">x</span><span style="color:#111">[</span><span style="color:#111">i</span><span style="color:#111">],</span> <span style="color:#111">marker</span><span style="color:#f92672">=</span><span style="color:#d88200">&#39;x&#39;</span><span style="color:#111">)</span>
-    <span style="color:#111">ax1</span><span style="color:#f92672">.</span><span style="color:#111">set_xlim</span><span style="color:#111">(</span><span style="color:#f92672">-</span><span style="color:#ae81ff">2.0</span><span style="color:#111">,</span> <span style="color:#ae81ff">2.0</span><span style="color:#111">)</span>
-    <span style="color:#111">ax1</span><span style="color:#f92672">.</span><span style="color:#111">set_ylim</span><span style="color:#111">(</span><span style="color:#f92672">-</span><span style="color:#ae81ff">2.0</span><span style="color:#111">,</span> <span style="color:#ae81ff">2.0</span><span style="color:#111">)</span>
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update</span>(i, x, f, f_grad, ax1, ax2):
+    ax1<span style="color:#f92672">.</span>cla()
+    ax1<span style="color:#f92672">.</span>plot(x, f)
+    ax1<span style="color:#f92672">.</span>plot(x, f_grad[i] <span style="color:#f92672">*</span> x <span style="color:#f92672">+</span> (f[i] <span style="color:#f92672">-</span> f_grad[i] <span style="color:#f92672">*</span> x[i]))
+    ax1<span style="color:#f92672">.</span>plot(<span style="color:#ae81ff">0</span>, f[i] <span style="color:#f92672">-</span> f_grad[i] <span style="color:#f92672">*</span> x[i], marker<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;x&#39;</span>)
+    ax1<span style="color:#f92672">.</span>set_xlim(<span style="color:#f92672">-</span><span style="color:#ae81ff">2.0</span>, <span style="color:#ae81ff">2.0</span>)
+    ax1<span style="color:#f92672">.</span>set_ylim(<span style="color:#f92672">-</span><span style="color:#ae81ff">2.0</span>, <span style="color:#ae81ff">2.0</span>)
     
-    <span style="color:#111">ax2</span><span style="color:#f92672">.</span><span style="color:#111">cla</span><span style="color:#111">()</span>
-    <span style="color:#111">ax2</span><span style="color:#f92672">.</span><span style="color:#111">plot</span><span style="color:#111">(</span><span style="color:#111">f_grad</span><span style="color:#111">[</span><span style="color:#111">i</span><span style="color:#111">],</span> <span style="color:#f92672">-</span><span style="color:#111">(</span><span style="color:#111">f</span><span style="color:#111">[</span><span style="color:#111">i</span><span style="color:#111">]</span> <span style="color:#f92672">-</span> <span style="color:#111">f_grad</span><span style="color:#111">[</span><span style="color:#111">i</span><span style="color:#111">]</span> <span style="color:#f92672">*</span> <span style="color:#111">x</span><span style="color:#111">[</span><span style="color:#111">i</span><span style="color:#111">]),</span> <span style="color:#111">marker</span><span style="color:#f92672">=</span><span style="color:#d88200">&#39;x&#39;</span><span style="color:#111">)</span>
-    <span style="color:#111">ax2</span><span style="color:#f92672">.</span><span style="color:#111">set_xlim</span><span style="color:#111">(</span><span style="color:#f92672">-</span><span style="color:#ae81ff">2.0</span><span style="color:#111">,</span> <span style="color:#ae81ff">2.0</span><span style="color:#111">)</span>
-    <span style="color:#111">ax2</span><span style="color:#f92672">.</span><span style="color:#111">set_ylim</span><span style="color:#111">(</span><span style="color:#f92672">-</span><span style="color:#ae81ff">2.0</span><span style="color:#111">,</span> <span style="color:#ae81ff">2.0</span><span style="color:#111">)</span>
+    ax2<span style="color:#f92672">.</span>cla()
+    ax2<span style="color:#f92672">.</span>plot(f_grad[i], <span style="color:#f92672">-</span>(f[i] <span style="color:#f92672">-</span> f_grad[i] <span style="color:#f92672">*</span> x[i]), marker<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;x&#39;</span>)
+    ax2<span style="color:#f92672">.</span>set_xlim(<span style="color:#f92672">-</span><span style="color:#ae81ff">2.0</span>, <span style="color:#ae81ff">2.0</span>)
+    ax2<span style="color:#f92672">.</span>set_ylim(<span style="color:#f92672">-</span><span style="color:#ae81ff">2.0</span>, <span style="color:#ae81ff">2.0</span>)
     
-    <span style="color:#111">ax1</span><span style="color:#f92672">.</span><span style="color:#111">set_title</span><span style="color:#111">(</span><span style="color:#d88200">&#39;y=f(x) and tangent&#39;</span><span style="color:#111">)</span>
-    <span style="color:#111">ax1</span><span style="color:#f92672">.</span><span style="color:#111">set_xlabel</span><span style="color:#111">(</span><span style="color:#d88200">&#34;x&#34;</span><span style="color:#111">)</span>
-    <span style="color:#111">ax1</span><span style="color:#f92672">.</span><span style="color:#111">set_ylabel</span><span style="color:#111">(</span><span style="color:#d88200">&#34;y&#34;</span><span style="color:#111">)</span>
-    <span style="color:#111">ax2</span><span style="color:#f92672">.</span><span style="color:#111">set_title</span><span style="color:#111">(</span><span style="color:#d88200">&#39;conjugate function -f*(x)&#39;</span><span style="color:#111">)</span>
-    <span style="color:#111">ax2</span><span style="color:#f92672">.</span><span style="color:#111">set_xlabel</span><span style="color:#111">(</span><span style="color:#d88200">&#34;s&#34;</span><span style="color:#111">)</span>
-    <span style="color:#111">ax2</span><span style="color:#f92672">.</span><span style="color:#111">set_ylabel</span><span style="color:#111">(</span><span style="color:#d88200">&#34;-f*(s)&#34;</span><span style="color:#111">)</span>
+    ax1<span style="color:#f92672">.</span>set_title(<span style="color:#e6db74">&#39;y=f(x) and tangent&#39;</span>)
+    ax1<span style="color:#f92672">.</span>set_xlabel(<span style="color:#e6db74">&#34;x&#34;</span>)
+    ax1<span style="color:#f92672">.</span>set_ylabel(<span style="color:#e6db74">&#34;y&#34;</span>)
+    ax2<span style="color:#f92672">.</span>set_title(<span style="color:#e6db74">&#39;conjugate function -f*(x)&#39;</span>)
+    ax2<span style="color:#f92672">.</span>set_xlabel(<span style="color:#e6db74">&#34;s&#34;</span>)
+    ax2<span style="color:#f92672">.</span>set_ylabel(<span style="color:#e6db74">&#34;-f*(s)&#34;</span>)
 
-<span style="color:#00a8c8">def</span> <span style="color:#75af00">draw</span><span style="color:#111">():</span>
-    <span style="color:#111">fig</span> <span style="color:#f92672">=</span> <span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">figure</span><span style="color:#111">()</span>
-    <span style="color:#111">fig</span><span style="color:#111">,</span> <span style="color:#111">(</span><span style="color:#111">ax1</span><span style="color:#111">,</span> <span style="color:#111">ax2</span><span style="color:#111">)</span> <span style="color:#f92672">=</span> <span style="color:#111">plt</span><span style="color:#f92672">.</span><span style="color:#111">subplots</span><span style="color:#111">(</span><span style="color:#ae81ff">1</span><span style="color:#111">,</span><span style="color:#ae81ff">2</span><span style="color:#111">,</span><span style="color:#111">figsize</span> <span style="color:#f92672">=</span> <span style="color:#111">(</span><span style="color:#ae81ff">10</span><span style="color:#111">,</span> <span style="color:#ae81ff">5</span><span style="color:#111">))</span>
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">draw</span>():
+    fig <span style="color:#f92672">=</span> plt<span style="color:#f92672">.</span>figure()
+    fig, (ax1, ax2) <span style="color:#f92672">=</span> plt<span style="color:#f92672">.</span>subplots(<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">2</span>,figsize <span style="color:#f92672">=</span> (<span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">5</span>))
 
-    <span style="color:#111">x</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">linspace</span><span style="color:#111">(</span><span style="color:#f92672">-</span><span style="color:#ae81ff">2.0</span><span style="color:#111">,</span> <span style="color:#ae81ff">2.0</span><span style="color:#111">,</span> <span style="color:#ae81ff">100</span><span style="color:#111">)</span>
-    <span style="color:#111">f</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">/</span><span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> <span style="color:#111">x</span> <span style="color:#f92672">**</span> <span style="color:#ae81ff">2</span>
-    <span style="color:#111">f_grad</span> <span style="color:#f92672">=</span> <span style="color:#111">np</span><span style="color:#f92672">.</span><span style="color:#111">gradient</span><span style="color:#111">(</span><span style="color:#111">f</span><span style="color:#111">,</span> <span style="color:#111">x</span><span style="color:#111">)</span>
+    x <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>linspace(<span style="color:#f92672">-</span><span style="color:#ae81ff">2.0</span>, <span style="color:#ae81ff">2.0</span>, <span style="color:#ae81ff">100</span>)
+    f <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">/</span><span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> x <span style="color:#f92672">**</span> <span style="color:#ae81ff">2</span>
+    f_grad <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>gradient(f, x)
     
-    <span style="color:#111">ani</span> <span style="color:#f92672">=</span> <span style="color:#111">animation</span><span style="color:#f92672">.</span><span style="color:#111">FuncAnimation</span><span style="color:#111">(</span><span style="color:#111">fig</span><span style="color:#111">,</span> <span style="color:#111">update</span><span style="color:#111">,</span> <span style="color:#111">fargs</span> <span style="color:#f92672">=</span> <span style="color:#111">(</span><span style="color:#111">x</span><span style="color:#111">,</span> <span style="color:#111">f</span><span style="color:#111">,</span> <span style="color:#111">f_grad</span><span style="color:#111">,</span> <span style="color:#111">ax1</span><span style="color:#111">,</span> <span style="color:#111">ax2</span><span style="color:#111">),</span> <span style="color:#111">interval</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span><span style="color:#111">,</span> <span style="color:#111">frames</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span><span style="color:#111">,</span> <span style="color:#111">repeat</span><span style="color:#f92672">=</span><span style="color:#111">True</span><span style="color:#111">)</span>
-    <span style="color:#111">ani</span><span style="color:#f92672">.</span><span style="color:#111">save</span><span style="color:#111">(</span><span style="color:#d88200">&#34;conjugate_func.gif&#34;</span><span style="color:#111">,</span> <span style="color:#111">writer</span> <span style="color:#f92672">=</span> <span style="color:#d88200">&#39;imagemagick&#39;</span><span style="color:#111">)</span>
+    ani <span style="color:#f92672">=</span> animation<span style="color:#f92672">.</span>FuncAnimation(fig, update, fargs <span style="color:#f92672">=</span> (x, f, f_grad, ax1, ax2), interval <span style="color:#f92672">=</span> <span style="color:#ae81ff">50</span>, frames <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>, repeat<span style="color:#f92672">=</span>True)
+    ani<span style="color:#f92672">.</span>save(<span style="color:#e6db74">&#34;conjugate_func.gif&#34;</span>, writer <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;imagemagick&#39;</span>)
 
-<span style="color:#111">draw</span><span style="color:#111">()</span></code></pre></div>
+draw()</code></pre></div>
 <h1 id="劣微分-劣勾配">劣微分・劣勾配</h1>
 
-<p>凸関数を最小化するために勾配情報が欲しいが，凸関数はいつでも微分可能であるとは限らない．例えば，$y=|x|$は凸関数だが，$x=0$で微分可能でない．このような関数に対して勾配（劣勾配）を定義してみる．</p>
+<p>凸関数を最小化するために勾配情報が欲しいが，凸関数はいつでも微分可能であるとは限らない．例えば， $y=|x|$ は凸関数だが， $x=0$ で微分可能でない．このような関数に対して勾配（劣勾配）を定義してみる．</p>
 
-<p>真凸関数$f:\mathbb{R}^n \to \mathbb{R} \cup \{\infty\}$かつ$x \in dom(f)$の元で，$\forall y \in \mathbb{R}^n$が</p>
+<p>真凸関数 $f:\mathbb{R}^n \to \mathbb{R} \cup \{\infty\}$ かつ $x \in dom(f)$ の元で， $\forall y \in \mathbb{R}^n$ が</p>
 
 <div class="mathjax">
 $$
@@ -409,21 +416,21 @@ f(\boldsymbol{y}) \geq f(\boldsymbol{x}) + \boldsymbol{g}^{\mathrm{T}}(\boldsymb
 $$
 </div>
 
-<p>を満たすとき，$\boldsymbol{g}$を$\boldsymbol{x}$における劣勾配という．劣勾配の集合$\partial f(\boldsymbol{x})$を劣微分という．</p>
+<p>を満たすとき， $\boldsymbol{g}$ を $\boldsymbol{x}$ における劣勾配という．劣勾配の集合 $\partial f(\boldsymbol{x})$ を劣微分という．</p>
 
-<p>$f(x)=|x|$の$x=0$における劣微分は，以下より，$\partial f(0) = [-1,1]$と求まる．</p>
+<p>$f(x)=|x|$ の $x=0$ における劣微分は，以下より， $\partial f(0) = [-1,1]$ と求まる．</p>
 
 <ul>
-<li>$y \gt 0$の場合，$f(y)=|y|=y \geq f(0) + g (y - 0)$なので，$g \leq 1$</li>
-<li>$y = 0$の場合，$f(y)=|y|=0 \geq f(0) + g (0 - 0)$なので，$g \in \mathbb{R}$</li>
-<li>$y \lt 0$の場合，$f(y)=|y|=-y \geq f(0) + g (y - 0)$なので，$g \geq -1$</li>
+<li>$y \gt 0$ の場合， $f(y)=|y|=y \geq f(0) + g (y - 0)$ なので，$g \leq 1$</li>
+<li>$y = 0$ の場合， $f(y)=|y|=0 \geq f(0) + g (0 - 0)$ なので，$g \in \mathbb{R}$</li>
+<li>$y \lt 0$ の場合， $f(y)=|y|=-y \geq f(0) + g (y - 0)$ なので，$g \geq -1$</li>
 </ul>
 
 <h1 id="強凸関数">強凸関数</h1>
 
-<p>関数$f:\mathbb{R}^n \to \mathbb{R} \cup \{\infty\}$と$\mu \geq 0$が以下を満たすとき，$f$をμ-強凸関数という．</p>
+<p>関数 $f:\mathbb{R}^n \to \mathbb{R} \cup \{\infty\}$ と $\mu \geq 0$ が以下を満たすとき， $f$ をμ-強凸関数という．</p>
 
-<p>任意の$\lambda \in (0,1)$と任意の$\boldsymbol{u,v} \in dom(f)$の元で，</p>
+<p>任意の $\lambda \in (0,1)$ と任意の $\boldsymbol{u,v} \in dom(f)$ の元で，</p>
 
 <div class="mathjax">
 $$
@@ -435,15 +442,15 @@ $$
 
 <p><img src="/img/strongly_convex_function.svg" alt="strongly_convex_function" /></p>
 
-<p>$f(x)=x^2$は強凸関数である．</p>
+<p>$f(x)=x^2$ は強凸関数である．</p>
 
 <h1 id="局所最適化">局所最適化</h1>
 
 <h1 id="直線探索法と反復法による最適化">直線探索法と反復法による最適化</h1>
 
-<p>$\phi(0)=f(x_0)$に比べて，$\phi(\alpha)=f(x_0+\alpha \boldsymbol{d})$が小さくなるような，ステップ幅$\alpha$（$\alpha \geq 0$）を探すことを<strong>直線探索</strong>という．$\boldsymbol{d}$を<strong>探索方向</strong>という．</p>
+<p>$\phi(0)=f(x_0)$ に比べて， $\phi(\alpha)=f(x_0+\alpha \boldsymbol{d})$ が小さくなるような，ステップ幅 $\alpha$ （ $\alpha \geq 0$ ）を探すことを<strong>直線探索</strong>という． $\boldsymbol{d}$ を<strong>探索方向</strong>という．</p>
 
-<p>より具体的には，初期解$x_0$を設定し，$x_k$から探索方向$\boldsymbol{d}_k$の方向に進み，ステップ幅$\alpha_k \geq 0$を直線探索で決定し，以下のように$x_k$を更新した上で関数値を評価するような，<strong>反復法</strong>によって最適解を探す．</p>
+<p>より具体的には，初期解 $x_0$ を設定し， $x_k$ から探索方向 $\boldsymbol{d}_k$ の方向に進み，ステップ幅 $\alpha_k \geq 0$ を直線探索で決定し，以下のように $x_k$ を更新した上で関数値を評価するような，<strong>反復法</strong>によって最適解を探す．</p>
 
 <div class="mathjax">
 $$
@@ -459,7 +466,7 @@ $$
 $$
 </div>
 
-<p>を満たすように探索方向$\boldsymbol{d}_k$を選ぶ．勾配$\nabla f(x_k)$は登る方向なので，$\boldsymbol{d}_k$は降下方向を選べば良い．</p>
+<p>を満たすように探索方向 $\boldsymbol{d}_k$ を選ぶ．勾配 $\nabla f(x_k)$ は登る方向なので， $\boldsymbol{d}_k$ は降下方向を選べば良い．</p>
 
 <p>探索方向が勾配に対して直交方向に近すぎない限り，勾配ノルム$\|\nabla f(x_k)\|$が0に収束するという，<strong>ゾーテンダイク条件</strong>に起因する．</p>
 
@@ -475,8 +482,8 @@ $$
 <li>アルミホ条件
 
 <ul>
-<li>$c_1 \in (0,1)$を設定し，以下を満たす$\alpha &gt; 0$を自力で探す．下図の例では，青矢印の範囲内が適切な$\alpha$となる．</li>
-<li>アルミホ条件では小さな$\alpha$が許容されるので，大きめの$\alpha$を選択しなければ，直線探索の回数が多くなってしまう．</li>
+<li>$c_1 \in (0,1)$ を設定し，以下を満たす $\alpha &gt; 0$ を自力で探す．下図の例では，青矢印の範囲内が適切な $\alpha$ となる．</li>
+<li>アルミホ条件では小さな $\alpha$ が許容されるので，大きめの $\alpha$ を選択しなければ，直線探索の回数が多くなってしまう．</li>
 </ul></li>
 </ul>
 
@@ -492,9 +499,9 @@ $$
 <li>ウルフ条件
 
 <ul>
-<li>$ 0 &lt; c_1 &lt; c_2 &lt; 1$を設定し，以下を満たす$\alpha &gt; 0$を自力で探す．下図の例では，青矢印の範囲内が適切な$\alpha$となる．</li>
-<li>アルミホ条件の弱点（極めて小さな$\alpha$を許容してしまう弱点）を回避することが可能．</li>
-<li>$|\phi^{&lsquo;}(\alpha)| \leq c_2 | \phi^{&lsquo;}(0) |$を用いると，強いウルフ条件になる．</li>
+<li>$ 0 &lt; c_1 &lt; c_2 &lt; 1$ を設定し，以下を満たす $\alpha &gt; 0$ を自力で探す．下図の例では，青矢印の範囲内が適切な $\alpha$ となる．</li>
+<li>アルミホ条件の弱点（極めて小さな $\alpha$ を許容してしまう弱点）を回避することが可能．</li>
+<li>$|\phi^{&lsquo;}(\alpha)| \leq c_2 | \phi^{&lsquo;}(0) |$ を用いると，強いウルフ条件になる．</li>
 </ul></li>
 </ul>
 
@@ -511,8 +518,8 @@ $$
 <li>ゴールドシュタイン条件
 
 <ul>
-<li>$c \in (0,\frac{1}{2})$を設定し，以下を満たす$\alpha &gt; 0$を自力で探す．</li>
-<li>アルミホ条件の弱点（極めて小さな$\alpha$を許容してしまう弱点）を回避することが可能．</li>
+<li>$c \in (0,\frac{1}{2})$ を設定し，以下を満たす $\alpha &gt; 0$ を自力で探す．</li>
+<li>アルミホ条件の弱点（極めて小さな $\alpha$ を許容してしまう弱点）を回避することが可能．</li>
 </ul></li>
 </ul>
 
@@ -522,19 +529,19 @@ $$
 $$
 </div>
 
-<p>$\alpha$は自力で探す必要があると述べたが，機械的には，以下の<strong>バックトラッキング</strong>によって探索することができる．</p>
+<p>$\alpha$ は自力で探す必要があると述べたが，機械的には，以下の<strong>バックトラッキング</strong>によって探索することができる．</p>
 
 <ol>
-<li>初期値$\alpha &gt; 0$と，縮小率$\rho \in (0,1)$を任意に設定する．</li>
-<li>$\alpha$が直線探索の条件を満たす場合は，$\alpha$をステップ幅として採用する．</li>
-<li>$\alpha \gets \rho \alpha$として2.を評価する．</li>
+<li>初期値 $\alpha &gt; 0$ と，縮小率 $\rho \in (0,1)$ を任意に設定する．</li>
+<li>$\alpha$ が直線探索の条件を満たす場合は， $\alpha$ をステップ幅として採用する．</li>
+<li>$\alpha \gets \rho \alpha$ として2.を評価する．</li>
 </ol>
 
 <h1 id="最適化アルゴリズムの停止条件">最適化アルゴリズムの停止条件</h1>
 
-<p>反復法において，$k$ステップ目の数値解を$x_k$とすると，$\nabla f(x_k)=0$と正定値性$\nabla^2 f(x_k) \succ O$を満たせば，$x_k$が局所最適解であると言えるので，反復法を終了させることができる．</p>
+<p>反復法において， $k$ ステップ目の数値解を $x_k$ とすると， $\nabla f(x_k)=0$ と正定値性 $\nabla^2 f(x_k) \succ O$ を満たせば， $x_k$ が局所最適解であると言えるので，反復法を終了させることができる．</p>
 
-<p>しかし，計算機を用いた反復法において，$\nabla f(x_k)=0$になるとは限らないので，</p>
+<p>しかし，計算機を用いた反復法において， $\nabla f(x_k)=0$ になるとは限らないので，</p>
 
 <div class="mathjax">
 $$
@@ -546,9 +553,9 @@ $$
 
 <p>&hellip;</p>
 
-<p>関数$f$が2階微分可能であり，局所最適解を$x^*$とする．このとき，$\nabla f(x^*)=0, \nabla^2 f(x^*) \succ O$が成り立つ．</p>
+<p>関数 $f$ が2階微分可能であり，局所最適解を $x^*$ とする．このとき， $\nabla f(x^*)=0, \nabla^2 f(x^*) \succ O$ が成り立つ．</p>
 
-<p>ここで，反復法の$k$ステップ目で得られた数値解$x_k$と真の局所最適解$x^*$との差を$\delta = x_k - x^*$，関数値の差を$f(x_k) - f(x^*) = h$とおくと，テイラーの定理を整理して以下が得られる．$t \in (0,1)$である．</p>
+<p>ここで，反復法の$k$ステップ目で得られた数値解 $x_k$ と真の局所最適解 $x^*$ との差を $\delta = x_k - x^*$ ，関数値の差を $f(x_k) - f(x^*) = h$ とおくと，テイラーの定理を整理して以下が得られる． $t \in (0,1)$ である．</p>
 
 <div class="mathjax">
 $$
@@ -560,7 +567,7 @@ f(x_k) = f(x^*) + \nabla f(x^*) \delta + \frac{1}{2} \delta \nabla^2 f(x^*+t \de
 $$
 </div>
 
-<p>これより，$h$と$\delta$のオーダーに関して，$\| \delta \| = O( \sqrt{h} )$となっている．</p>
+<p>これより， $h$ と $\delta$ のオーダーに関して， $\| \delta \| = O( \sqrt{h} )$ となっている．</p>
 
 <p>勾配のテイラーの定理より，</p>
 
@@ -572,9 +579,9 @@ $$
 $$
 </div>
 
-<p>なので，$\| \nabla f(x_k) \|$のオーダーは$\| \delta \|$と同じ$O( \sqrt{h} )$になる．</p>
+<p>なので， $\| \nabla f(x_k) \|$ のオーダーは $\| \delta \|$ と同じ $O( \sqrt{h} )$ になる．</p>
 
-<p>よって，$h \to 0$を目的とした反復法を用いるのなら，$h$に$\varepsilon$ぶんの誤差があるとした$\| \nabla f(x_k) \| &lt;\varepsilon$よりも，</p>
+<p>よって， $h \to 0$ を目的とした反復法を用いるのなら， $h$ に $\varepsilon$ ぶんの誤差があるとした $\| \nabla f(x_k) \| &lt;\varepsilon$ よりも，</p>
 
 <div class="mathjax">
 $$
@@ -582,7 +589,7 @@ $$
 $$
 </div>
 
-<p>を反復法の停止条件とするほうが適当であると言える．この停止条件と，以下の$h,\delta$についての条件を，反復法を停止させるための判断材料とすることがある．</p>
+<p>を反復法の停止条件とするほうが適当であると言える．この停止条件と，以下の $h,\delta$ についての条件を，反復法を停止させるための判断材料とすることがある．</p>
 
 <div class="mathjax">
 $$
@@ -591,7 +598,7 @@ h < \varepsilon \\
 $$
 </div>
 
-<p>また，$h$は$\delta$の影響を受けるため，$\delta$のスケーリングや単位系の変更が$h$に伝播する．よって，停止条件を以下のように定めることもある．</p>
+<p>また， $h$ は $\delta$ の影響を受けるため， $\delta$ のスケーリングや単位系の変更が $h$ に伝播する．よって，停止条件を以下のように定めることもある．</p>
 
 <div class="mathjax">
 $$
@@ -611,7 +618,7 @@ $$
 
 <h1 id="収束速度-収束率">収束速度（収束率）</h1>
 
-<p>反復法における数値解$x_0,x_1,&hellip;$が迅速に最適解$x^*$に収束するようなアルゴリズムを考える必要がある．最適解近傍での収束の速さを<strong>収束速度</strong>または<strong>収束率</strong>という．<strong>最適解の近傍に到達するまでの速さとは無関係</strong>であることに注意する．</p>
+<p>反復法における数値解 $x_0,x_1,&hellip;$ が迅速に最適解 $x^*$ に収束するようなアルゴリズムを考える必要がある．最適解近傍での収束の速さを<strong>収束速度</strong>または<strong>収束率</strong>という．<strong>最適解の近傍に到達するまでの速さとは無関係</strong>であることに注意する．</p>
 
 <p>収束速度は，<strong>1次収束</strong>，<strong>超1次収束</strong>，<strong>2次収束</strong>の3つに分けることができ，1次収束よりも2次収束のほうが収束速度が速い．</p>
 
@@ -625,7 +632,7 @@ $$
 $$
 </div>
 
-<p>また，定数$C&gt;0,r \in (0,1)$を用いて以下のように表現することも可能である．
+<p>また，定数 $C&gt;0,r \in (0,1)$ を用いて以下のように表現することも可能である．
 <div class="mathjax">
 $$
 \| x_k - x^* \| \leq C r^k
@@ -642,7 +649,7 @@ $$
 $$
 </div>
 
-<p>また，$r_k \to 0 (k \to \infty)$となる（つまり，数値解が最適解に近づくにつれて$r_k$が小さくなっていく）数列$r_k$を用いて以下のように表現することも可能である．</p>
+<p>また， $r_k \to 0 (k \to \infty)$ となる（つまり，数値解が最適解に近づくにつれて $r_k$ が小さくなっていく）数列 $r_k$ を用いて以下のように表現することも可能である．</p>
 
 <div class="mathjax">
 $$
@@ -660,9 +667,9 @@ $$
 $$
 </div>
 
-<p>収束率が高く，分母が限りなく0に近づくため，$k \to \infty$時は$\infty$未満となる．</p>
+<p>収束率が高く，分母が限りなく0に近づくため， $k \to \infty$ 時は $\infty$ 未満となる．</p>
 
-<p>また，定数$C&gt;0,r \in (0,1)$を用いて以下のように表現することも可能である．
+<p>また，定数 $C&gt;0,r \in (0,1)$ を用いて以下のように表現することも可能である．
 <div class="mathjax">
 $$
 \| x_k - x^* \| \leq C r^{2^k}
@@ -671,18 +678,33 @@ $$
 
 <p>1次収束よりも収束率が高く，収束速度も速いことがわかる．</p>
 
+  </div>
+  <footer class="post-footer">
+    
     <div class="share">
     <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fhow-to-solve-numerical-min-max%2f&text=%e9%96%a2%e6%95%b0%e3%81%ae%e6%9c%80%e5%a4%a7%e5%80%a4%e3%81%be%e3%81%9f%e3%81%af%e6%9c%80%e5%b0%8f%e5%80%a4%e3%82%92%e6%a9%9f%e6%a2%b0%e7%9a%84%e3%81%ab%e6%b1%82%e3%82%81%e3%82%8b - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
     <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fhow-to-solve-numerical-min-max%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
     <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fhow-to-solve-numerical-min-max%2f&title=%e9%96%a2%e6%95%b0%e3%81%ae%e6%9c%80%e5%a4%a7%e5%80%a4%e3%81%be%e3%81%9f%e3%81%af%e6%9c%80%e5%b0%8f%e5%80%a4%e3%82%92%e6%a9%9f%e6%a2%b0%e7%9a%84%e3%81%ab%e6%b1%82%e3%82%81%e3%82%8b - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
 </div>
-  </div>
-  <footer class="post-footer">
-    
   </footer>
 </article>
+
+
+<div class="post-widget">
+  <div class="twitter-widget">
+    <a class="twitter-timeline" data-lang="en" data-width="300" href="https://twitter.com/yasakurara?ref_src=twsrc%5Etfw">Tweets by yasakurara</a>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </div>
+</div>
+
+
 <footer class="footer">
-  <span>&copy; 2020 yasakura</span>
+  <nav>
+    <ul>
+      <li><a href="https://yasakura.me//terms/">Terms of Use</a></li>
+    </ul>
+  </nav>
+  <span>&copy; 2021 yasakura</span>
 </footer>
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({

@@ -1,14 +1,35 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Categories on yasakura</title>
+    <title>yasakura</title>
     <link>https://yasakura.me/categories/</link>
-    <description>Recent content in Categories on yasakura</description>
+    <description>Recent content on yasakura</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
+    <lastBuildDate>Sat, 02 Jan 2021 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://yasakura.me/categories/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>How to manage Python2.X, 3.X and packages every project</title>
+      <link>https://yasakura.me/post/manage-python3-and-python27-and-packages-en/</link>
+      <pubDate>Sat, 02 Jan 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://yasakura.me/post/manage-python3-and-python27-and-packages-en/</guid>
+      <description>Motivation  want to switch major version of Python (i.e. between Python2.X and Python3.X). want to switch minor version of Python (i.e. between Python3.A and Python3.B). want to isolate some packages for every project. don&amp;rsquo;t want to construct in vain a new docker container for each Python project.  How to switch any version of Python with pyenv Installation  Confirm the default Python version.
+$ python --version Python 2.</description>
+    </item>
+    
+    <item>
+      <title>How to manage Python2.X, 3.X and packages every project</title>
+      <link>https://yasakura.me/post/manage-python3-and-python27-and-packages-en/</link>
+      <pubDate>Sat, 02 Jan 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://yasakura.me/post/manage-python3-and-python27-and-packages-en/</guid>
+      <description>Motivation  want to switch major version of Python (i.e. between Python2.X and Python3.X). want to switch minor version of Python (i.e. between Python3.A and Python3.B). want to isolate some packages for every project. don&amp;rsquo;t want to construct in vain a new docker container for each Python project.  How to switch any version of Python with pyenv Installation  Confirm the default Python version.
+$ python --version Python 2.</description>
+    </item>
     
   </channel>
 </rss>

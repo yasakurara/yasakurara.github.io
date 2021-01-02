@@ -6,9 +6,19 @@
     <description>Recent content in Tags on yasakura</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
+    <lastBuildDate>Sat, 02 Jan 2021 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://yasakura.me/tags/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Python</title>
+      <link>https://yasakura.me/tags/python/</link>
+      <pubDate>Sat, 02 Jan 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://yasakura.me/tags/python/</guid>
+      <description></description>
+    </item>
     
   </channel>
 </rss>

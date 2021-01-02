@@ -6,10 +6,20 @@
     <description>Recent content in Posts on yasakura</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Thu, 13 Aug 2020 00:00:00 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 02 Jan 2021 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://yasakura.me/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>How to manage Python2.X, 3.X and packages every project</title>
+      <link>https://yasakura.me/post/manage-python3-and-python27-and-packages-en/</link>
+      <pubDate>Sat, 02 Jan 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://yasakura.me/post/manage-python3-and-python27-and-packages-en/</guid>
+      <description>Motivation  want to switch major version of Python (i.e. between Python2.X and Python3.X). want to switch minor version of Python (i.e. between Python3.A and Python3.B). want to isolate some packages for every project. don&amp;rsquo;t want to construct in vain a new docker container for each Python project.  How to switch any version of Python with pyenv Installation  Confirm the default Python version.
+$ python --version Python 2.</description>
+    </item>
     
     <item>
       <title>Dockerコンテナのネットワーク構成</title>
@@ -65,13 +75,12 @@ dpkg-reconfigure -plow unattended-upgrades</description>
       <pubDate>Wed, 01 Apr 2020 00:00:05 +0900</pubDate>
       
       <guid>https://yasakura.me/post/how-to-solve-numerical-min-max/</guid>
-      <description>勉強中のため，この記事は書きかけであり，随時更新するつもり．．．
+      <description>おことわり 勉強中のため随時更新中です
 モチベーション 関数の最大値または最小値を機械的に求めるためにはどうしたらよいかを知る
-シュワルツの不等式 $$ |\boldsymbol{x}^T\boldsymbol{y}| \leq \|\boldsymbol{x}\| \|\boldsymbol{y} \| $$  $\boldsymbol{x}$と$\boldsymbol{y}$が1次従属となる場合に等号が成立する．これは，内積$\vec{a} \cdot \vec{b} = |\vec{a}| |\vec{b}| \cos \theta$をイメージするとわかりやすい．
-Rolleの定理 rolle theorem $f(x)$が$[a,b]$で連続，$(a,b)$で微分可能，$f(a)=f(b)$を満たすとき，$f&amp;rsquo;(c) = 0$ となる $a &amp;lt; c &amp;lt; b$ が存在する．
-平均値の定理 mean-value theorem $f(x)$が$[a,b]$で連続，$(a,b)$で微分可能なとき，$\frac{f(b)-f(a)}{b-a} = f&amp;rsquo;(c)$ となる $a &amp;lt; c &amp;lt; b$ が存在する．
-テイラーの定理による関数の近似 1階微分可能な関数の近似（ラグランジュの剰余項） 関数$f:\mathbb{ R }^n \to \mathbb{R}$が１階微分可能のとき，$\boldsymbol{x_0,\delta} \in \mathbb{R}$に対して実数$c \in (0,1)$が存在する．
-$$ f(\boldsymbol{x_0}+\boldsymbol{\delta}) = f(\boldsymbol{x_0}) + \nabla f(\boldsymbol{x_0}+c\boldsymbol{\delta})^T \boldsymbol{\delta} $$  上式を整理すると，以下のように，左辺の変化量を満たす$f$の勾配が$(\boldsymbol{x}, \boldsymbol{x} + \boldsymbol{\delta})$の範囲内に存在すると解釈できる．これは平均値の定理である．$\boldsymbol{\delta}$が非常に小さければ，微分の定義そのものであるが，$\boldsymbol{\delta}$は実数全体を取りうるので，微分の定義とは異なることに注意．</description>
+シュワルツの不等式 $$ |\boldsymbol{x}^T\boldsymbol{y}| \leq \|\boldsymbol{x}\| \|\boldsymbol{y} \| $$  $\boldsymbol{x}$ と $\boldsymbol{y}$ が1次従属となる場合に等号が成立する．これは，内積 $\vec{a} \cdot \vec{b} = |\vec{a}| |\vec{b}| \cos \theta$ をイメージするとわかりやすい．
+Rolleの定理 rolle theorem $f(x)$ が $[a,b]$ で連続， $(a,b)$ で微分可能， $f(a)=f(b)$ を満たすとき， $f&amp;rsquo;(c) = 0$ となる $a &amp;lt; c &amp;lt; b$ が存在する．
+平均値の定理 mean-value theorem $f(x)$ が $[a,b]$ で連続， $(a,b)$ で微分可能なとき， $\frac{f(b)-f(a)}{b-a} = f&amp;rsquo;(c)$ となる $a &amp;lt; c &amp;lt; b$ が存在する．
+テイラーの定理による関数の近似 1階微分可能な関数の近似（ラグランジュの剰余項） 関数 $f:\mathbb{ R }^n \to \mathbb{R}$ が１階微分可能のとき， $\boldsymbol{x_0,\delta} \in \mathbb{R}$ に対して実数 $c \in (0,1)$ が存在する．</description>
     </item>
     
     <item>
@@ -80,12 +89,11 @@ $$ f(\boldsymbol{x_0}+\boldsymbol{\delta}) = f(\boldsymbol{x_0}) + \nabla f(\bol
       <pubDate>Wed, 01 Apr 2020 00:00:04 +0900</pubDate>
       
       <guid>https://yasakura.me/post/subdifferential/</guid>
-      <description>モチベーション  部分的に微分できない関数をなんとか微分したい L1正則化(Lasso)を用いると，過学習を防げる場合がある  関数の種類 目的関数の最小値を求めたい機会は多々ある，目的関数を微分することで最小値を求めることがあるが，関数の形によっては，部分的に微分できない場合がある．例えば，$y=\|x\|$は$x=0$で微分不可能である．
- 関数が連続でない：境界（$y=\|x\|$の$x=0$付近）において，左極限と右極限が一致しないもの $C_1$級関数：1階微分可能であり，それが連続であるもの $C_n$級関数：n階微分可能であり，n階の導関数が連続であるもの 滑らかな関数：任意階微分可能であり，任意階の導関数が連続であるもの．$C_\infty$級関数．  劣微分・劣勾配 凸関数を最小化するために勾配情報が欲しいが，凸関数はいつでも微分可能であるとは限らない．例えば，$y=|x|$は凸関数だが，$x=0$で微分可能でない．このような関数に対して勾配（劣勾配）を定義してみる．
-真凸関数$f:\mathbb{R}^n \to \mathbb{R} \cup \{\infty\}$かつ$x \in dom(f)$の元で，$\forall y \in \mathbb{R}^n$が
-$$ f(\boldsymbol{y}) \geq f(\boldsymbol{x}) + \boldsymbol{g}^{\mathrm{T}}(\boldsymbol{y}-\boldsymbol{x}) $$  を満たすとき，$\boldsymbol{g}$を$\boldsymbol{x}$における劣勾配という．劣勾配の集合$\partial f(\boldsymbol{x})$を劣微分という．
-$f(x)=|x|$の$x=0$における劣微分は，以下より，$\partial f(0) = [-1,1]$と求まる．
- $y \gt 0$の場合，$f(y)=|y|=y \geq f(0) + g (y - 0)$なので，$g \leq 1$ $y = 0$の場合，$f(y)=|y|=0 \geq f(0) + g (0 - 0)$なので，$g \in \mathbb{R}$ $y \lt 0$の場合，$f(y)=|y|=-y \geq f(0) + g (y - 0)$なので，$g \geq -1$  もっと複雑な関数を微分したい 座標降下法(Coordinate Descent)または勾配降下法(Gradient Descent)を用いる．</description>
+      <description>モチベーション  部分的に微分できない関数をなんとか微分したい L1正則化(Lasso)を用いると，過学習を防げる場合がある  関数の種類 目的関数の最小値を求めたい機会は多々ある，目的関数を微分することで最小値を求めることがあるが，関数の形によっては，部分的に微分できない場合がある．例えば， $y=\|x\|$ は $x=0$ で微分不可能である．
+ 関数が連続でない：境界（ $y=\|x\|$ の $x=0$ 付近）において，左極限と右極限が一致しないもの $C_1$ 級関数：1階微分可能であり，それが連続であるもの $C_n$ 級関数：n階微分可能であり，n階の導関数が連続であるもの 滑らかな関数：任意階微分可能であり，任意階の導関数が連続であるもの．$C_\infty$ 級関数．  劣微分・劣勾配 凸関数を最小化するために勾配情報が欲しいが，凸関数はいつでも微分可能であるとは限らない．例えば， $y=|x|$ は凸関数だが， $x=0$ で微分可能でない．このような関数に対して勾配（劣勾配）を定義してみる．
+真凸関数 $f:\mathbb{R}^n \to \mathbb{R} \cup \{\infty\}$ かつ $x \in dom(f)$ の元で， $\forall y \in \mathbb{R}^n$ が
+$$ f(\boldsymbol{y}) \geq f(\boldsymbol{x}) + \boldsymbol{g}^{\mathrm{T}}(\boldsymbol{y}-\boldsymbol{x}) $$  を満たすとき， $\boldsymbol{g}$ を $\boldsymbol{x}$ における劣勾配という．劣勾配の集合 $\partial f(\boldsymbol{x})$ を劣微分という．
+$f(x)=|x|$ の $x=0$ における劣微分は，以下より， $\partial f(0) = [-1,1]$ と求まる．</description>
     </item>
     
     <item>
@@ -95,10 +103,10 @@ $f(x)=|x|$の$x=0$における劣微分は，以下より，$\partial f(0) = [-1
       
       <guid>https://yasakura.me/post/linear-model/</guid>
       <description>モチベーション 散布図から関数を予測したい
-scikit-learnのLinearRegressionで単回帰する -3 &amp;lt; x &amp;lt; 3 の範囲でxをランダムに50点生成し，$y=0.1x+0.3$に入力した後，yにσ=0.1のガウシアンノイズを加えたtを教師データとした．青線(original)が直線y，散布図(training data)がtである．
-scikit-learnのLinearRegressionを用いて$y=0.1x+0.3$を予測したものが赤線(predictive)である．
-coefficientは0.09くらい，interceptは0.30くらいとなり，$y=0.09x+0.30$と予測できた．
-import numpy as np from matplotlib import pyplot as plt from sklearn.linear_model import LinearRegression from sklearn.model_selection import train_test_split from matplotlib.colors import ListedColormap colors = [&amp;#39;#e74c3c&amp;#39;, &amp;#39;#3498db&amp;#39;, &amp;#39;#1abc9c&amp;#39;, &amp;#39;#9b59b6&amp;#39;, &amp;#39;#f1c40f&amp;#39;] # red, blue, green, purple, yellow cmap = ListedColormap(colors) plt.style.use(&amp;#39;seaborn&amp;#39;) def f(x): return 0.1*x + 0.3 N = 50 X = np.zeros((N,1)) np.random.seed(seed=10) X[:,0] = np.random.uniform(-3, 3, N) noise = 0.</description>
+scikit-learnのLinearRegressionで単回帰する -3 &amp;lt; x &amp;lt; 3 の範囲でxをランダムに50点生成し， $y=0.1x+0.3$ に入力した後，yにσ=0.1のガウシアンノイズを加えたtを教師データとした．青線(original)が直線y，散布図(training data)がtである．
+scikit-learnのLinearRegressionを用いて $y=0.1x+0.3$ を予測したものが赤線 (predictive) である．
+coefficientは0.09くらい，interceptは0.30くらいとなり， $y=0.09x+0.30$ と予測できた．
+import numpy as np from matplotlib import pyplot as plt from sklearn.linear_model import LinearRegression from sklearn.model_selection import train_test_split from matplotlib.colors import ListedColormap colors = [&amp;#39;#e74c3c&amp;#39;, &amp;#39;#3498db&amp;#39;, &amp;#39;#1abc9c&amp;#39;, &amp;#39;#9b59b6&amp;#39;, &amp;#39;#f1c40f&amp;#39;] # red, blue, green, purple, yellow cmap = ListedColormap(colors) plt.style.use(&amp;#39;seaborn&amp;#39;) def f(x): return 0.1*x + 0.3 N = 50 X = np.</description>
     </item>
     
     <item>
@@ -107,9 +115,9 @@ import numpy as np from matplotlib import pyplot as plt from sklearn.linear_mode
       <pubDate>Wed, 01 Apr 2020 00:00:03 +0900</pubDate>
       
       <guid>https://yasakura.me/post/classification-and-regression-with-decision-tree/</guid>
-      <description>モチベーション  決定木で分類と回帰をやりたい なぜ決定木で分類と回帰ができるのかを知りたい scikit-learnでサクッとやりたい  scikit-learnのDecisionTreeClassifierで分類する 2つの特徴量$X_0,X_1$からなる，以下のようなデータセットを分類したい．
+      <description>モチベーション  決定木で分類と回帰をやりたい なぜ決定木で分類と回帰ができるのかを知りたい scikit-learnでサクッとやりたい  scikit-learnのDecisionTreeClassifierで分類する 2つの特徴量 $X_0,X_1$ からなる，以下のようなデータセットを分類したい．
 from sklearn.datasets import make_moons import matplotlib.pyplot as plt from matplotlib.colors import ListedColormap # style colors = [&amp;#39;#e74c3c&amp;#39;, &amp;#39;#3498db&amp;#39;, &amp;#39;#1abc9c&amp;#39;, &amp;#39;#9b59b6&amp;#39;, &amp;#39;#f1c40f&amp;#39;] # red, blue, green, purple, yellow cmap = ListedColormap(colors) plt.style.use(&amp;#39;seaborn&amp;#39;) X, y = make_moons(n_samples=100, noise=0.25, random_state=0) plt.figure(figsize=(4,4)) plt.scatter(X[:,0], X[:,1], c=y, cmap=cmap, marker=&amp;#39;.&amp;#39;) plt.ylabel(&amp;#39;X0&amp;#39;) plt.xlabel(&amp;#39;X1&amp;#39;) plt.show() scikit-learnのDecisionTreeClassifierで分類した結果が以下である．
- 1.10. Decision Trees Users Guide sklearn.tree.DecisionTreeClassifier  from sklearn.datasets import make_moons from matplotlib.colors import ListedColormap from sklearn.</description>
+ 1.10. Decision Trees Users Guide sklearn.tree.DecisionTreeClassifier  from sklearn.datasets import make_moons from matplotlib.</description>
     </item>
     
     <item>
@@ -118,21 +126,25 @@ from sklearn.datasets import make_moons import matplotlib.pyplot as plt from mat
       <pubDate>Wed, 01 Apr 2020 00:00:02 +0900</pubDate>
       
       <guid>https://yasakura.me/post/diagonalization/</guid>
-      <description>モチベーション  行列を用いた座標変換をおさらいしたい 対角化で行列計算を楽にしたい  線形独立と線形従属 線形独立と線形従属 is 何？ 列ベクトル$\boldsymbol{e}_k (k=1,2,\dots,n)$を$\forall l_j \in \mathbb {R} (j=1,2,\dots,m)$を用いて以下のようにおいてみる．つまり，$\boldsymbol{e}_k \in \mathbb {R}^m$．
-$$ \boldsymbol{e}_k= \begin{pmatrix} l_{1k}\\ l_{2k}\\ \vdots\\ l_{mk} \end{pmatrix} $$  次に，列ベクトル集合$\lbrace \boldsymbol{e_1}, \boldsymbol{e_2}, \dots, \boldsymbol{e_n} \rbrace$と$\forall a_k \in \mathbb {R} (k=1,2,\dots,n)$を用いて，以下のような線形和をつくる．
-$$ a_1\boldsymbol{e_1}+a_2\boldsymbol{e_2}+\dots+a_n\boldsymbol{e_n}　\tag{1} $$  (1)式を0にできるような，$a_k$が複数あるなら，$\lbrace \boldsymbol{e_1}, \boldsymbol{e_2}, \dots, \boldsymbol{e_n} \rbrace$は線形従属であると言う．ベクトルをうまく組み合わせれば，一つの輪をつくることができるイメージ．
-一方，(1)式を0にするには$a_k=0 (k=1,2,\dots,n)$が必要である場合，$\lbrace \boldsymbol{e_1}, \boldsymbol{e_2}, \dots, \boldsymbol{e_n} \rbrace$は線形独立であると言う．つまり，ベクトルを組み合わせても輪がつくれないイメージ．
-線形独立と線形独立を判別する方法 (1)式=0とおくと，(1)式から $a_1l_{j1}+a_2l_{j2}+\dots+a_nl_{jn}=0$ という式がm本できる．つまり，n(=m)次の連立方程式となる．
-列ベクトル集合$\lbrace {e_1}, {e_2}, \dots, {e_n} \rbrace$を合体させてm x nの正方行列とすると，(2)式のように整理できる．</description>
+      <description>モチベーション  行列を用いた座標変換をおさらいしたい 対角化で行列計算を楽にしたい  線形独立と線形従属 線形独立と線形従属 is 何？ 列ベクトル $\boldsymbol{e}_k (k=1,2,\dots,n)$を$\forall l_j \in \mathbb {R} (j=1,2,\dots,m)$ を用いて以下のようにおいてみる．つまり， $\boldsymbol{e}_k \in \mathbb {R}^m$ ．
+$$ \boldsymbol{e}_k= \begin{pmatrix} l_{1k}\\ l_{2k}\\ \vdots\\ l_{mk} \end{pmatrix} $$  次に，列ベクトル集合 $\lbrace \boldsymbol{e_1}, \boldsymbol{e_2}, \dots, \boldsymbol{e_n} \rbrace$と$\forall a_k \in \mathbb {R} (k=1,2,\dots,n)$ を用いて，以下のような線形和をつくる．
+$$ a_1\boldsymbol{e_1}+a_2\boldsymbol{e_2}+\dots+a_n\boldsymbol{e_n}　\tag{1} $$  (1)式を0にできるような， $a_k$ が複数あるなら， $\lbrace \boldsymbol{e_1}, \boldsymbol{e_2}, \dots, \boldsymbol{e_n} \rbrace$ は線形従属であると言う．ベクトルをうまく組み合わせれば，一つの輪をつくることができるイメージ．
+一方，(1)式を0にするには $a_k=0 (k=1,2,\dots,n)$ が必要である場合， $\lbrace \boldsymbol{e_1}, \boldsymbol{e_2}, \dots, \boldsymbol{e_n} \rbrace$ は線形独立であると言う．つまり，ベクトルを組み合わせても輪がつくれないイメージ．</description>
     </item>
     
     <item>
-      <title>python2とpython3を共存させる</title>
+      <title>Python2.XとPython3.Xを共存させる</title>
       <link>https://yasakura.me/post/manage-python3-and-python27/</link>
       <pubDate>Wed, 01 Apr 2020 00:00:01 +0900</pubDate>
       
       <guid>https://yasakura.me/post/manage-python3-and-python27/</guid>
-      <description> モチベーション  pythonとpython3とpipとpip3をいちいち使い分けるのが面倒くさい． むやみやたらにpipすると環境がどんどん汚れていくのが嫌だ． プロジェクトごとにDockerコンテナを立ち上げるような，大げさな管理はしたくない．  venvでsandboxをつくる $ python -V Python 2.7.10 $ python3 -V Python 3.7.3 $ mkdir ml $ cd ml $ python3 -m venv venv $ . venv/bin/activate (venv) $ python -V Python 3.7.3  venv下にあるパッケージを確認する (venv) $ pip freeze  venvを解除する (venv) $ deactivate $ python -V Python 2.7.10  </description>
+      <description>モチベーション  Python2.X系とPython3.X系やpipとpip3を共存させて，必要に応じて切り替えて使いたい． Pythonのマイナーバージョンを細かく切り替えたい． pipでパッケージをインストールすると環境が汚れてしまうのでプロジェクトごとにパッケージを管理したい． 「プロジェクトごとにDockerコンテナを立ち上げてそこでPythonを実行する」というような大げさな管理はしたくない．  pyenvでPythonのバージョンを切り替える  デフォルトのPythonのバージョンを確認する
+$ python --version Python 2.7.16 brewでpyenvをインストールする
+$ brew install pyenv PATHなどを設定する
+export PYENV_ROOT=&amp;#34;${HOME}/.pyenv&amp;#34; export PATH=${PYENV_ROOT}/bin:$PATH eval &amp;#34;$(pyenv init -)&amp;#34; pyenvで使用可能なPythonのバージョン一覧を確認する
+$ pyenv install -l Available versions: 2.1.3 2.2.3 2.3.7 : : 任意のバージョンをインストールする
+$ pyenv install 3.9.0 : Installed Python-3.9.0 to /Users/xxxx/.pyenv/versions/3.9.0 切替可能なバージョンを確認する
+$ pyenv versions \* system (set by /Users/xxxx/.pyenv/version) 3.9.0  システム全体のPythonバージョンを切り替える $ pyenv global 3.9.0 $ pyenv versions system \* 3.</description>
     </item>
     
     <item>
@@ -141,10 +153,10 @@ $$ a_1\boldsymbol{e_1}+a_2\boldsymbol{e_2}+\dots+a_n\boldsymbol{e_n}　\tag{1} $
       <pubDate>Wed, 01 Apr 2020 00:00:00 +0900</pubDate>
       
       <guid>https://yasakura.me/post/generate-static-site-with-hugo/</guid>
-      <description>モチベーション  ブログを書きたい デザインを自由にカスタマイズしたい WordPressなどのCMSで管理するほどでもない StaticGenの上位にHugoがある  記事を新規作成する hugo new post/&amp;lt;article name&amp;gt;.md   プロジェクトディレクトリにあるarchetypes/のdefault.mdを元に新しいエントリがcontent/以下に作成される．  リアルタイムでプレビューしながら記事を執筆orテーマをカスタマイズする hugo server --watch -D --port &amp;lt;port&amp;gt; --bind 0.0.0.0 --baseURL=&amp;lt;local machine&#39;s IP address&amp;gt;   コードを変更するごとに自動でリロードさせるためには，--watchをつける．
+      <description>モチベーション  ブログを書きたい デザインを自由にカスタマイズしたい WordPressなどのCMSで管理するほどでもない StaticGenの上位にHugoがある  記事を新規作成する $ hugo new post/&amp;lt;article name&amp;gt;.md  プロジェクトディレクトリにあるarchetypes/のdefault.mdを元に新しいエントリがcontent/以下に作成される．  リアルタイムでプレビューしながら記事を執筆orテーマをカスタマイズする $ hugo server --watch -D --port &amp;lt;port&amp;gt; --bind 0.0.0.0 --baseURL=&amp;lt;local machine&amp;#39;s IP address&amp;gt;  コードを変更するごとに自動でリロードさせるためには，--watchをつける．
  Draft記事を表示させるためには，-Dをつける．
  --bindを指定しない場合は，127.0.0.1にbindされる．127.0.0.1へのbindだと，hugo serverを実行しているローカルマシンからのアクセスhttp://localhost:&amp;lt;port&amp;gt;のみに制限されてしまう．0.0.0.0にbindすることで，LAN内にあるローカルマシン以外（スマホなど）からはhttp://&amp;lt;local machine&#39;s IP address&amp;gt;:&amp;lt;port&amp;gt;でアクセスできるようになる．  Themeのカスタマイズ ユーザが指定したパラメータを呼び出す  .Params.xxxはarticleのfront-matterから参照される
- .Site.Params.xxxはconfig.tomlから参照される  リストコンテンツの順番を制御できるページネーションを実装する {{ $pages := where .Pages &amp;#34;.Params.type&amp;#34; &amp;#34;!=&amp;#34; &amp;#34;about&amp;#34; }} {{ $sorted := ($pages.ByParam &amp;#34;lastmod&amp;#34;).Reverse }} {{ $paginator := .Paginate $sorted (index .</description>
+ .Site.Params.xxxはconfig.tomlから参照される  リストコンテンツの順番を制御できるページネーションを実装する {{ $v1 := where .Pages &amp;#34;.Params.type&amp;#34; &amp;#34;!=&amp;#34; &amp;#34;about&amp;#34; }} {{ $v2 := where .Pages &amp;#34;.Params.type&amp;#34; &amp;#34;!=&amp;#34; &amp;#34;terms&amp;#34; }} {{ $pages := $v1 | intersect $v2 }} {{ $paginator := .</description>
     </item>
     
   </channel>

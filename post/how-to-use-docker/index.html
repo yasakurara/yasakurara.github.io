@@ -23,7 +23,7 @@
  docker build -t &lt;image name&gt;:&lt;tag&gt; &lt;Dockerfileがあるディレクトリ&gt;によりDockerイメージがつくられる  &lt;tag&gt;にはimageのversionを設定するのが一般的．&lt;tag&gt;を省略した場合はlatestとされる．  docker pull &lt;image name&gt;でDockerイメージをもってくることができる．  DockerイメージはDocker Hubにて検索できる．  docker imagesで手元にあるDockerイメージ一覧を表示する．  docker images -qにより，DockerイメージID一覧を表示する．   Dockerイメージを元に，コンテナを立ち上げる  docker run -it --name &lt;container name&gt; &lt;image name&gt;:&lt;tag&gt; &lt;command&gt;  &lt;image name&gt;:&lt;tag&gt;から&lt;container name&gt;という名前のコンテナを立ち上げ，コンテナ内で&lt;command&gt;を実行する． -iはホストからコンテナへの標準入力を繋げるためのもの．-tはコンテナからホストへの標準出力を繋げるためのもの． -hオプションによって，ホスト名を指定できる． -dオプションによって，コンテナをバックグラウンドで実行できる． -p &lt;host&gt;:&lt;container&gt;オプションによって，ホストのポートとコンテナのポートをつなげる．この時，iptablesが書き換えられ，ホスト側のポートがWANに曝されるので注意．  -pでなく，--expose &lt;port&gt;フラグを指定すると，リンクしたコンテナから&lt;container name&gt;:&lt;exposed port&gt;でアクセスすることができる．また，iptablesは変更されない．  --rmフラグによって，コンテナがstopしたあとはコンテナを削除するようにする． --privilegedフラグによって，コンテナ内からホストのデバイスにアクセスすることができる．セキュリティには注意する．  --deviceフラグや--cap-addフラグによってデバイス単位で細かくアクセス権限を制御することができる．  --link &lt;container&gt;:&lt;nickname&gt;を指定することで，&lt;container&gt;へアクセスする際のホスト名として利用できる．  例えば，hogeという名前のコンテナが立ち上がっている環境で，--link hoge:hgを指定して新たなコンテナを立ち上げたとすると，そのコンテナからはcurl http://hogeというような形でアクセスすることができる．  Dockerイメージによっては，ずっと起動するものもあれば，&lt;command&gt;を一発実行してstopするものもある．  &lt;command&gt;に/bin/shを指定し，コンテナ内にshを立ち上げることで，コンテナを立ち上げたままにしておくことが多い．   docker ps  起動中のコンテナ一覧を表示する  docker attach &lt;container&gt;  コンテナにアタッチする．アタッチ後の振る舞いはDockerイメージによって異なり，コンテナの標準入出力が可能になる場合もあれば，何も起きない場合もある． アタッチしている状態で，ctrl&#43;pしctrl&#43;qすると，コンテナからデタッチすることができる．  docker exec -it &lt;container&gt; &lt;command&gt;  起動中のコンテナにコマンドを流し込むことができる． &lt;command&gt;に/bin/shを指定してコンテナ内にシェルを立ち上げることで，コンテナ内で作業することができる．   DockerコンテナのPID=1問題 docker runで指定した&lt;commnad&gt;は，PID=1のプロセスとして実行される．PID=1なプロセスはカーネルから特別扱いされるため，プロセス自体がシグナルをハンドルするように実装されていなければ，シグナルは無視されてしまう．">
   
   <link href=/css/style.css rel="stylesheet">
-  <link href=/css/font.css rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;900&display=swap" rel="stylesheet">
   
   <link rel="icon" href="https://yasakura.me/img/favicon.ico">
   
@@ -34,7 +34,7 @@
     <div class="title"><a href="https://yasakura.me/">yasakura</a></div>
     <nav id="navigation">
       <ul class="menu">
-        <li><a href="https://yasakura.me//about/">ABOUT</a></li>
+        <li><a href="https://yasakura.me//about/">ABOUT ME</a></li>
       </ul>
     </nav>
   </header>
@@ -44,16 +44,21 @@
     <p class="post-meta">2020.8.13</p>
     
     <h1 class="post-title">Dockerコンテナのライフサイクル</h1>
+    <ul class="post-author">
+      <li>
+        <a href="https://twitter.com/yasakurara"><svg id="twitter-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><style>.cls-1{fill:none;}.cls-2{fill:#1da1f2;}</style></defs><title>Twitter_Logo_Blue</title><rect class="cls-1" width="400" height="400"/><path class="cls-2" d="M153.62,301.59c94.34,0,145.94-78.16,145.94-145.94,0-2.22,0-4.43-.15-6.63A104.36,104.36,0,0,0,325,122.47a102.38,102.38,0,0,1-29.46,8.07,51.47,51.47,0,0,0,22.55-28.37,102.79,102.79,0,0,1-32.57,12.45,51.34,51.34,0,0,0-87.41,46.78A145.62,145.62,0,0,1,92.4,107.81a51.33,51.33,0,0,0,15.88,68.47A50.91,50.91,0,0,1,85,169.86c0,.21,0,.43,0,.65a51.31,51.31,0,0,0,41.15,50.28,51.21,51.21,0,0,1-23.16.88,51.35,51.35,0,0,0,47.92,35.62,102.92,102.92,0,0,1-63.7,22A104.41,104.41,0,0,1,75,278.55a145.21,145.21,0,0,0,78.62,23"/></svg>@yasakurara</a>
+      </li>
+    </ul>
     
-  </header>
-  <div class="post-content">
     <div class="share">
     <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fhow-to-use-docker%2f&text=Docker%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%e3%81%ae%e3%83%a9%e3%82%a4%e3%83%95%e3%82%b5%e3%82%a4%e3%82%af%e3%83%ab - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
     <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fhow-to-use-docker%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
     <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fhow-to-use-docker%2f&title=Docker%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%e3%81%ae%e3%83%a9%e3%82%a4%e3%83%95%e3%82%b5%e3%82%a4%e3%82%af%e3%83%ab - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
 </div>
+  </header>
+  <div class="post-content">
     
-<h1>もくじ</h1>
+<h1>Table of Contents</h1>
 <nav id="TableOfContents">
 <ul>
 <li><a href="#モチベーション">モチベーション</a></li>
@@ -425,18 +430,33 @@ services:
 </ul></li>
 </ul>
 
+  </div>
+  <footer class="post-footer">
+    
     <div class="share">
     <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fhow-to-use-docker%2f&text=Docker%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%e3%81%ae%e3%83%a9%e3%82%a4%e3%83%95%e3%82%b5%e3%82%a4%e3%82%af%e3%83%ab - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
     <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fhow-to-use-docker%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
     <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fhow-to-use-docker%2f&title=Docker%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%e3%81%ae%e3%83%a9%e3%82%a4%e3%83%95%e3%82%b5%e3%82%a4%e3%82%af%e3%83%ab - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
 </div>
-  </div>
-  <footer class="post-footer">
-    
   </footer>
 </article>
+
+
+<div class="post-widget">
+  <div class="twitter-widget">
+    <a class="twitter-timeline" data-lang="en" data-width="300" href="https://twitter.com/yasakurara?ref_src=twsrc%5Etfw">Tweets by yasakurara</a>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </div>
+</div>
+
+
 <footer class="footer">
-  <span>&copy; 2020 yasakura</span>
+  <nav>
+    <ul>
+      <li><a href="https://yasakura.me//terms/">Terms of Use</a></li>
+    </ul>
+  </nav>
+  <span>&copy; 2021 yasakura</span>
 </footer>
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({

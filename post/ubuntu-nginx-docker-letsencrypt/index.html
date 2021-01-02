@@ -29,7 +29,7 @@ vi /etc/apt/apt.conf.d/50unattended-upgrades
 dpkg-reconfigure -plow unattended-upgrades">
   
   <link href=/css/style.css rel="stylesheet">
-  <link href=/css/font.css rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;900&display=swap" rel="stylesheet">
   
   <link rel="icon" href="https://yasakura.me/img/favicon.ico">
   
@@ -40,7 +40,7 @@ dpkg-reconfigure -plow unattended-upgrades">
     <div class="title"><a href="https://yasakura.me/">yasakura</a></div>
     <nav id="navigation">
       <ul class="menu">
-        <li><a href="https://yasakura.me//about/">ABOUT</a></li>
+        <li><a href="https://yasakura.me//about/">ABOUT ME</a></li>
       </ul>
     </nav>
   </header>
@@ -50,16 +50,21 @@ dpkg-reconfigure -plow unattended-upgrades">
     <p class="post-meta">2020.8.13</p>
     
     <h1 class="post-title">UbuntuにNginxコンテナを立ててHTTPSに対応する</h1>
+    <ul class="post-author">
+      <li>
+        <a href="https://twitter.com/yasakurara"><svg id="twitter-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><style>.cls-1{fill:none;}.cls-2{fill:#1da1f2;}</style></defs><title>Twitter_Logo_Blue</title><rect class="cls-1" width="400" height="400"/><path class="cls-2" d="M153.62,301.59c94.34,0,145.94-78.16,145.94-145.94,0-2.22,0-4.43-.15-6.63A104.36,104.36,0,0,0,325,122.47a102.38,102.38,0,0,1-29.46,8.07,51.47,51.47,0,0,0,22.55-28.37,102.79,102.79,0,0,1-32.57,12.45,51.34,51.34,0,0,0-87.41,46.78A145.62,145.62,0,0,1,92.4,107.81a51.33,51.33,0,0,0,15.88,68.47A50.91,50.91,0,0,1,85,169.86c0,.21,0,.43,0,.65a51.31,51.31,0,0,0,41.15,50.28,51.21,51.21,0,0,1-23.16.88,51.35,51.35,0,0,0,47.92,35.62,102.92,102.92,0,0,1-63.7,22A104.41,104.41,0,0,1,75,278.55a145.21,145.21,0,0,0,78.62,23"/></svg>@yasakurara</a>
+      </li>
+    </ul>
     
-  </header>
-  <div class="post-content">
     <div class="share">
     <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fubuntu-nginx-docker-letsencrypt%2f&text=Ubuntu%e3%81%abNginx%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%e3%82%92%e7%ab%8b%e3%81%a6%e3%81%a6HTTPS%e3%81%ab%e5%af%be%e5%bf%9c%e3%81%99%e3%82%8b - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
     <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fubuntu-nginx-docker-letsencrypt%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
     <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fubuntu-nginx-docker-letsencrypt%2f&title=Ubuntu%e3%81%abNginx%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%e3%82%92%e7%ab%8b%e3%81%a6%e3%81%a6HTTPS%e3%81%ab%e5%af%be%e5%bf%9c%e3%81%99%e3%82%8b - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
 </div>
+  </header>
+  <div class="post-content">
     
-<h1>もくじ</h1>
+<h1>Table of Contents</h1>
 <nav id="TableOfContents">
 <ul>
 <li><a href="#モチベーション">モチベーション</a></li>
@@ -279,126 +284,109 @@ ADD default.conf /etc/nginx/conf.d/
 </ul>
 
 <p>次に，以下のようなNginxの設定ファイルを作成＆編集する．パラメータの説明は今回は省く．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-nginx" data-lang="nginx"><span style="color:#66d9ef">user</span>  <span style="color:#e6db74">nginx</span>;
+<span style="color:#66d9ef">worker_processes</span>  <span style="color:#ae81ff">1</span>;
 
-<pre><code>user  nginx;
-worker_processes  1;
-
-error_log  /var/log/nginx/error.log warn;
-pid        /var/run/nginx.pid;
+<span style="color:#66d9ef">error_log</span>  <span style="color:#e6db74">/var/log/nginx/error.log</span> <span style="color:#e6db74">warn</span>;
+<span style="color:#66d9ef">pid</span>        <span style="color:#e6db74">/var/run/nginx.pid</span>;
 
 
-events {
-    worker_connections  1024;
-    multi_accept on;
-    use epoll;
+<span style="color:#66d9ef">events</span> {
+    <span style="color:#f92672">worker_connections</span>  <span style="color:#ae81ff">1024</span>;
+    <span style="color:#f92672">multi_accept</span> <span style="color:#66d9ef">on</span>;
+    <span style="color:#f92672">use</span> <span style="color:#e6db74">epoll</span>;
 }
 
 
-http {
-    server_tokens off;
-    include       /etc/nginx/mime.types;
-    default_type  application/octet-stream;
+<span style="color:#66d9ef">http</span> {
+    <span style="color:#f92672">server_tokens</span> <span style="color:#66d9ef">off</span>;
+    <span style="color:#f92672">include</span>       <span style="color:#e6db74">/etc/nginx/mime.types</span>;
+    <span style="color:#f92672">default_type</span>  <span style="color:#e6db74">application/octet-stream</span>;
 
-    log_format  main  '$remote_addr - $remote_user [$time_local] &quot;$request&quot; '
-                      '$status $body_bytes_sent &quot;$http_referer&quot; '
-                      '&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;';
+    <span style="color:#f92672">log_format</span>  <span style="color:#e6db74">main</span>  <span style="color:#e6db74">&#39;</span>$remote_addr <span style="color:#e6db74">-</span> $remote_user <span style="color:#e6db74">[</span>$time_local] <span style="color:#e6db74">&#34;</span>$request&#34; <span style="color:#e6db74">&#39;</span>
+                      <span style="color:#e6db74">&#39;</span>$status $body_bytes_sent <span style="color:#e6db74">&#34;</span>$http_referer&#34; <span style="color:#e6db74">&#39;</span>
+                      <span style="color:#e6db74">&#39;&#34;</span>$http_user_agent&#34; <span style="color:#e6db74">&#34;</span>$http_x_forwarded_for&#34;&#39;;
 
-    access_log  /var/log/nginx/access.log  main;
+    <span style="color:#f92672">access_log</span>  <span style="color:#e6db74">/var/log/nginx/access.log</span>  <span style="color:#e6db74">main</span>;
 
-    sendfile        on;
-    tcp_nopush      on;
-    tcp_nodelay     on;
+    <span style="color:#f92672">sendfile</span>        <span style="color:#66d9ef">on</span>;
+    <span style="color:#f92672">tcp_nopush</span>      <span style="color:#66d9ef">on</span>;
+    <span style="color:#f92672">tcp_nodelay</span>     <span style="color:#66d9ef">on</span>;
 
-    keepalive_timeout  65;
+    <span style="color:#f92672">keepalive_timeout</span>  <span style="color:#ae81ff">65</span>;
 
-    include /etc/nginx/conf.d/*.conf; &lt;=== 別の.confファイルをincludeする
-}
-</code></pre>
-
+    <span style="color:#f92672">include</span> <span style="color:#e6db74">/etc/nginx/conf.d/*.conf</span>; <span style="color:#f92672">&lt;===</span> <span style="color:#e6db74">別の.confファイルをincludeする</span>
+<span style="color:#960050;background-color:#1e0010">}</span></code></pre></div>
 <p>また，以下のようなnginx.confからincludeされるdefault.confを作成＆編集する．パラメータの説明は今回は省く．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-nginx" data-lang="nginx"><span style="color:#66d9ef">server</span> {
+    <span style="color:#f92672">server_name</span>  <span style="color:#e6db74">&lt;hostname&gt;</span>;
+    <span style="color:#f92672">listen</span>  <span style="color:#ae81ff">80</span>;
 
-<pre><code>server {
-    server_name  &lt;hostname&gt;;
-    listen  80;
-
-    location / {
-        root   /usr/share/nginx/html;
-        index  index.html index.htm;
+    <span style="color:#f92672">location</span> <span style="color:#e6db74">/</span> {
+        <span style="color:#f92672">root</span>   <span style="color:#e6db74">/usr/share/nginx/html</span>;
+        <span style="color:#f92672">index</span>  <span style="color:#e6db74">index.html</span> <span style="color:#e6db74">index.htm</span>;
     }
 
-    # redirect server error pages to the static page /50x.html
-    #
-    error_page   500 502 503 504  /50x.html;
-    location = /50x.html {
-        root   /usr/share/nginx/html;
+    <span style="color:#75715e"># redirect server error pages to the static page /50x.html
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">#
+</span><span style="color:#75715e"></span>    <span style="color:#f92672">error_page</span>   <span style="color:#ae81ff">500</span> <span style="color:#ae81ff">502</span> <span style="color:#ae81ff">503</span> <span style="color:#ae81ff">504</span>  <span style="color:#e6db74">/50x.html</span>;
+    <span style="color:#f92672">location</span> = <span style="color:#e6db74">/50x.html</span> {
+        <span style="color:#f92672">root</span>   <span style="color:#e6db74">/usr/share/nginx/html</span>;
     }
-}
-
-</code></pre>
-
+}</code></pre></div>
 <p>そして，以下のようなdocker-compose.ymlを書く．詳しくは<a href="https://yasakura.me/post/how-to-use-docker/">Dockerコンテナのライフサイクル</a>を参照のこと．</p>
-
-<pre><code>version: '3'
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yml" data-lang="yml">version: <span style="color:#e6db74">&#39;3&#39;</span>
 services:
   proxy:
     build: ./nginx &lt;=== /web/nginx/Dockerfileへの相対パス
-    tty: true
+    tty: <span style="color:#66d9ef">true</span>
     container_name: proxy
     logging:
-      driver: &quot;json-file&quot;
+      driver: <span style="color:#e6db74">&#34;json-file&#34;</span>
       options:
-        max-size: &quot;10m&quot;
-        max-file: &quot;3&quot;
+        max-size: <span style="color:#e6db74">&#34;10m&#34;</span>
+        max-file: <span style="color:#e6db74">&#34;3&#34;</span>
     ports:
-      - &quot;80:80&quot;   &lt;=== HTTPで外部からアクセスできるように
-      - &quot;443:443&quot; &lt;=== HTTPSで外部からアクセスできるように
+      - <span style="color:#e6db74">&#34;80:80&#34;</span>   &lt;=== HTTPで外部からアクセスできるように
+      - <span style="color:#e6db74">&#34;443:443&#34;</span> &lt;=== HTTPSで外部からアクセスできるように
     volumes:
-      - '/web/nginx/logs:/var/log/nginx' &lt;=== nginxのログはホスト側と共有する
-      - '/web/nginx/letsencrypt:/etc/letsencrypt' &lt;=== letsencryptのディレクトリもホストと共有する
-</code></pre>
-
+      - <span style="color:#e6db74">&#39;/web/nginx/logs:/var/log/nginx&#39;</span> &lt;=== nginxのログはホスト側と共有する
+      - <span style="color:#e6db74">&#39;/web/nginx/letsencrypt:/etc/letsencrypt&#39;</span> &lt;=== letsencryptのディレクトリもホストと共有する</code></pre></div>
 <p>最後に，ホストの<code>/web/</code>ディレクトリ内で<code>docker-compose up -d</code>を実行すると，docker-compose.ymlから新たなDockerイメージがビルドされてNginxコンテナが立ち上がる．ブラウザから<code>http://&lt;hostname&gt;</code>でアクセスできれば，HTTP部分は開通．</p>
-
-<pre><code>$ docker ps
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-shell" data-lang="shell">$ docker ps
 CONTAINER ID        IMAGE           COMMAND                  CREATED             STATUS              PORTS                                      NAMES
-5320cf3e8eff        web_proxy       &quot;/docker-entrypoint.…&quot;   21 seconds ago      Up 20 seconds       0.0.0.0:80-&gt;80/tcp, 0.0.0.0:443-&gt;443/tcp   proxy
-</code></pre>
-
+5320cf3e8eff        web_proxy       <span style="color:#e6db74">&#34;/docker-entrypoint.…&#34;</span>   <span style="color:#ae81ff">21</span> seconds ago      Up <span style="color:#ae81ff">20</span> seconds       <span style="color:#ae81ff">0</span>.0.0.0:80-&gt;80/tcp, <span style="color:#ae81ff">0</span>.0.0.0:443-&gt;443/tcp   proxy</code></pre></div>
 <h1 id="httpsに対応する">HTTPSに対応する</h1>
 
 <p>ホストで<code>docker exec -it proxy bash</code>を実行することでNginxコンテナに入り，<code>cerbot</code>を実行することでLet&rsquo;s encrypt証明書を発行する．発行された証明書はコンテナ内の<code>/etc/letsencrypt/live/&lt;hostname&gt;/</code>に保存される．</p>
 
 <p>次に，default.confを以下のように編集する．80番ポートへのアクセスは443番ポート(https://)へリダイレクトするように設定し，443番ポートにはsslの設定を行う．</p>
-
-<pre><code>server {
-    server_name  &lt;hostname&gt;;
-    listen 80;
-    return 301 https://$host$request_uri;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-nginx" data-lang="nginx"><span style="color:#66d9ef">server</span> {
+    <span style="color:#f92672">server_name</span>  <span style="color:#e6db74">&lt;hostname&gt;</span>;
+    <span style="color:#f92672">listen</span> <span style="color:#ae81ff">80</span>;
+    <span style="color:#f92672">return</span> <span style="color:#ae81ff">301</span> <span style="color:#e6db74">https://</span>$host$request_uri;
 }
 
-server {
-    server_name  &lt;hostname&gt;;
-    listen  443;
-    ssl on;
-    ssl_protocols  TLSv1.2 TLSv1.3;
-    ssl_certificate     /etc/letsencrypt/live/&lt;hostname&gt;/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/&lt;hostname&gt;/privkey.pem;
+<span style="color:#66d9ef">server</span> {
+    <span style="color:#f92672">server_name</span>  <span style="color:#e6db74">&lt;hostname&gt;</span>;
+    <span style="color:#f92672">listen</span>  <span style="color:#ae81ff">443</span>;
+    <span style="color:#f92672">ssl</span> <span style="color:#66d9ef">on</span>;
+    <span style="color:#f92672">ssl_protocols</span>  <span style="color:#e6db74">TLSv1.2</span> <span style="color:#e6db74">TLSv1.3</span>;
+    <span style="color:#f92672">ssl_certificate</span>     <span style="color:#e6db74">/etc/letsencrypt/live/&lt;hostname&gt;/fullchain.pem</span>;
+    <span style="color:#f92672">ssl_certificate_key</span> <span style="color:#e6db74">/etc/letsencrypt/live/&lt;hostname&gt;/privkey.pem</span>;
 
-    location / {
-        root   /usr/share/nginx/html;
-        index  index.html index.htm;
+    <span style="color:#f92672">location</span> <span style="color:#e6db74">/</span> {
+        <span style="color:#f92672">root</span>   <span style="color:#e6db74">/usr/share/nginx/html</span>;
+        <span style="color:#f92672">index</span>  <span style="color:#e6db74">index.html</span> <span style="color:#e6db74">index.htm</span>;
     }
 
-    # redirect server error pages to the static page /50x.html
-    #
-    error_page   500 502 503 504  /50x.html;
-    location = /50x.html {
-        root   /usr/share/nginx/html;
+    <span style="color:#75715e"># redirect server error pages to the static page /50x.html
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">#
+</span><span style="color:#75715e"></span>    <span style="color:#f92672">error_page</span>   <span style="color:#ae81ff">500</span> <span style="color:#ae81ff">502</span> <span style="color:#ae81ff">503</span> <span style="color:#ae81ff">504</span>  <span style="color:#e6db74">/50x.html</span>;
+    <span style="color:#f92672">location</span> = <span style="color:#e6db74">/50x.html</span> {
+        <span style="color:#f92672">root</span>   <span style="color:#e6db74">/usr/share/nginx/html</span>;
     }
-}
-
-</code></pre>
-
+}</code></pre></div>
 <p>最後に，ホストの<code>/web/</code>ディレクトリ内で<code>docker-compose restart</code>を実行して，Nginxコンテナを再起動することで，default.confを再読み込みさせる．ブラウザから<code>https://&lt;hostname&gt;</code>でアクセスできれば，HTTPSの対応が完了する．</p>
 
 <h1 id="let-s-encryptの証明書は90日で期限切れになる">Let&rsquo;s encryptの証明書は90日で期限切れになる</h1>
@@ -435,18 +423,33 @@ No renewals were attempted.
 </code></pre></li>
 </ol>
 
+  </div>
+  <footer class="post-footer">
+    
     <div class="share">
     <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fubuntu-nginx-docker-letsencrypt%2f&text=Ubuntu%e3%81%abNginx%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%e3%82%92%e7%ab%8b%e3%81%a6%e3%81%a6HTTPS%e3%81%ab%e5%af%be%e5%bf%9c%e3%81%99%e3%82%8b - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
     <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fubuntu-nginx-docker-letsencrypt%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
     <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fubuntu-nginx-docker-letsencrypt%2f&title=Ubuntu%e3%81%abNginx%e3%82%b3%e3%83%b3%e3%83%86%e3%83%8a%e3%82%92%e7%ab%8b%e3%81%a6%e3%81%a6HTTPS%e3%81%ab%e5%af%be%e5%bf%9c%e3%81%99%e3%82%8b - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
 </div>
-  </div>
-  <footer class="post-footer">
-    
   </footer>
 </article>
+
+
+<div class="post-widget">
+  <div class="twitter-widget">
+    <a class="twitter-timeline" data-lang="en" data-width="300" href="https://twitter.com/yasakurara?ref_src=twsrc%5Etfw">Tweets by yasakurara</a>
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </div>
+</div>
+
+
 <footer class="footer">
-  <span>&copy; 2020 yasakura</span>
+  <nav>
+    <ul>
+      <li><a href="https://yasakura.me//terms/">Terms of Use</a></li>
+    </ul>
+  </nav>
+  <span>&copy; 2021 yasakura</span>
 </footer>
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({

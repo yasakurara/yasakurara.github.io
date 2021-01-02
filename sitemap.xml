@@ -3,6 +3,52 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://yasakura.me/categories/</loc>
+    <lastmod>2021-01-02T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://yasakura.me/categories/</loc>
+    <lastmod>2021-01-02T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://yasakura.me/post/manage-python3-and-python27-and-packages-en/</loc>
+    <lastmod>2021-01-02T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://yasakura.me/post/</loc>
+    <lastmod>2021-01-02T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://yasakura.me/tags/python/</loc>
+    <lastmod>2021-01-02T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://yasakura.me/tags/</loc>
+    <lastmod>2021-01-02T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://yasakura.me/</loc>
+    <lastmod>2021-01-02T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://yasakura.me/terms/</loc>
+    <lastmod>2021-01-02T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://yasakura.me/post/docker-network/</loc>
     <lastmod>2020-08-13T00:00:00+09:00</lastmod>
   </url>
@@ -18,20 +64,8 @@
   </url>
   
   <url>
-    <loc>https://yasakura.me/post/</loc>
-    <lastmod>2020-10-05T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
     <loc>https://yasakura.me/post/ubuntu-nginx-docker-letsencrypt/</loc>
     <lastmod>2020-08-13T00:00:00+09:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://yasakura.me/</loc>
-    <lastmod>2020-10-05T00:00:00+00:00</lastmod>
-    <priority>0</priority>
   </url>
   
   <url>
@@ -61,27 +95,17 @@
   
   <url>
     <loc>https://yasakura.me/post/manage-python3-and-python27/</loc>
-    <lastmod>2020-04-01T00:00:01+09:00</lastmod>
+    <lastmod>2021-01-02T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://yasakura.me/post/generate-static-site-with-hugo/</loc>
-    <lastmod>2020-10-05T00:00:00+00:00</lastmod>
+    <lastmod>2021-01-02T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://yasakura.me/about/</loc>
-    <lastmod>2020-10-05T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://yasakura.me/categories/</loc>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://yasakura.me/tags/</loc>
-    <priority>0</priority>
+    <lastmod>2020-12-30T00:00:00+00:00</lastmod>
   </url>
   
 </urlset>
