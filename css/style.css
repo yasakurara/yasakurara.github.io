@@ -463,11 +463,11 @@ a[href^="#fn:"]:after{ content: ']' }
   text-align: center;
 }
 .footer span {
-  margin-left: 2px;
-  margin-right: 2px;
+  margin: 0 2px;
 }
 .footer li {
   display: inline-block;
+  margin: 0 10px;
 }
 .footer nav {
   padding: 20px 0;
