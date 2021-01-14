@@ -21,8 +21,7 @@
   
   <title>Dockerコンテナのネットワーク構成 - yasakura</title>
   
-  <meta name="description" content="モチベーション  Dockerコンテナのネットワークを理解するための足がかりとして，netnsについてまとめたい． Dockerコンテナが構成するネットワークについてまとめたい． -pオプションで何も考えずにポートを外に出すのは危険だよと言いたい  OSI参照モデルで役割を把握しておく OSI参照モデルを覚える必要は無いと思うが，どのレイヤーがどのような役割を行っているのかを理解しておく必要はあると思う．
-   レイヤー 呼称 例     L7 アプリケーション層 HTTP,FTP,DNS,SNMP   L6 プレゼンテーション層 HTTP,FTP,DNS,SNMP   L5 セッション層 HTTP,FTP,DNS,SNMP,TCP   L4 トランスポート層 TCP,UDP   L3 インターネット層 IP,ICMP,ARP   L2 リンク層 Ethernet,Wi-Fi   L1 物理層 UTP,STP     L2はブリッジ周辺  Ethernetヘッダの制御．IPパケットに，MACアドレスなどを埋め込んだEthernetヘッダをつける/とる． ブリッジはこの辺．  L3はルーター周辺  IPヘッダの制御．TCPセグメントやICMPセグメントにIPヘッダをつける/とる．  pingやtracerouteはL3で処理される． 経由するルータの数をTTL(Time To Live)として指定することで，TTL=0になるとそのパケットは破棄される．  192.">
+  <meta name="description" content="モチベーション Dockerコンテナのネットワークを理解するための足がかりとして，netnsについてまとめたい． Dockerコンテナが構成する">
   
   <link href=/css/style.css rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;900&display=swap" rel="stylesheet">

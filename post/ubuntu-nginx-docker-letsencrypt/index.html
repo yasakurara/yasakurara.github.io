@@ -21,14 +21,7 @@
   
   <title>UbuntuにNginxコンテナを立ててHTTPSに対応する - yasakura</title>
   
-  <meta name="description" content="モチベーション  まっさらなUbuntuにNginxコンテナを立てて，それをWEBサーバーとして運用したい． Let&rsquo;s encryptでHTTPSに対応したい．  前準備  UbuntuがインストールされたAmazon EC2やAmazon Lightsail，GCP Compute Engine, VPSや物理サーバなどを用意し，グローバルなIPアドレスを設定しておく． ドメインを取得し，UbuntuサーバーのIPアドレスと関連付けておく．  パッケージをアップデートする  apt updateでパッケージ一覧を更新 apt upgradeでパッケージを更新 apt autoremoveで必要なくなったパッケージを削除 apt autocleanで.debファイルを削除
- /var/log/apt/history.logにaptコマンドの履歴がある /var/log/apt/term.logにaptコマンドのログがある   パッケージの自動アップデートを設定する セキュリティ対策のため，パッケージは常に最新になるようにする．
- 20-auto-upgradesを編集する
-vi /etc/apt/apt.conf.d/20auto-upgrades
-APT::Periodic::Update-Package-Lists &quot;1&quot;; APT::Periodic::Download-Upgradeable-Packages &quot;1&quot;; APT::Periodic::AutocleanInterval &quot;7&quot;; APT::Periodic::Unattended-Upgrade &quot;1&quot;;   Update-Package-Lists : アップデートの確認頻度[Day] Download-Upgradeable-Packages : アップデートをダウンロードしておくか AutocleanInterval : クリーンアップ頻度[Day] Unattended-Upgrade : アップデートをインストールするか  50unattended-upgradesを編集する
-vi /etc/apt/apt.conf.d/50unattended-upgrades
-&quot;${distro_id}:${distro_codename}-updates&quot;; をコメントアウト  20-auto-upgradesを適用する
-dpkg-reconfigure -plow unattended-upgrades">
+  <meta name="description" content="モチベーション まっさらなUbuntuにNginxコンテナを立てて，それをWEBサーバーとして運用したい． Let&rsquo;s encryptでHTTPSに対応し">
   
   <link href=/css/style.css rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;900&display=swap" rel="stylesheet">
@@ -89,7 +82,7 @@ dpkg-reconfigure -plow unattended-upgrades">
 <li><a href="#dockerをインストールする">Dockerをインストールする</a></li>
 <li><a href="#nginxコンテナを立ち上げてhttpでアクセスできることを確認する">Nginxコンテナを立ち上げてHTTPでアクセスできることを確認する</a></li>
 <li><a href="#httpsに対応する">HTTPSに対応する</a></li>
-<li><a href="#let-s-encryptの証明書は90日で期限切れになる">Let&rsquo;s encryptの証明書は90日で期限切れになる</a></li>
+<li><a href="#let-s-encryptの証明書は90日で期限切れになるので-自動で更新するようにする">Let&rsquo;s encryptの証明書は90日で期限切れになるので，自動で更新するようにする</a></li>
 </ul>
 </nav>
 
@@ -397,7 +390,7 @@ CONTAINER ID        IMAGE           COMMAND                  CREATED            
 }</code></pre></div>
 <p>最後に，ホストの<code>/web/</code>ディレクトリ内で<code>docker-compose restart</code>を実行して，Nginxコンテナを再起動することで，default.confを再読み込みさせる．ブラウザから<code>https://&lt;hostname&gt;</code>でアクセスできれば，HTTPSの対応が完了する．</p>
 
-<h1 id="let-s-encryptの証明書は90日で期限切れになる">Let&rsquo;s encryptの証明書は90日で期限切れになる</h1>
+<h1 id="let-s-encryptの証明書は90日で期限切れになるので-自動で更新するようにする">Let&rsquo;s encryptの証明書は90日で期限切れになるので，自動で更新するようにする</h1>
 
 <p>Let&rsquo;s encryptの証明書は90日で期限切れになるので，定期的に更新する必要がある．証明書の更新を自動で行うため，cronにjobを登録する．</p>
 

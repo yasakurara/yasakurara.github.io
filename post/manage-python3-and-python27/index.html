@@ -21,13 +21,7 @@
   
   <title>Python2.XとPython3.Xを共存させる - yasakura</title>
   
-  <meta name="description" content="モチベーション  Python2.X系とPython3.X系やpipとpip3を共存させて，必要に応じて切り替えて使いたい． Pythonのマイナーバージョンを細かく切り替えたい． pipでパッケージをインストールすると環境が汚れてしまうのでプロジェクトごとにパッケージを管理したい． 「プロジェクトごとにDockerコンテナを立ち上げてそこでPythonを実行する」というような大げさな管理はしたくない．  pyenvでPythonのバージョンを切り替える  デフォルトのPythonのバージョンを確認する
-$ python --version Python 2.7.16 brewでpyenvをインストールする
-$ brew install pyenv PATHなどを設定する
-export PYENV_ROOT=&#34;${HOME}/.pyenv&#34; export PATH=${PYENV_ROOT}/bin:$PATH eval &#34;$(pyenv init -)&#34; pyenvで使用可能なPythonのバージョン一覧を確認する
-$ pyenv install -l Available versions: 2.1.3 2.2.3 2.3.7 : : 任意のバージョンをインストールする
-$ pyenv install 3.9.0 : Installed Python-3.9.0 to /Users/xxxx/.pyenv/versions/3.9.0 切替可能なバージョンを確認する
-$ pyenv versions \* system (set by /Users/xxxx/.pyenv/version) 3.9.0  システム全体のPythonバージョンを切り替える $ pyenv global 3.9.0 $ pyenv versions system \* 3.">
+  <meta name="description" content="モチベーション Python2.X系とPython3.X系やpipとpip3を共存させて，必要に応じて切り替えて使いたい． Pythonのマイナ">
   
   <link href=/css/style.css rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;900&display=swap" rel="stylesheet">

@@ -21,10 +21,7 @@
   
   <title>Gitをやっていく - yasakura</title>
   
-  <meta name="description" content="モチベーション  個人的に普段よく使うGitコマンドについて自分なりにまとめておきたい Pro Gitだとカロリー過多  Repositoryを用意する Local Repositoryから始める  git init &lt;directory&gt;  &lt;directory&gt;をLocal repositoryとする． &lt;directory&gt;内に.gitという隠しフォルダが作成される．Gitの諸々は.gitで管理されることになる．   Remote Repositoryから始める  GitHubにSSH公開鍵を登録しておく
- cd ~/.ssh ssh-keygen -t rsa -b 4096で鍵作成 chmod 600 &lt;秘密鍵へのパス&gt; パスフレーズを設定したなら  ssh-add &lt;秘密鍵へのパス&gt;で秘密鍵をSSHエージェントに登録 ssh-add -lでSSHエージェントに秘密鍵が登録されたことを確認  pbcopy &lt; &lt;公開鍵へのパス&gt;で公開鍵をクリップボードにコピー SSH and GPG keysのNew SSH keyに公開鍵をコピペ ~/.ssh/configに接続先を登録
-Host &lt;nickname&gt; HostName github.com IdentityFile &lt;秘密鍵へのパス&gt; User git  ssh -T &lt;nickname&gt;で接続確認
- Hi XXX! You&#39;ve successfully authenticated, but GitHub does not provide shell access.">
+  <meta name="description" content="モチベーション 個人的に普段よく使うGitコマンドについて自分なりにまとめておきたい Pro Gitだとカロリー過多 Repositoryを用意する Local">
   
   <link href=/css/style.css rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;900&display=swap" rel="stylesheet">

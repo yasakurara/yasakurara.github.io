@@ -1,40 +1,40 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>Python on yasakura</title>
-    <link>https://yasakura.me/tags/python/</link>
-    <description>Recent content in Python on yasakura</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>ja</language>
-    <lastBuildDate>Sat, 02 Jan 2021 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="https://yasakura.me/tags/python/index.xml" rel="self" type="application/rss+xml" />
-    
-    
-    <item>
-      <title>How to manage Python2.X, 3.X and packages every project</title>
-      <link>https://yasakura.me/post/manage-python3-and-python27-and-packages-en/</link>
-      <pubDate>Sat, 02 Jan 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://yasakura.me/post/manage-python3-and-python27-and-packages-en/</guid>
-      <description>Motivation  want to switch major version of Python (i.e. between Python2.X and Python3.X). want to switch minor version of Python (i.e. between Python3.A and Python3.B). want to isolate some packages for every project. don&amp;rsquo;t want to construct in vain a new docker container for each Python project.  How to switch any version of Python with pyenv Installation  Confirm the default Python version.
-$ python --version Python 2.</description>
-    </item>
-    
-    <item>
-      <title>Python2.XとPython3.Xを共存させる</title>
-      <link>https://yasakura.me/post/manage-python3-and-python27/</link>
-      <pubDate>Wed, 01 Apr 2020 00:00:01 +0900</pubDate>
-      
-      <guid>https://yasakura.me/post/manage-python3-and-python27/</guid>
-      <description>モチベーション  Python2.X系とPython3.X系やpipとpip3を共存させて，必要に応じて切り替えて使いたい． Pythonのマイナーバージョンを細かく切り替えたい． pipでパッケージをインストールすると環境が汚れてしまうのでプロジェクトごとにパッケージを管理したい． 「プロジェクトごとにDockerコンテナを立ち上げてそこでPythonを実行する」というような大げさな管理はしたくない．  pyenvでPythonのバージョンを切り替える  デフォルトのPythonのバージョンを確認する
-$ python --version Python 2.7.16 brewでpyenvをインストールする
-$ brew install pyenv PATHなどを設定する
-export PYENV_ROOT=&amp;#34;${HOME}/.pyenv&amp;#34; export PATH=${PYENV_ROOT}/bin:$PATH eval &amp;#34;$(pyenv init -)&amp;#34; pyenvで使用可能なPythonのバージョン一覧を確認する
-$ pyenv install -l Available versions: 2.1.3 2.2.3 2.3.7 : : 任意のバージョンをインストールする
-$ pyenv install 3.9.0 : Installed Python-3.9.0 to /Users/xxxx/.pyenv/versions/3.9.0 切替可能なバージョンを確認する
-$ pyenv versions \* system (set by /Users/xxxx/.pyenv/version) 3.9.0  システム全体のPythonバージョンを切り替える $ pyenv global 3.9.0 $ pyenv versions system \* 3.</description>
-    </item>
-    
-  </channel>
+	<channel>
+		<title>yasakura</title>
+		<link>https://yasakura.me/tags/python/</link>
+		<description>Recent content of yasakura</description>
+		<generator>Hugo -- gohugo.io</generator>
+		
+		<language>ja</language>
+        
+        
+        
+		<lastBuildDate>Sat, 02 Jan 2021 00:00:00 +0000</lastBuildDate>
+		
+		<atom:link href="https://yasakura.me/tags/python/" rel="self" type="application/rss+xml" />
+		
+        
+        
+        
+        
+        
+		<item>
+			<title>How to manage Python2.X, 3.X and packages every project</title>
+			<link>https://yasakura.me/post/manage-python3-and-python27-and-packages-en/</link>
+			<pubDate>Sat, 02 Jan 2021 00:00:00 +0000</pubDate>
+			
+			<guid>https://yasakura.me/post/manage-python3-and-python27-and-packages-en/</guid>
+			
+		</item>
+		
+		<item>
+			<title>Python2.XとPython3.Xを共存させる</title>
+			<link>https://yasakura.me/post/manage-python3-and-python27/</link>
+			<pubDate>Wed, 01 Apr 2020 00:00:01 +0900</pubDate>
+			
+			<guid>https://yasakura.me/post/manage-python3-and-python27/</guid>
+			
+		</item>
+		
+	</channel>
 </rss>

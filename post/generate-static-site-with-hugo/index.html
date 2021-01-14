@@ -21,10 +21,7 @@
   
   <title>Hugoで静的サイトをジェネる - yasakura</title>
   
-  <meta name="description" content="モチベーション  ブログを書きたい デザインを自由にカスタマイズしたい WordPressなどのCMSで管理するほどでもない StaticGenの上位にHugoがある  記事を新規作成する $ hugo new post/&lt;article name&gt;.md  プロジェクトディレクトリにあるarchetypes/のdefault.mdを元に新しいエントリがcontent/以下に作成される．  リアルタイムでプレビューしながら記事を執筆orテーマをカスタマイズする $ hugo server --watch -D --port &lt;port&gt; --bind 0.0.0.0 --baseURL=&lt;local machine&#39;s IP address&gt;  コードを変更するごとに自動でリロードさせるためには，--watchをつける．
- Draft記事を表示させるためには，-Dをつける．
- --bindを指定しない場合は，127.0.0.1にbindされる．127.0.0.1へのbindだと，hugo serverを実行しているローカルマシンからのアクセスhttp://localhost:&lt;port&gt;のみに制限されてしまう．0.0.0.0にbindすることで，LAN内にあるローカルマシン以外（スマホなど）からはhttp://&lt;local machine&#39;s IP address&gt;:&lt;port&gt;でアクセスできるようになる．  Themeのカスタマイズ ユーザが指定したパラメータを呼び出す  .Params.xxxはarticleのfront-matterから参照される
- .Site.Params.xxxはconfig.tomlから参照される  リストコンテンツの順番を制御できるページネーションを実装する {{ $v1 := where .Pages &#34;.Params.type&#34; &#34;!=&#34; &#34;about&#34; }} {{ $v2 := where .Pages &#34;.Params.type&#34; &#34;!=&#34; &#34;terms&#34; }} {{ $pages := $v1 | intersect $v2 }} {{ $paginator := .">
+  <meta name="description" content="モチベーション ブログを書きたい デザインを自由にカスタマイズしたい WordPressなどのCMSで管理するほどでもない StaticGenの上位">
   
   <link href=/css/style.css rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;900&display=swap" rel="stylesheet">
