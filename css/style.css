@@ -215,6 +215,10 @@ pre, code {
   padding: 20px 0;
 }
 
+.post-adsense {
+  padding: 0 0 40px 0;
+}
+
 .post-widget {
   max-width: 740px;
   margin: 0 auto;
