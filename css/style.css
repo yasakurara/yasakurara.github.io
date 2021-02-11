@@ -236,14 +236,14 @@ pre, code {
 }
 .post-content h1 {
   font-size: 20px;
-  margin-top: 40px;
+  margin-top: 50px;
 }
 .post-content h1:first-child {
   margin-top: 0;
 }
 .post-content h2 {
   font-size: 18px;
-  margin-top: 1.5em;
+  margin-top: 2em;
 }
 .post-content h3 {
   font-size: 16px;

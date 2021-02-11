@@ -21,7 +21,7 @@
   
   <title>Gitをやっていく - yasakura</title>
   
-  <meta name="description" content="モチベーション 個人的に普段よく使うGitコマンドについて自分なりにまとめておきたい Pro Gitだとカロリー過多 Repositoryを用意する Local">
+  <meta name="description" content="モチベーション 個人的に普段よく使うGitコマンドについて自分なりにまとめておきたい Pro Gitだとカロリー過多 Repositoryを用意する ロ">
   
   <link href=/css/style.css rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;900&display=swap" rel="stylesheet">
@@ -89,8 +89,8 @@
 <li><a href="#モチベーション">モチベーション</a></li>
 <li><a href="#repositoryを用意する">Repositoryを用意する</a>
 <ul>
-<li><a href="#local-repositoryから始める">Local Repositoryから始める</a></li>
-<li><a href="#remote-repositoryから始める">Remote Repositoryから始める</a></li>
+<li><a href="#ローカルリポジトリから始める">ローカルリポジトリから始める</a></li>
+<li><a href="#リモートリポジトリから始める">リモートリポジトリから始める</a></li>
 </ul></li>
 <li><a href="#repositoryの初期設定をする">Repositoryの初期設定をする</a>
 <ul>
@@ -101,6 +101,7 @@
 <li><a href="#gitで管理したくないファイルを指定する">Gitで管理したくないファイルを指定する</a></li>
 </ul></li>
 <li><a href="#リモートリポジトリにはニックネームが付いている">リモートリポジトリにはニックネームが付いている</a></li>
+<li><a href="#githubのレポジトリにhttpsではなくsshを使ってアクセスするように変更する">GitHubのレポジトリにHTTPSではなくSSHを使ってアクセスするように変更する</a></li>
 <li><a href="#コミットのいろいろな呼ばれ方">コミットのいろいろな呼ばれ方</a></li>
 <li><a href="#ブランチのいろいろな呼ばれ方">ブランチのいろいろな呼ばれ方</a></li>
 <li><a href="#リモートブランチをリモート追跡ブランチに取り込む">リモートブランチをリモート追跡ブランチに取り込む</a></li>
@@ -154,21 +155,21 @@
 
 <h1 id="repositoryを用意する">Repositoryを用意する</h1>
 
-<h2 id="local-repositoryから始める">Local Repositoryから始める</h2>
+<h2 id="ローカルリポジトリから始める">ローカルリポジトリから始める</h2>
 
 <ul>
 <li><code>git init &lt;directory&gt;</code>
 
 <ul>
-<li><code>&lt;directory&gt;</code>をLocal repositoryとする．</li>
+<li><code>&lt;directory&gt;</code>をローカルリポジトリとする．</li>
 <li><code>&lt;directory&gt;</code>内に<code>.git</code>という隠しフォルダが作成される．Gitの諸々は<code>.git</code>で管理されることになる．</li>
 </ul></li>
 </ul>
 
-<h2 id="remote-repositoryから始める">Remote Repositoryから始める</h2>
+<h2 id="リモートリポジトリから始める">リモートリポジトリから始める</h2>
 
 <ol>
-<li><p>GitHubにSSH公開鍵を登録しておく</p>
+<li>GitHubにSSH公開鍵を登録しておく
 
 <ol>
 <li><code>cd ~/.ssh</code></li>
@@ -182,28 +183,24 @@
 </ol></li>
 <li><code>pbcopy &lt; &lt;公開鍵へのパス&gt;</code>で公開鍵をクリップボードにコピー</li>
 <li><a href="https://github.com/settings/keys">SSH and GPG keys</a>の<code>New SSH key</code>に公開鍵をコピペ</li>
-
-<li><p><code>~/.ssh/config</code>に接続先を登録</p>
-
-<pre><code>Host &lt;nickname&gt;
+<li><code>~/.ssh/config</code>に接続先を登録
+<code>
+Host &lt;nickname&gt;
 HostName github.com
 IdentityFile &lt;秘密鍵へのパス&gt;
 User git
-</code></pre></li>
-
-<li><p><code>ssh -T &lt;nickname&gt;</code>で接続確認</p>
+</code></li>
+<li><code>ssh -T &lt;nickname&gt;</code>で接続確認
 
 <ul>
 <li><code>Hi XXX! You've successfully authenticated, but GitHub does not provide shell access.</code>と言われれば優勝</li>
 </ul></li>
-
-<li><p><code>rm &lt;公開鍵へのパス&gt;</code>で公開鍵を削除しておく</p></li>
+<li><code>rm &lt;公開鍵へのパス&gt;</code>で公開鍵を削除しておく</li>
 </ol></li>
-
-<li><p><code>git clone https://&lt;repository&gt;.git &lt;directory&gt;</code></p>
+<li><code>git clone git@github.com:&lt;repository&gt;.git &lt;directory&gt;</code>
 
 <ul>
-<li><code>&lt;directory&gt;</code> : Local repositoryとしたいディレクトリへのパス</li>
+<li><code>&lt;directory&gt;</code> : ローカルリポジトリとしたいディレクトリへのパス</li>
 <li><code>&lt;directory&gt;</code>内に<code>.git</code>という隠しフォルダが作成される．Gitの諸々は<code>.git</code>で管理されることになる．</li>
 </ul></li>
 </ol>
@@ -301,9 +298,27 @@ origin	git@github.com:&lt;ユーザ名&gt;/&lt;リポジトリ名&gt;.git (fetch
 origin	git@github.com:&lt;ユーザ名&gt;/&lt;リポジトリ名&gt;.git (push)
 </code></pre>
 
-<p>一方，<code>git init</code>で作成したローカルリポジトリに，任意のリモートリポジトリのニックネームを設定するには，<code>git remote add &lt;nickname&gt; https://github.com/&lt;ユーザ名&gt;/&lt;リポジトリ名&gt;.git</code>を実行する．</p>
+<p>一方，<code>git init</code>で作成したローカルリポジトリに，任意のリモートリポジトリのニックネームを設定するには，<code>git remote add &lt;nickname&gt; git@github.com:&lt;user&gt;/&lt;repository&gt;.git</code>を実行する．</p>
 
 <p>ここで設定された/されているリモートリポジトリのニックネーム（たとえば<code>origin</code>など）は，<code>git push origin master</code>や<code>git pull origin master</code>などのコマンドで利用される．</p>
+
+<h1 id="githubのレポジトリにhttpsではなくsshを使ってアクセスするように変更する">GitHubのレポジトリにHTTPSではなくSSHを使ってアクセスするように変更する</h1>
+
+<p>GitHubは2021年8月13日以降，パスワード（HTTPS）を使ったレポジトリへのアクセスを<a href="https://github.blog/2020-12-15-token-authentication-requirements-for-git-operations/">禁止する</a>．</p>
+
+<p>GitHubにpushしたときに，GitHubから&rdquo;You recently used a password to access the repository at <repository>&ldquo;という内容のメールが飛んできた場合，<code>&lt;repository&gt;</code>へのアクセス方法がSSHではなくHTTPSになっている．</p>
+
+<p><code>git remote -v</code>すると，以下のように<code>https</code>から始まるリモートリポジトリが登録されていることが確認できる．</p>
+
+<pre><code>origin  https://github.com/&lt;user&gt;/&lt;repository&gt;.git (fetch)
+origin  https://github.com/&lt;user&gt;/&lt;repository&gt;.git (push)
+</code></pre>
+
+<p>SSHを使ったアクセスに変更するには，<code>git remote set-url origin git@github.com:&lt;user&gt;/&lt;repository&gt;.git</code>を実行し（<code>git@github.com</code>の部分は自分のsshの設定による．sshの設定については<a href="#リモートリポジトリから始める">リモートリポジトリから始める</a>を参照），<code>git remote -v</code>すると，以下のように設定され，以後はSSHによるアクセスとなる．</p>
+
+<pre><code>origin	git@github.com:&lt;user&gt;/&lt;repository&gt;.git (fetch)
+origin	git@github.com:&lt;user&gt;/&lt;repository&gt;.git (push)
+</code></pre>
 
 <h1 id="コミットのいろいろな呼ばれ方">コミットのいろいろな呼ばれ方</h1>
 
