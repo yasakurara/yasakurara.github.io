@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html>
 <head>
   
     
@@ -19,7 +19,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   
-  <title>Python2.XとPython3.Xを共存させる - yasakura</title>
+  <title>Python2とPython3を共存させる - yasakura</title>
   
   <meta name="description" content="モチベーション Python2.X系とPython3.X系やpipとpip3を共存させて，必要に応じて切り替えて使いたい． Pythonのマイナ">
   
@@ -33,8 +33,13 @@
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:site" content="@yasakurara" />
   <meta property="og:url" content="https://yasakura.me/post/manage-python3-and-python27/" />
-  <meta property="og:title" content="Python2.XとPython3.Xを共存させる" />
+  <meta property="og:title" content="Python2とPython3を共存させる" />
   <meta property="og:image" content="https://yasakura.me/img/thumbnail.png" />
+  
+  <link rel="alternate" hreflang="en" href="https://yasakura.me//post/manage-python3-and-python27-and-packages-en/">
+  <link rel="alternate" hreflang="ja" href="https://yasakura.me//post/manage-python3-and-python27/">
+  
+  
 </head>
 <body>
   <header class="header">
@@ -50,7 +55,7 @@
     
     <p class="post-meta">2021.1.2</p>
     
-    <h1 class="post-title">Python2.XとPython3.Xを共存させる</h1>
+    <h1 class="post-title">Python2とPython3を共存させる</h1>
     <ul class="post-author">
       <li>
         <a href="https://twitter.com/yasakurara"><svg id="twitter-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><style>.cls-1{fill:none;}.cls-2{fill:#1da1f2;}</style></defs><title>Twitter_Logo_Blue</title><rect class="cls-1" width="400" height="400"/><path class="cls-2" d="M153.62,301.59c94.34,0,145.94-78.16,145.94-145.94,0-2.22,0-4.43-.15-6.63A104.36,104.36,0,0,0,325,122.47a102.38,102.38,0,0,1-29.46,8.07,51.47,51.47,0,0,0,22.55-28.37,102.79,102.79,0,0,1-32.57,12.45,51.34,51.34,0,0,0-87.41,46.78A145.62,145.62,0,0,1,92.4,107.81a51.33,51.33,0,0,0,15.88,68.47A50.91,50.91,0,0,1,85,169.86c0,.21,0,.43,0,.65a51.31,51.31,0,0,0,41.15,50.28,51.21,51.21,0,0,1-23.16.88,51.35,51.35,0,0,0,47.92,35.62,102.92,102.92,0,0,1-63.7,22A104.41,104.41,0,0,1,75,278.55a145.21,145.21,0,0,0,78.62,23"/></svg>@yasakurara</a>
@@ -64,9 +69,9 @@
     </ul>
     
     <div class="share">
-    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27%2f&text=Python2.X%e3%81%a8Python3.X%e3%82%92%e5%85%b1%e5%ad%98%e3%81%95%e3%81%9b%e3%82%8b - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
+    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27%2f&text=Python2%e3%81%a8Python3%e3%82%92%e5%85%b1%e5%ad%98%e3%81%95%e3%81%9b%e3%82%8b - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
     <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
-    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27%2f&title=Python2.X%e3%81%a8Python3.X%e3%82%92%e5%85%b1%e5%ad%98%e3%81%95%e3%81%9b%e3%82%8b - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
+    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27%2f&title=Python2%e3%81%a8Python3%e3%82%92%e5%85%b1%e5%ad%98%e3%81%95%e3%81%9b%e3%82%8b - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
 </div>
   </header>
   
@@ -239,9 +244,9 @@ $</code></pre></div></li>
     </ul>
     
     <div class="share">
-    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27%2f&text=Python2.X%e3%81%a8Python3.X%e3%82%92%e5%85%b1%e5%ad%98%e3%81%95%e3%81%9b%e3%82%8b - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
+    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27%2f&text=Python2%e3%81%a8Python3%e3%82%92%e5%85%b1%e5%ad%98%e3%81%95%e3%81%9b%e3%82%8b - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
     <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
-    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27%2f&title=Python2.X%e3%81%a8Python3.X%e3%82%92%e5%85%b1%e5%ad%98%e3%81%95%e3%81%9b%e3%82%8b - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
+    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27%2f&title=Python2%e3%81%a8Python3%e3%82%92%e5%85%b1%e5%ad%98%e3%81%95%e3%81%9b%e3%82%8b - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
 </div>
   </footer>
   
@@ -265,7 +270,7 @@ $</code></pre></div></li>
 
 <div class="post-widget">
   <div class="twitter-widget">
-    <a class="twitter-timeline" data-width="300" data-height="1000" href="https://twitter.com/yasakurara?ref_src=twsrc%5Etfw">Tweets by yasakurara</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    <a class="twitter-timeline" data-width="300" data-height="1000" data-dnt="true" href="https://twitter.com/yasakurara?ref_src=twsrc%5Etfw">Tweets by yasakurara</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
   </div>
 </div>
 
@@ -273,8 +278,8 @@ $</code></pre></div></li>
 <footer class="footer">
   <nav>
     <ul>
-      <li><a href="https://yasakura.me//terms/">サイトポリシー</a></li>
-      <li><a href="https://yasakura.me//privacy/">プライバシーポリシー</a></li>
+      <li><a href="https://yasakura.me//terms/">Site Policy</a></li>
+      <li><a href="https://yasakura.me//privacy/">Privacy Policy</a></li>
     </ul>
   </nav>
   <span>&copy; 2021 yasakura</span>

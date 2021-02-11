@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html>
 <head>
   
     
@@ -35,6 +35,8 @@
   <meta property="og:url" content="https://yasakura.me/post/how-to-use-docker/" />
   <meta property="og:title" content="Dockerコンテナのライフサイクル" />
   <meta property="og:image" content="https://yasakura.me/img/thumbnail.png" />
+  
+  
 </head>
 <body>
   <header class="header">
@@ -99,6 +101,11 @@
 <li><a href="#停止しているコンテナを破棄する">停止しているコンテナを破棄する</a></li>
 <li><a href="#ローカルのdockerイメージを破棄する">ローカルのDockerイメージを破棄する</a></li>
 <li><a href="#コンテナとホスト間でファイルをコピーする">コンテナとホスト間でファイルをコピーする</a></li>
+<li><a href="#コンテナ内でstdout-stderrされたものを外部から見る">コンテナ内でstdout/stderrされたものを外部から見る</a>
+<ul>
+<li><a href="#ロギング情報の確認">ロギング情報の確認</a></li>
+</ul></li>
+<li><a href="#docker-for-mac">Docker for Mac</a></li>
 <li><a href="#dockerfileの書き方">Dockerfileの書き方</a></li>
 <li><a href="#docker-compose-ymlでコンテナを複数立ち上げる">docker-compose.ymlでコンテナを複数立ち上げる</a>
 <ul>
@@ -308,6 +315,55 @@ root        16  0.0  0.1  44596  3388 pts/0    R+   13:39   0:00 ps -axu
 </ul></li>
 </ul>
 
+<h1 id="コンテナ内でstdout-stderrされたものを外部から見る">コンテナ内でstdout/stderrされたものを外部から見る</h1>
+
+<ul>
+<li><p><code>docker logs &lt;container&gt;</code></p>
+
+<ul>
+<li><code>-f</code>オプションでリアルタイムで表示する</li>
+
+<li><p>ログ自体は<code>/var/lib/docker/containers/&lt;container id&gt;/&lt;container id&gt;-json.log</code>にある</p>
+
+<h2 id="ロギング情報の確認">ロギング情報の確認</h2></li>
+</ul></li>
+
+<li><p><code>docker info --format '{{.LoggingDriver}}'</code></p>
+
+<ul>
+<li>現在設定しているロギングドライバーを確認する</li>
+</ul></li>
+
+<li><p><code>docker inspect -f &quot;{{.LogPath}}&quot; &lt;container name&gt;</code></p>
+
+<ul>
+<li>あるコンテナのstdout/stderr出力を保存している先を確認する</li>
+</ul></li>
+</ul>
+
+<h1 id="docker-for-mac">Docker for Mac</h1>
+
+<p>Linuxでは，Dockerエンジンをホスト上で直接実行しているが，Docker for Macでは，Mac上にVMを立ち上げてその上でDockerエンジンを実行している．
+例えば，<code>docker volume ls</code>でvolume名を取得し，そのvolumeがmountされている場所を<code>docker volume inspect &lt;volume name&gt;</code>で確認すると，以下のようなMountpointを取得することができる．ただし，MountpointはMac上には存在せず，VMからみたパスである．</p>
+
+<pre><code>$ docker volume ls
+DRIVER    VOLUME NAME
+local     xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+...
+$ docker volume inspect xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+[
+    {
+        &quot;CreatedAt&quot;: &quot;2019-12-21T05:10:05Z&quot;,
+        &quot;Driver&quot;: &quot;local&quot;,
+        &quot;Labels&quot;: null,
+        &quot;Mountpoint&quot;: &quot;/var/lib/docker/volumes/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/_data&quot;,
+        &quot;Name&quot;: &quot;xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&quot;,
+        &quot;Options&quot;: null,
+        &quot;Scope&quot;: &quot;local&quot;
+    }
+]
+</code></pre>
+
 <h1 id="dockerfileの書き方">Dockerfileの書き方</h1>
 
 <p>Dockerfileとは，<code>docker build</code>のための手順書のようなもの．Dockerfileを元にオリジナルのDockerイメージをつくることができる．</p>
@@ -374,6 +430,12 @@ services:
       context: ./php
       args:
         - TZ=${TZ}
+    container_name: php-fpm
+    logging:
+      driver: &quot;json-file&quot;
+      options:
+        max-size: &quot;10m&quot;
+        max-file: &quot;3&quot;
     volumes:
       - ./www/html:/var/www/html
     environment:
@@ -414,6 +476,12 @@ services:
 <li><code>args</code>で，DockerfileのARGに渡すものを指定できる．</li>
 </ul></li>
 <li><code>container_name</code>に，任意のコンテナ名を指定する．</li>
+<li><code>logging</code>に，コンテナのstdout/stderr出力の保存方法を指定する
+
+<ul>
+<li><code>driver</code>には，<code>json-file</code>の他，<code>syslog</code>なども指定できる</li>
+<li><code>options</code>にログローテートの設定を指定できる．</li>
+</ul></li>
 <li><code>tty: true</code>により，<code>docker run</code>の<code>-it</code>オプションに相当する設定がされる．</li>
 <li><code>volumes</code>には<code>&lt;ホスト側のパス&gt;:&lt;コンテナ内のパス&gt;</code>を指定する．これにより，ホスト側のディレクトリがコンテナ内のディレクトリと共有される．</li>
 <li><code>environment</code>には，コンテナ内の環境変数を指定する．</li>
@@ -483,7 +551,7 @@ services:
 
 <div class="post-widget">
   <div class="twitter-widget">
-    <a class="twitter-timeline" data-width="300" data-height="1000" href="https://twitter.com/yasakurara?ref_src=twsrc%5Etfw">Tweets by yasakurara</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    <a class="twitter-timeline" data-width="300" data-height="1000" data-dnt="true" href="https://twitter.com/yasakurara?ref_src=twsrc%5Etfw">Tweets by yasakurara</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
   </div>
 </div>
 
@@ -491,8 +559,8 @@ services:
 <footer class="footer">
   <nav>
     <ul>
-      <li><a href="https://yasakura.me//terms/">サイトポリシー</a></li>
-      <li><a href="https://yasakura.me//privacy/">プライバシーポリシー</a></li>
+      <li><a href="https://yasakura.me//terms/">Site Policy</a></li>
+      <li><a href="https://yasakura.me//privacy/">Privacy Policy</a></li>
     </ul>
   </nav>
   <span>&copy; 2021 yasakura</span>

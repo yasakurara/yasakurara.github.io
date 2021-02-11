@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html>
 <head>
   
     
@@ -35,6 +35,8 @@
   <meta property="og:url" content="https://yasakura.me/post/linear-model/" />
   <meta property="og:title" content="線形モデルでデータを表現する" />
   <meta property="og:image" content="https://yasakura.me/img/thumbnail.png" />
+  
+  
 </head>
 <body>
   <header class="header">
@@ -48,7 +50,7 @@
 <article class="post post-view">
   <header class="post-header">
     
-    <p class="post-meta">2020.4.1</p>
+    <p class="post-meta">2021.2.10</p>
     
     <h1 class="post-title">線形モデルでデータを表現する</h1>
     <ul class="post-author">
@@ -90,7 +92,7 @@
 <li><a href="#scikit-learnのlinearregressionで重回帰する">scikit-learnのLinearRegressionで重回帰する</a></li>
 <li><a href="#単回帰と同様-二乗和誤差を小さくするような係数を探す">単回帰と同様，二乗和誤差を小さくするような係数を探す</a></li>
 <li><a href="#線形モデルで非線形を表現する">線形モデルで非線形を表現する</a></li>
-<li><a href="#過学習をどのように抑えるか">過学習をどのように抑えるか</a></li>
+<li><a href="#正則化項を導入することで過学習を抑える">正則化項を導入することで過学習を抑える</a></li>
 </ul>
 </nav>
 
@@ -624,7 +626,7 @@ fig, ax <span style="color:#f92672">=</span> plt<span style="color:#f92672">.</s
     ax<span style="color:#f92672">.</span>set_ylabel(<span style="color:#e6db74">r</span><span style="color:#e6db74">&#39;$t$&#39;</span>)</code></pre></div>
 <p>$\boldsymbol{\phi(x)} = (1, x, sin(x))$ のようにすることで，三角関数を含んだモデルを構築することができる．が，自身での実装が必要になる．</p>
 
-<h1 id="過学習をどのように抑えるか">過学習をどのように抑えるか</h1>
+<h1 id="正則化項を導入することで過学習を抑える">正則化項を導入することで過学習を抑える</h1>
 
 <p>0 &lt; x &lt; 1 の範囲でxをランダムに10点生成し， $y=sin(2\pi x)$ に入力した後，yにσ=0.2のガウシアンノイズを加えたtを教師データとした．青線が関数y，散布図がtである．</p>
 
@@ -816,7 +818,7 @@ fig, ax <span style="color:#f92672">=</span> plt<span style="color:#f92672">.</s
 
 <div class="post-widget">
   <div class="twitter-widget">
-    <a class="twitter-timeline" data-width="300" data-height="1000" href="https://twitter.com/yasakurara?ref_src=twsrc%5Etfw">Tweets by yasakurara</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    <a class="twitter-timeline" data-width="300" data-height="1000" data-dnt="true" href="https://twitter.com/yasakurara?ref_src=twsrc%5Etfw">Tweets by yasakurara</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
   </div>
 </div>
 
@@ -824,8 +826,8 @@ fig, ax <span style="color:#f92672">=</span> plt<span style="color:#f92672">.</s
 <footer class="footer">
   <nav>
     <ul>
-      <li><a href="https://yasakura.me//terms/">サイトポリシー</a></li>
-      <li><a href="https://yasakura.me//privacy/">プライバシーポリシー</a></li>
+      <li><a href="https://yasakura.me//terms/">Site Policy</a></li>
+      <li><a href="https://yasakura.me//privacy/">Privacy Policy</a></li>
     </ul>
   </nav>
   <span>&copy; 2021 yasakura</span>

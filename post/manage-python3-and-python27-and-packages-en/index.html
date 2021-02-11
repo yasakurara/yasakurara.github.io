@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html>
 <head>
   
     
@@ -19,9 +19,9 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   
-  <title>How to manage Python2.X, 3.X and packages every project - yasakura</title>
+  <title>Manage multiple python versions with pyenv and isolate packages every project with venv - yasakura</title>
   
-  <meta name="description" content="Motivation  want to switch major version of Python (i.e. between Python2.X and Python3.X). want to switch minor version of Python (i.e. between Python3.A and Python3.B). want to isolate some packages for every project. don&rsquo;t want to construct in vain a new docker container for each Python project.  How to switch any version of Python with pyenv Installation  Confirm the default Python version.
+  <meta name="description" content="Motivation  want to switch major version of Python (i.e. between Python 2 and Python 3). want to switch minor version of Python (i.e. between Python3.A and Python3.B). want to isolate some packages for every project. don&rsquo;t want to construct in vain a new docker container for each Python project.  How to switch any version of Python with pyenv Installation  Confirm the default Python version.
 $ python --version Python 2.">
   
   <link href=/css/style.css rel="stylesheet">
@@ -34,8 +34,13 @@ $ python --version Python 2.">
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:site" content="@yasakurara" />
   <meta property="og:url" content="https://yasakura.me/post/manage-python3-and-python27-and-packages-en/" />
-  <meta property="og:title" content="How to manage Python2.X, 3.X and packages every project" />
+  <meta property="og:title" content="Manage multiple python versions with pyenv and isolate packages every project with venv" />
   <meta property="og:image" content="https://yasakura.me/img/thumbnail.png" />
+  
+  
+  <link rel="alternate" hreflang="en" href="https://yasakura.me//post/manage-python3-and-python27-and-packages-en/">
+  <link rel="alternate" hreflang="ja" href="https://yasakura.me//post/manage-python3-and-python27/">
+  
 </head>
 <body>
   <header class="header">
@@ -49,9 +54,9 @@ $ python --version Python 2.">
 <article class="post post-view">
   <header class="post-header">
     
-    <p class="post-meta">2021.1.2</p>
+    <p class="post-meta">2021.2.10</p>
     
-    <h1 class="post-title">How to manage Python2.X, 3.X and packages every project</h1>
+    <h1 class="post-title">Manage multiple python versions with pyenv and isolate packages every project with venv</h1>
     <ul class="post-author">
       <li>
         <a href="https://twitter.com/yasakurara"><svg id="twitter-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><style>.cls-1{fill:none;}.cls-2{fill:#1da1f2;}</style></defs><title>Twitter_Logo_Blue</title><rect class="cls-1" width="400" height="400"/><path class="cls-2" d="M153.62,301.59c94.34,0,145.94-78.16,145.94-145.94,0-2.22,0-4.43-.15-6.63A104.36,104.36,0,0,0,325,122.47a102.38,102.38,0,0,1-29.46,8.07,51.47,51.47,0,0,0,22.55-28.37,102.79,102.79,0,0,1-32.57,12.45,51.34,51.34,0,0,0-87.41,46.78A145.62,145.62,0,0,1,92.4,107.81a51.33,51.33,0,0,0,15.88,68.47A50.91,50.91,0,0,1,85,169.86c0,.21,0,.43,0,.65a51.31,51.31,0,0,0,41.15,50.28,51.21,51.21,0,0,1-23.16.88,51.35,51.35,0,0,0,47.92,35.62,102.92,102.92,0,0,1-63.7,22A104.41,104.41,0,0,1,75,278.55a145.21,145.21,0,0,0,78.62,23"/></svg>@yasakurara</a>
@@ -65,9 +70,9 @@ $ python --version Python 2.">
     </ul>
     
     <div class="share">
-    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27-and-packages-en%2f&text=How%20to%20manage%20Python2.X%2c%203.X%20and%20packages%20every%20project - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
+    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27-and-packages-en%2f&text=Manage%20multiple%20python%20versions%20with%20pyenv%20and%20isolate%20packages%20every%20project%20with%20venv - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
     <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27-and-packages-en%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
-    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27-and-packages-en%2f&title=How%20to%20manage%20Python2.X%2c%203.X%20and%20packages%20every%20project - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
+    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27-and-packages-en%2f&title=Manage%20multiple%20python%20versions%20with%20pyenv%20and%20isolate%20packages%20every%20project%20with%20venv - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
 </div>
   </header>
   
@@ -108,7 +113,7 @@ $ python --version Python 2.">
 <h1 id="motivation">Motivation</h1>
 
 <ul>
-<li>want to switch major version of Python (i.e. between Python2.X and Python3.X).</li>
+<li>want to switch major version of Python (i.e. between Python 2 and Python 3).</li>
 <li>want to switch minor version of Python (i.e. between Python3.A and Python3.B).</li>
 <li>want to isolate some packages for every project.</li>
 <li>don&rsquo;t want to construct in vain a new docker container for each Python project.</li>
@@ -247,9 +252,9 @@ $</code></pre></div></li>
     </ul>
     
     <div class="share">
-    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27-and-packages-en%2f&text=How%20to%20manage%20Python2.X%2c%203.X%20and%20packages%20every%20project - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
+    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27-and-packages-en%2f&text=Manage%20multiple%20python%20versions%20with%20pyenv%20and%20isolate%20packages%20every%20project%20with%20venv - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
     <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27-and-packages-en%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
-    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27-and-packages-en%2f&title=How%20to%20manage%20Python2.X%2c%203.X%20and%20packages%20every%20project - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
+    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fmanage-python3-and-python27-and-packages-en%2f&title=Manage%20multiple%20python%20versions%20with%20pyenv%20and%20isolate%20packages%20every%20project%20with%20venv - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
 </div>
   </footer>
   
@@ -273,7 +278,7 @@ $</code></pre></div></li>
 
 <div class="post-widget">
   <div class="twitter-widget">
-    <a class="twitter-timeline" data-width="300" data-height="1000" href="https://twitter.com/yasakurara?ref_src=twsrc%5Etfw">Tweets by yasakurara</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    <a class="twitter-timeline" data-width="300" data-height="1000" data-dnt="true" href="https://twitter.com/yasakurara?ref_src=twsrc%5Etfw">Tweets by yasakurara</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
   </div>
 </div>
 
@@ -281,8 +286,8 @@ $</code></pre></div></li>
 <footer class="footer">
   <nav>
     <ul>
-      <li><a href="https://yasakura.me//terms/">サイトポリシー</a></li>
-      <li><a href="https://yasakura.me//privacy/">プライバシーポリシー</a></li>
+      <li><a href="https://yasakura.me//terms/">Site Policy</a></li>
+      <li><a href="https://yasakura.me//privacy/">Privacy Policy</a></li>
     </ul>
   </nav>
   <span>&copy; 2021 yasakura</span>

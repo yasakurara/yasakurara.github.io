@@ -5,8 +5,6 @@
 		<description>Recent content of yasakura</description>
 		<generator>Hugo -- gohugo.io</generator>
 		
-		<language>ja</language>
-        
         
         
 		<lastBuildDate>Mon, 11 Jan 2021 00:00:00 +0000</lastBuildDate>
@@ -19,7 +17,7 @@
         
         
 		<item>
-			<title>How to manage Python2.X, 3.X and packages every project</title>
+			<title>Manage multiple python versions with pyenv and isolate packages every project with venv</title>
 			<link>https://yasakura.me/post/manage-python3-and-python27-and-packages-en/</link>
 			<pubDate>Sat, 02 Jan 2021 00:00:00 +0000</pubDate>
 			
@@ -73,15 +71,6 @@
 		</item>
 		
 		<item>
-			<title>線形モデルでデータを表現する</title>
-			<link>https://yasakura.me/post/linear-model/</link>
-			<pubDate>Wed, 01 Apr 2020 00:00:04 +0900</pubDate>
-			
-			<guid>https://yasakura.me/post/linear-model/</guid>
-			
-		</item>
-		
-		<item>
 			<title>劣微分とLassoによるスパース性</title>
 			<link>https://yasakura.me/post/subdifferential/</link>
 			<pubDate>Wed, 01 Apr 2020 00:00:04 +0900</pubDate>
@@ -109,7 +98,7 @@
 		</item>
 		
 		<item>
-			<title>Python2.XとPython3.Xを共存させる</title>
+			<title>Python2とPython3を共存させる</title>
 			<link>https://yasakura.me/post/manage-python3-and-python27/</link>
 			<pubDate>Wed, 01 Apr 2020 00:00:01 +0900</pubDate>
 			
@@ -123,6 +112,15 @@
 			<pubDate>Wed, 01 Apr 2020 00:00:00 +0900</pubDate>
 			
 			<guid>https://yasakura.me/post/generate-static-site-with-hugo/</guid>
+			
+		</item>
+		
+		<item>
+			<title>線形モデルでデータを表現する</title>
+			<link>https://yasakura.me/post/linear-model/</link>
+			<pubDate>Wed, 01 Apr 2020 00:00:00 +0000</pubDate>
+			
+			<guid>https://yasakura.me/post/linear-model/</guid>
 			
 		</item>
 		
