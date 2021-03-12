@@ -19,7 +19,8 @@ article, aside, figcaption, figure, footer, header, main, nav, section {
 
 body {
   margin: 0;
-  font-family: "Inter", "sans-serif";
+  /* font-family: "Inter", "sans-serif"; */
+  font-family: "-apple-system","BlinkMacSystemFont","Helvetica Neue","Segoe UI","Hiragino Kaku Gothic ProN","Hiragino Sans","ヒラギノ角ゴ ProN W3","Arial","メイリオ","Meiryo","sans-serif";
   line-height: 1.6em;
   word-wrap: break-word;
   overflow-wrap : break-word;
