@@ -7,7 +7,7 @@
 		
         
         
-		<lastBuildDate>Sat, 02 Jan 2021 00:00:00 +0000</lastBuildDate>
+		<lastBuildDate>Mon, 17 May 2021 00:00:00 +0000</lastBuildDate>
 		
 		<atom:link href="https://yasakura.me/tags/python/" rel="self" type="application/rss+xml" />
 		
@@ -16,6 +16,15 @@
         
         
         
+		<item>
+			<title>Pythonと他言語のライブラリをまたぐ</title>
+			<link>https://yasakura.me/post/foreign-function-interface-python/</link>
+			<pubDate>Mon, 17 May 2021 00:00:00 +0000</pubDate>
+			
+			<guid>https://yasakura.me/post/foreign-function-interface-python/</guid>
+			
+		</item>
+		
 		<item>
 			<title>Manage multiple python versions with pyenv and isolate packages every project with venv</title>
 			<link>https://yasakura.me/post/manage-python3-and-python27-and-packages-en/</link>

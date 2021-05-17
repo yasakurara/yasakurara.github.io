@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html>
+<head>
+  
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-162790219-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-162790219-1');
+    </script>
+    
+    <script data-ad-client="ca-pub-7758429902812373" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+  
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  
+  <title>Pythonと他言語のライブラリをまたぐ - yasakura</title>
+  
+  <meta name="description" content="モチベーション 共有ライブラリをPythonから呼びたい Foreign Function Interface (FFI) 一般に，あるプログラミング言語から他のプログラミング言語で定義された関数などを">
+  
+  <link href=/css/style.css rel="stylesheet">
+  
+  
+  <link rel="icon" href="https://yasakura.me/img/favicon.ico">
+  
+  <link rel="alternate" type="application/atom+xml" href="https://yasakura.me/index.xml" title="yasakura">
+  
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@yasakurara" />
+  <meta property="og:url" content="https://yasakura.me/post/foreign-function-interface-python/" />
+  <meta property="og:title" content="Pythonと他言語のライブラリをまたぐ" />
+  <meta property="og:image" content="https://yasakura.me/img/thumbnail.png" />
+  
+  
+</head>
+<body>
+  <header class="header">
+    <div class="title"><a href="https://yasakura.me/">yasakura</a></div>
+    <nav id="navigation">
+      <ul class="menu">
+        <li><a href="https://yasakura.me//about/">ABOUT</a></li>
+      </ul>
+    </nav>
+  </header>
+<article class="post post-view">
+  <header class="post-header">
+    
+    <p class="post-meta">2021.5.17</p>
+    
+    <h1 class="post-title">Pythonと他言語のライブラリをまたぐ</h1>
+    <ul class="post-author">
+      <li>
+        <a href="https://twitter.com/yasakurara"><svg id="twitter-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><style>.cls-1{fill:none;}.cls-2{fill:#1da1f2;}</style></defs><title>Twitter_Logo_Blue</title><rect class="cls-1" width="400" height="400"/><path class="cls-2" d="M153.62,301.59c94.34,0,145.94-78.16,145.94-145.94,0-2.22,0-4.43-.15-6.63A104.36,104.36,0,0,0,325,122.47a102.38,102.38,0,0,1-29.46,8.07,51.47,51.47,0,0,0,22.55-28.37,102.79,102.79,0,0,1-32.57,12.45,51.34,51.34,0,0,0-87.41,46.78A145.62,145.62,0,0,1,92.4,107.81a51.33,51.33,0,0,0,15.88,68.47A50.91,50.91,0,0,1,85,169.86c0,.21,0,.43,0,.65a51.31,51.31,0,0,0,41.15,50.28,51.21,51.21,0,0,1-23.16.88,51.35,51.35,0,0,0,47.92,35.62,102.92,102.92,0,0,1-63.7,22A104.41,104.41,0,0,1,75,278.55a145.21,145.21,0,0,0,78.62,23"/></svg>@yasakurara</a>
+      </li>
+    </ul>
+    
+    <ul class="post-tags">
+      
+      <li><a href="https://yasakura.me/tags/ffi/">#FFI</a></li>
+      
+      <li><a href="https://yasakura.me/tags/python/">#python</a></li>
+      
+      <li><a href="https://yasakura.me/tags/ctypes/">#ctypes</a></li>
+      
+    </ul>
+    
+    <div class="share">
+    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fforeign-function-interface-python%2f&text=Python%e3%81%a8%e4%bb%96%e8%a8%80%e8%aa%9e%e3%81%ae%e3%83%a9%e3%82%a4%e3%83%96%e3%83%a9%e3%83%aa%e3%82%92%e3%81%be%e3%81%9f%e3%81%90 - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
+    <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fforeign-function-interface-python%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
+    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fforeign-function-interface-python%2f&title=Python%e3%81%a8%e4%bb%96%e8%a8%80%e8%aa%9e%e3%81%ae%e3%83%a9%e3%82%a4%e3%83%96%e3%83%a9%e3%83%aa%e3%82%92%e3%81%be%e3%81%9f%e3%81%90 - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
+</div>
+  </header>
+  
+  
+  <div class="post-adsense" align="center">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <ins class="adsbygoogle"
+        style="display:block; text-align:center;"
+        data-ad-layout="in-article"
+        data-ad-format="fluid"
+        data-ad-client="ca-pub-7758429902812373"
+        data-ad-slot="2928625484"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  
+  
+  <div class="post-content">
+    
+<h1>Table of Contents</h1>
+<nav id="TableOfContents">
+<ul>
+<li><a href="#モチベーション">モチベーション</a></li>
+<li><a href="#foreign-function-interface-ffi">Foreign Function Interface (FFI)</a></li>
+<li><a href="#pythonからc-c-の共有ライブラリを呼ぶ">PythonからC/C++の共有ライブラリを呼ぶ</a>
+<ul>
+<li><a href="#ctypesでc-c-の共有ライブラリを呼ぶ方法">ctypesでC/C++の共有ライブラリを呼ぶ方法</a></li>
+<li><a href="#共有ライブラリ内の関数群">共有ライブラリ内の関数群</a></li>
+<li><a href="#pythonから共有ライブラリ内の関数を呼ぶ方法">Pythonから共有ライブラリ内の関数を呼ぶ方法</a></li>
+</ul></li>
+</ul>
+</nav>
+
+    
+
+<h1 id="モチベーション">モチベーション</h1>
+
+<p>共有ライブラリをPythonから呼びたい</p>
+
+<h1 id="foreign-function-interface-ffi">Foreign Function Interface (FFI)</h1>
+
+<p>一般に，あるプログラミング言語から他のプログラミング言語で定義された関数などを利用するためには，<a href="https://ja.wikipedia.org/wiki/Foreign_function_interface">Foreign Function Interface (FFI)</a>を用意する必要がある．</p>
+
+<h1 id="pythonからc-c-の共有ライブラリを呼ぶ">PythonからC/C++の共有ライブラリを呼ぶ</h1>
+
+<p>PythonのFFIとして， <a href="https://docs.python.org/3/library/ctypes.html">ctypes</a> や <a href="https://docs.python.org/3/extending/extending.html">Python.h</a> , <a href="https://www.boost.org/doc/libs/1_70_0/libs/python/doc/html/index.html">Boost.Python</a> などがある．</p>
+
+<p>ctypesはPythonに標準で組み込まれているので，<code>import</code>するだけで使える．</p>
+
+<h2 id="ctypesでc-c-の共有ライブラリを呼ぶ方法">ctypesでC/C++の共有ライブラリを呼ぶ方法</h2>
+
+<p>共有ライブラリ内の関数の入出力に関して，以下のパターンを想定し，それぞれについてctypesから呼び出す方法を実装した．</p>
+
+<ol>
+<li>引数が無い関数を呼ぶ例</li>
+<li>引数が複数ある関数を呼ぶ例</li>
+<li>関数の引数に参照渡しする例</li>
+<li>関数の引数に構造体を値渡しする例</li>
+<li>関数の引数に構造体を参照渡しする例</li>
+<li>入れ子の構造体を参照渡しする例</li>
+<li>関数ポインタを渡す例</li>
+</ol>
+
+<h2 id="共有ライブラリ内の関数群">共有ライブラリ内の関数群</h2>
+
+<p>以下のようなCのソースコードを例えば <code>myutils.c</code> とし， <code>gcc -shared -o libmyutils.so myutils.c</code> などで共有ライブラリを作成したとする．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span>
+<span style="color:#75715e">// 1. helloworld
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">helloworld</span>(<span style="color:#66d9ef">void</span>){
+    printf(<span style="color:#e6db74">&#34;Hello World !</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>);
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+
+
+<span style="color:#75715e">// 2. pass two values
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">sum</span>(<span style="color:#66d9ef">int</span> a, <span style="color:#66d9ef">int</span> b){
+    <span style="color:#66d9ef">return</span> a<span style="color:#f92672">+</span>b;
+}
+
+
+<span style="color:#75715e">// 3. pass a pointer value
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">pass_value_by_reference</span>(<span style="color:#66d9ef">int</span> <span style="color:#f92672">*</span>value){
+    <span style="color:#66d9ef">int</span> tmp <span style="color:#f92672">=</span> <span style="color:#f92672">*</span>value;
+    <span style="color:#f92672">*</span>value <span style="color:#f92672">=</span> <span style="color:#ae81ff">321</span>;
+    printf(<span style="color:#e6db74">&#34;%d -&gt; %d</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, tmp, <span style="color:#f92672">*</span>value);
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+
+
+<span style="color:#75715e">// 4. pass a struct by value
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">typedef</span> <span style="color:#66d9ef">struct</span> {
+    <span style="color:#66d9ef">int</span> value;
+    <span style="color:#66d9ef">char</span> str[<span style="color:#ae81ff">100</span>];
+}pass_struct_by_value_t;
+
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">pass_struct_by_value</span>(pass_struct_by_value_t my_struct){
+    printf(<span style="color:#e6db74">&#34;%d %s</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, my_struct.value, my_struct.str);
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+
+
+<span style="color:#75715e">// 5. pass a pointer struct
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">typedef</span> <span style="color:#66d9ef">struct</span> {
+    <span style="color:#66d9ef">int</span> value;
+    <span style="color:#66d9ef">char</span> str[<span style="color:#ae81ff">100</span>];
+    <span style="color:#66d9ef">int</span> result;
+}pass_struct_by_reference_t;
+
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">pass_struct_by_reference</span>(pass_struct_by_reference_t <span style="color:#f92672">*</span>my_struct_p){
+    printf(<span style="color:#e6db74">&#34;%d %s</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, my_struct_p<span style="color:#f92672">-&gt;</span>value, my_struct_p<span style="color:#f92672">-&gt;</span>str);
+    my_struct_p<span style="color:#f92672">-&gt;</span>result <span style="color:#f92672">=</span> <span style="color:#ae81ff">123</span>;
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+
+
+<span style="color:#75715e">// 6. pass a nested struct
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">typedef</span> <span style="color:#66d9ef">struct</span> {
+    <span style="color:#66d9ef">char</span> ip_address[<span style="color:#ae81ff">64</span>];
+}ip_t;
+
+<span style="color:#66d9ef">typedef</span> <span style="color:#66d9ef">struct</span> {
+    <span style="color:#66d9ef">char</span> name[<span style="color:#ae81ff">128</span>];
+    <span style="color:#66d9ef">int</span> ip_num;
+    ip_t <span style="color:#f92672">*</span>ip;
+}machine_t;
+
+<span style="color:#66d9ef">typedef</span> <span style="color:#66d9ef">struct</span> {
+    <span style="color:#66d9ef">int</span> machine_num;
+    machine_t <span style="color:#f92672">*</span>machine;
+}servers_t;
+
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">show_servers</span>(servers_t <span style="color:#f92672">*</span>servers){
+    <span style="color:#66d9ef">for</span>(<span style="color:#66d9ef">int</span> i<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>; i<span style="color:#f92672">&lt;</span>servers<span style="color:#f92672">-&gt;</span>machine_num; i<span style="color:#f92672">++</span>){
+        machine_t <span style="color:#f92672">*</span>machine <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span>servers<span style="color:#f92672">-&gt;</span>machine[i];
+        <span style="color:#66d9ef">for</span>(<span style="color:#66d9ef">int</span> j<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>; j<span style="color:#f92672">&lt;</span>machine<span style="color:#f92672">-&gt;</span>ip_num; j<span style="color:#f92672">++</span>){
+            printf(<span style="color:#e6db74">&#34;%s %s</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, machine<span style="color:#f92672">-&gt;</span>name, machine<span style="color:#f92672">-&gt;</span>ip[j].ip_address);
+        }
+    }
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+
+
+<span style="color:#75715e">// 7. pass a function pointer
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">typedef</span> <span style="color:#a6e22e">void</span> (<span style="color:#f92672">*</span>callback_func)(<span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>msg);
+<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">callback_sample</span>(callback_func callback){
+    callback(<span style="color:#e6db74">&#34;Hello World !&#34;</span>);
+}</code></pre></div>
+<h2 id="pythonから共有ライブラリ内の関数を呼ぶ方法">Pythonから共有ライブラリ内の関数を呼ぶ方法</h2>
+
+<p>さきほど用意した共有ライブラリ <code>libmyutils.so</code> のそれぞれの関数をPythonからctypesを使って呼ぶ方法</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e">#!/usr/bin/env python</span>
+<span style="color:#75715e"># -*- coding: utf-8 -*-</span>
+
+<span style="color:#f92672">import</span> ctypes
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">Main</span>():
+        
+    libtest <span style="color:#f92672">=</span> ctypes<span style="color:#f92672">.</span>CDLL(<span style="color:#e6db74">&#34;./libmyutils.so&#34;</span>)
+
+    <span style="color:#75715e">### 1. helloworld</span>
+    libtest<span style="color:#f92672">.</span>helloworld<span style="color:#f92672">.</span>argtypes <span style="color:#f92672">=</span> None
+    libtest<span style="color:#f92672">.</span>helloworld<span style="color:#f92672">.</span>restype <span style="color:#f92672">=</span> ctypes<span style="color:#f92672">.</span>c_int
+    libtest<span style="color:#f92672">.</span>helloworld()
+    <span style="color:#66d9ef">print</span>()
+
+
+    <span style="color:#75715e">### 2. pass two values</span>
+    libtest<span style="color:#f92672">.</span>sum<span style="color:#f92672">.</span>argtypes <span style="color:#f92672">=</span> [ctypes<span style="color:#f92672">.</span>c_int, ctypes<span style="color:#f92672">.</span>c_int]
+    libtest<span style="color:#f92672">.</span>sum<span style="color:#f92672">.</span>restype <span style="color:#f92672">=</span> ctypes<span style="color:#f92672">.</span>c_int
+    rc <span style="color:#f92672">=</span> libtest<span style="color:#f92672">.</span>sum(<span style="color:#ae81ff">123</span>, <span style="color:#ae81ff">321</span>)
+    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#34;rc={}&#34;</span><span style="color:#f92672">.</span>format(rc))
+    <span style="color:#66d9ef">print</span>()
+
+
+    <span style="color:#75715e">### 3. pass a pointer value</span>
+    libtest<span style="color:#f92672">.</span>pass_value_by_reference<span style="color:#f92672">.</span>argtypes <span style="color:#f92672">=</span> [ctypes<span style="color:#f92672">.</span>POINTER(ctypes<span style="color:#f92672">.</span>c_int)]
+    libtest<span style="color:#f92672">.</span>pass_value_by_reference<span style="color:#f92672">.</span>restype <span style="color:#f92672">=</span> ctypes<span style="color:#f92672">.</span>c_int
+    myValue <span style="color:#f92672">=</span> ctypes<span style="color:#f92672">.</span>c_int(<span style="color:#ae81ff">123</span>)
+    rc <span style="color:#f92672">=</span> libtest<span style="color:#f92672">.</span>pass_value_by_reference(myValue)
+    <span style="color:#66d9ef">print</span>(myValue<span style="color:#f92672">.</span>value)
+    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#34;rc={}&#34;</span><span style="color:#f92672">.</span>format(rc))
+    <span style="color:#66d9ef">print</span>()
+
+
+    <span style="color:#75715e">### 4. pass a struct by value</span>
+    <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">pass_struct_by_value_t</span>(ctypes<span style="color:#f92672">.</span>Structure):
+        _fields_ <span style="color:#f92672">=</span> [
+            (<span style="color:#e6db74">&#34;value&#34;</span>, ctypes<span style="color:#f92672">.</span>c_int),
+            (<span style="color:#e6db74">&#34;str&#34;</span>, ctypes<span style="color:#f92672">.</span>c_char<span style="color:#f92672">*</span><span style="color:#ae81ff">100</span>)
+        ]
+    libtest<span style="color:#f92672">.</span>pass_struct_by_value<span style="color:#f92672">.</span>argtypes <span style="color:#f92672">=</span> [pass_struct_by_value_t]
+    libtest<span style="color:#f92672">.</span>pass_struct_by_value<span style="color:#f92672">.</span>restype <span style="color:#f92672">=</span> ctypes<span style="color:#f92672">.</span>c_int
+    myStruct <span style="color:#f92672">=</span> pass_struct_by_value_t(<span style="color:#ae81ff">123</span>, <span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;Hello World !&#34;</span>)
+    rc <span style="color:#f92672">=</span> libtest<span style="color:#f92672">.</span>pass_struct_by_value(myStruct)
+    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#34;rc={}&#34;</span><span style="color:#f92672">.</span>format(rc))
+    <span style="color:#66d9ef">print</span>()
+
+
+    <span style="color:#75715e">### 5. pass a pointer struct</span>
+    <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">pass_struct_by_reference_t</span>(ctypes<span style="color:#f92672">.</span>Structure):
+        _fields_ <span style="color:#f92672">=</span> [
+            (<span style="color:#e6db74">&#34;value&#34;</span>, ctypes<span style="color:#f92672">.</span>c_int),
+            (<span style="color:#e6db74">&#34;str&#34;</span>, ctypes<span style="color:#f92672">.</span>c_char<span style="color:#f92672">*</span><span style="color:#ae81ff">100</span>),
+            (<span style="color:#e6db74">&#34;result&#34;</span>, ctypes<span style="color:#f92672">.</span>c_int)
+        ]
+    libtest<span style="color:#f92672">.</span>pass_struct_by_reference<span style="color:#f92672">.</span>argtypes <span style="color:#f92672">=</span> [ctypes<span style="color:#f92672">.</span>POINTER(pass_struct_by_reference_t)]
+    libtest<span style="color:#f92672">.</span>pass_struct_by_reference<span style="color:#f92672">.</span>restype <span style="color:#f92672">=</span> ctypes<span style="color:#f92672">.</span>c_int
+    myStruct <span style="color:#f92672">=</span> pass_struct_by_reference_t(<span style="color:#ae81ff">123</span>, <span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;Hello World !&#34;</span>)
+    rc <span style="color:#f92672">=</span> libtest<span style="color:#f92672">.</span>pass_struct_by_reference(ctypes<span style="color:#f92672">.</span>byref(myStruct))
+    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#34;result={}&#34;</span><span style="color:#f92672">.</span>format(myStruct<span style="color:#f92672">.</span>result))
+    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#34;rc={}&#34;</span><span style="color:#f92672">.</span>format(rc))
+    <span style="color:#66d9ef">print</span>()
+
+
+    <span style="color:#75715e">### 6. pass a nested struct</span>
+    <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ip_t</span>(ctypes<span style="color:#f92672">.</span>Structure):
+        _fields_ <span style="color:#f92672">=</span> [
+            (<span style="color:#e6db74">&#34;ip_address&#34;</span>, ctypes<span style="color:#f92672">.</span>c_char<span style="color:#f92672">*</span><span style="color:#ae81ff">64</span>)
+        ]
+    <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">machine_t</span>(ctypes<span style="color:#f92672">.</span>Structure):
+        _fields_ <span style="color:#f92672">=</span> [
+            (<span style="color:#e6db74">&#34;name&#34;</span>, ctypes<span style="color:#f92672">.</span>c_char<span style="color:#f92672">*</span><span style="color:#ae81ff">128</span>),
+            (<span style="color:#e6db74">&#34;ip_num&#34;</span>, ctypes<span style="color:#f92672">.</span>c_int),
+            (<span style="color:#e6db74">&#34;ip&#34;</span>, ctypes<span style="color:#f92672">.</span>POINTER(ip_t))
+        ]
+    <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">servers_t</span>(ctypes<span style="color:#f92672">.</span>Structure):
+        _fields_ <span style="color:#f92672">=</span> [
+            (<span style="color:#e6db74">&#34;machine_num&#34;</span>, ctypes<span style="color:#f92672">.</span>c_int),
+            (<span style="color:#e6db74">&#34;machine&#34;</span>, ctypes<span style="color:#f92672">.</span>POINTER(machine_t))
+        ]
+    libtest<span style="color:#f92672">.</span>show_servers<span style="color:#f92672">.</span>argtypes <span style="color:#f92672">=</span> [ctypes<span style="color:#f92672">.</span>POINTER(servers_t)]
+    libtest<span style="color:#f92672">.</span>show_servers<span style="color:#f92672">.</span>restype <span style="color:#f92672">=</span> ctypes<span style="color:#f92672">.</span>c_int
+
+    machine_list <span style="color:#f92672">=</span> []
+
+    ip_list <span style="color:#f92672">=</span> []
+    ip_list<span style="color:#f92672">.</span>append(ip_t(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;192.168.0.1&#34;</span>))
+    ip_num <span style="color:#f92672">=</span> len(ip_list)
+    ips <span style="color:#f92672">=</span> (ip_t<span style="color:#f92672">*</span>ip_num)(<span style="color:#f92672">*</span>ip_list)
+    machine_list<span style="color:#f92672">.</span>append(machine_t(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;machineA&#34;</span>, ip_num, ips))
+
+    ip_list<span style="color:#f92672">.</span>clear()
+    ip_list<span style="color:#f92672">.</span>append(ip_t(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;192.168.1.1&#34;</span>))
+    ip_list<span style="color:#f92672">.</span>append(ip_t(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;192.168.2.2&#34;</span>))
+    ip_list<span style="color:#f92672">.</span>append(ip_t(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;192.168.2.3&#34;</span>))
+    ip_num <span style="color:#f92672">=</span> len(ip_list)
+    ips <span style="color:#f92672">=</span> (ip_t<span style="color:#f92672">*</span>ip_num)(<span style="color:#f92672">*</span>ip_list)
+    machine_list<span style="color:#f92672">.</span>append(machine_t(<span style="color:#e6db74">b</span><span style="color:#e6db74">&#34;machineB&#34;</span>, ip_num, ips))
+
+    machine_num <span style="color:#f92672">=</span> len(machine_list)
+    machines <span style="color:#f92672">=</span> (machine_t<span style="color:#f92672">*</span>machine_num)(<span style="color:#f92672">*</span>machine_list)
+    servers <span style="color:#f92672">=</span> servers_t(machine_num, machines)
+    rc <span style="color:#f92672">=</span> libtest<span style="color:#f92672">.</span>show_servers(ctypes<span style="color:#f92672">.</span>byref(servers))
+    <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#34;rc={}&#34;</span><span style="color:#f92672">.</span>format(rc))
+    <span style="color:#66d9ef">print</span>()
+
+
+    <span style="color:#75715e">### 7. pass a function pointer</span>
+    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">callbackFunc</span>(msg):
+        <span style="color:#66d9ef">print</span>(<span style="color:#e6db74">&#34;Hey, {}&#34;</span><span style="color:#f92672">.</span>format(msg<span style="color:#f92672">.</span>decode(<span style="color:#e6db74">&#39;utf-8&#39;</span>)))
+    myCallback <span style="color:#f92672">=</span> ctypes<span style="color:#f92672">.</span>CFUNCTYPE(None, ctypes<span style="color:#f92672">.</span>c_char_p)
+    libtest<span style="color:#f92672">.</span>callback_sample<span style="color:#f92672">.</span>argtypes <span style="color:#f92672">=</span> [myCallback]
+    libtest<span style="color:#f92672">.</span>callback_sample<span style="color:#f92672">.</span>restype <span style="color:#f92672">=</span> None
+    libtest<span style="color:#f92672">.</span>callback_sample(myCallback(callbackFunc))
+
+<span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;__main__&#39;</span>:
+    Main()</code></pre></div>
+  </div>
+  <footer class="post-footer">
+    
+    <ul class="post-tags">
+      
+      <li><a href="https://yasakura.me/tags/ffi/">#FFI</a></li>
+      
+      <li><a href="https://yasakura.me/tags/python/">#python</a></li>
+      
+      <li><a href="https://yasakura.me/tags/ctypes/">#ctypes</a></li>
+      
+    </ul>
+    
+    <div class="share">
+    <a href="https://twitter.com/share?url=https%3a%2f%2fyasakura.me%2fpost%2fforeign-function-interface-python%2f&text=Python%e3%81%a8%e4%bb%96%e8%a8%80%e8%aa%9e%e3%81%ae%e3%83%a9%e3%82%a4%e3%83%96%e3%83%a9%e3%83%aa%e3%82%92%e3%81%be%e3%81%9f%e3%81%90 - yasakura" rel="nofollow" target="_blank" class="tw">Twitter</a>
+    <a href="http://www.facebook.com/sharer.php?u=https%3a%2f%2fyasakura.me%2fpost%2fforeign-function-interface-python%2f" class="fb" target="_blank" rel="nofollow">Facebook</a>
+    <a href="http://b.hatena.ne.jp/add?mode=confirm&url=https%3a%2f%2fyasakura.me%2fpost%2fforeign-function-interface-python%2f&title=Python%e3%81%a8%e4%bb%96%e8%a8%80%e8%aa%9e%e3%81%ae%e3%83%a9%e3%82%a4%e3%83%96%e3%83%a9%e3%83%aa%e3%82%92%e3%81%be%e3%81%9f%e3%81%90 - yasakura" class="ht" target="_blank" rel="nofollow">Hatena</a>
+</div>
+  </footer>
+  
+  
+  <div class="post-adsense" align="center">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <ins class="adsbygoogle"
+        style="display:block; text-align:center;"
+        data-ad-layout="in-article"
+        data-ad-format="fluid"
+        data-ad-client="ca-pub-7758429902812373"
+        data-ad-slot="2928625484"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+  
+  
+</article>
+
+
+<div class="post-widget">
+  <div class="twitter-widget">
+    <a class="twitter-timeline" data-width="300" data-height="1000" data-dnt="true" href="https://twitter.com/yasakurara?ref_src=twsrc%5Etfw">Tweets by yasakurara</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  </div>
+</div>
+
+
+<footer class="footer">
+  <nav>
+    <ul>
+      <li><a href="https://yasakura.me//terms/">Site Policy</a></li>
+      <li><a href="https://yasakura.me//privacy/">Privacy Policy</a></li>
+    </ul>
+  </nav>
+  <span>&copy; 2021 yasakura</span>
+</footer>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [['$','$'], ['\\(','\\)']],
+      processEscapes: true
+    },
+    linebreaks: {
+      automatic: true
+    }
+  });
+</script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML' async></script>
+</body>
+</html>
+

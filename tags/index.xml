@@ -7,7 +7,7 @@
 		
         
         
-		<lastBuildDate>Sat, 02 Jan 2021 00:00:00 +0000</lastBuildDate>
+		<lastBuildDate>Mon, 17 May 2021 00:00:00 +0000</lastBuildDate>
 		
 		<atom:link href="https://yasakura.me/tags/" rel="self" type="application/rss+xml" />
 		
@@ -17,11 +17,29 @@
         
         
 		<item>
+			<title>ctypes</title>
+			<link>https://yasakura.me/tags/ctypes/</link>
+			<pubDate>Mon, 17 May 2021 00:00:00 +0000</pubDate>
+			
+			<guid>https://yasakura.me/tags/ctypes/</guid>
+			
+		</item>
+		
+		<item>
 			<title>Python</title>
 			<link>https://yasakura.me/tags/python/</link>
-			<pubDate>Sat, 02 Jan 2021 00:00:00 +0000</pubDate>
+			<pubDate>Mon, 17 May 2021 00:00:00 +0000</pubDate>
 			
 			<guid>https://yasakura.me/tags/python/</guid>
+			
+		</item>
+		
+		<item>
+			<title>FFI</title>
+			<link>https://yasakura.me/tags/ffi/</link>
+			<pubDate>Mon, 17 May 2021 00:00:00 +0000</pubDate>
+			
+			<guid>https://yasakura.me/tags/ffi/</guid>
 			
 		</item>
 		
