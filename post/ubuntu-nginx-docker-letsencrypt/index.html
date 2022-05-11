@@ -97,7 +97,7 @@
 <li><a href="#サーバーに公開鍵を登録する">サーバーに公開鍵を登録する</a></li>
 </ul></li>
 <li><a href="#firewallを設定する">Firewallを設定する</a></li>
-<li><a href="#dockerをインストールする">Dockerをインストールする</a></li>
+<li><a href="#docker-rootless-をインストールする">Docker(rootless)をインストールする</a></li>
 <li><a href="#nginxコンテナを立ち上げてhttpでアクセスできることを確認する">Nginxコンテナを立ち上げてHTTPでアクセスできることを確認する</a></li>
 <li><a href="#httpsに対応する">HTTPSに対応する</a></li>
 <li><a href="#let-s-encryptの証明書は90日で期限切れになるので-自動で更新するようにする">Let&rsquo;s encryptの証明書は90日で期限切れになるので，自動で更新するようにする</a></li>
@@ -183,21 +183,23 @@ APT::Periodic::Unattended-Upgrade &quot;1&quot;;
 
 <h2 id="ローカルで公開鍵を生成する">ローカルで公開鍵を生成する</h2>
 
-<ol>
-<li><code>cd ~/.ssh</code></li>
-<li><code>ssh-keygen -t rsa -b 4096</code></li>
-<li><code>chmod 600 &lt;秘密鍵&gt;</code></li>
+<p>以下はmacbookをローカルとした場合の手順
+1. <code>cd ~/.ssh</code>
+2. <code>ssh-keygen -t rsa -b 4096</code>
+3. <code>chmod 600 &lt;秘密鍵&gt;</code>
+4. <code>vi config</code></p>
 
-<li><p><code>vi config</code></p>
-
-<pre><code>Host &lt;nickname&gt;
+<pre><code>```
+Host &lt;nickname&gt;
 HostName &lt;ip address&gt;
 Port &lt;port for ssh&gt;
 User &lt;username&gt;
 IdentityFile ~/.ssh/&lt;秘密鍵&gt;
-</code></pre></li>
+```
+</code></pre>
 
-<li><p><code>pbcopy &lt; ~/.ssh/&lt;公開鍵&gt;</code></p></li>
+<ol>
+<li><code>cat &lt; ~/.ssh/&lt;公開鍵&gt; | pbcopy</code></li>
 </ol>
 
 <h2 id="サーバーに公開鍵を登録する">サーバーに公開鍵を登録する</h2>
@@ -245,21 +247,32 @@ UsePAM no
 <li><code>sudo ufw status numbered</code></li>
 <li><code>sudo ufw delete &lt;消したい番号&gt;</code></li>
 </ul></li>
-<li>Dockerはiptablesを直接書き換えるので，<code>ufw</code>で80/433番ポートをフィルタしても効果は無い．詳しくは<a href="https://yasakura.me/post/docker-network/">Dockerコンテナ/Kubernetesのネットワーク構成</a>を参照のこと．</li>
 </ul>
 
-<h1 id="dockerをインストールする">Dockerをインストールする</h1>
+<h1 id="docker-rootless-をインストールする">Docker(rootless)をインストールする</h1>
 
 <ol>
-<li>UbuntuにDockerをインストールする
+<li><code>cat /etc/lsb-release</code>でUbuntuのバージョンを確認する．ここではUbuntu 20.04を対象とした．</li>
+<li><code>uidmap</code>が<a href="https://docs.docker.com/engine/security/rootless/#prerequisites">必要なので</a>，<code>sudo apt install uidmap</code>を実行する．</li>
+<li><a href="https://docs.docker.com/engine/install/">Install Docker Engine</a></li>
+<li><a href="https://docs.docker.com/engine/security/rootless/">Run the Docker daemon as a non-root user</a>
 
 <ul>
-<li><a href="https://docs.docker.com/engine/install/ubuntu/">Install Docker Engine on Ubuntu</a></li>
+<li>systemctl周辺でエラーが生じる場合は，<code>export XDG_RUNTIME_DIR=/run/user/$UID</code>して実行してみる．</li>
 </ul></li>
-<li>一般ユーザが<code>docker</code>コマンドを使えるようにする
+<li>rootlessだと1024番未満のportをbindすることができない．<code>/etc/sysctl.conf</code>に<code>net.ipv4.ip_unprivileged_port_start=0</code>を追加して<code>sudo sysctl --system</code>を実行することで，1024番未満のportをbindできるようになる．</li>
+<li><code>sudo ufw allow 80</code>と<code>sudo ufw allow 443</code>を実行して，80番portと443番portへの外部からのアクセスを許可する．</li>
+<li>Rootlessはデフォルトで，<a href="https://matsuand.github.io/docs.docker.jp.onthefly/engine/security/rootless/#networking-errors">client ipをコンテナに伝搬しない</a>ので，（コンテナ内のnginxでclient ipを取得しようとしても，コンテナの接続しているdocker bridgeのgatewayになってしまう）以下を実行してclient ipをコンテナ内で受け取れるようにする．ただし，デフォルトの方がパフォーマンスが良いので，コンテナでclient ipを受け取らなくても良いのなら設定する必要は無い．
 
 <ul>
-<li><a href="https://docs.docker.com/engine/install/linux-postinstall/">Post-installation steps for Linux</a></li>
+<li><code>~/.config/systemd/user/docker.service.d/override.conf</code>に以下を追加する
+<code>
+[Service]
+Environment=&quot;DOCKERD_ROOTLESS_ROOTLESSKIT_PORT_DRIVER=slirp4netns&quot;
+</code></li>
+<li><code>sudo systemctl daemon-reload</code></li>
+<li><code>sudo systemctl restart docker</code></li>
+<li><code>reboot</code></li>
 </ul></li>
 </ol>
 
@@ -484,7 +497,7 @@ No renewals were attempted.
       <li><a href="https://yasakura.me//privacy/">Privacy Policy</a></li>
     </ul>
   </nav>
-  <span>&copy; 2021 yasakura</span>
+  <span>&copy; 2022 yasakura</span>
 </footer>
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({

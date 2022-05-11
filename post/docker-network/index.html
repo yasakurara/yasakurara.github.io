@@ -110,6 +110,7 @@
 </ul></li>
 <li><a href="#コンテナ用のネットワークをつくる">コンテナ用のネットワークをつくる</a></li>
 <li><a href="#publishとexpose">publishとexpose</a></li>
+<li><a href="#docker-composeで作成されるネットワーク">docker-composeで作成されるネットワーク</a></li>
 <li><a href="#kubernetesのネットワーク構成">Kubernetesのネットワーク構成</a></li>
 </ul>
 </nav>
@@ -756,6 +757,15 @@ Chain DOCKER-USER <span style="color:#f92672">(</span><span style="color:#ae81ff
 
 <p><code>docker run</code>で<code>-p</code>(publish)オプションを指定したり，docker-compose.ymlで<code>ports</code>を指定すると，NATテーブルが自動で書き換えられる．これにより，WANとコンテナ間のアクセスが実現する．一方，セキュリティの観点から，80/443番ポートはpublishしたいが，DBコンテナとサーバーコンテナ間のポートはpublishしたくないなどと言った場合は，それぞれのコンテナを立ち上げるときに<code>--expose &lt;port&gt;</code>を指定することで，exposeなportはホスト内のみで有効となる．docker-compose.ymlなら<code>EXPOSE</code>がそれに該当する．</p>
 
+<h1 id="docker-composeで作成されるネットワーク">docker-composeで作成されるネットワーク</h1>
+
+<ul>
+<li>プロジェクト名： docker-compose.ymlのカレントディレクトリ．<code>docker-compose -p &lt;プロジェクト名&gt;</code>または環境変数<code>COMPOSE_PROJECT_NAME</code>で指定できる．</li>
+<li>コンテナ名： <code>&lt;プロジェクト名&gt;&lt;サービス名&gt;&lt;通し番号&gt;</code></li>
+<li>ホスト名： <code>&lt;CONTAINER ID&gt;</code></li>
+<li>ネットワーク名： <code>&lt;プロジェクト名&gt;_default</code></li>
+</ul>
+
 <h1 id="kubernetesのネットワーク構成">Kubernetesのネットワーク構成</h1>
 
 <p>あとで書く</p>
@@ -802,7 +812,7 @@ Chain DOCKER-USER <span style="color:#f92672">(</span><span style="color:#ae81ff
       <li><a href="https://yasakura.me//privacy/">Privacy Policy</a></li>
     </ul>
   </nav>
-  <span>&copy; 2021 yasakura</span>
+  <span>&copy; 2022 yasakura</span>
 </footer>
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({

@@ -169,7 +169,7 @@
 <h2 id="リモートリポジトリから始める">リモートリポジトリから始める</h2>
 
 <ol>
-<li>GitHubにSSH公開鍵を登録しておく
+<li><p>GitHubにSSH公開鍵を登録しておく</p>
 
 <ol>
 <li><code>cd ~/.ssh</code></li>
@@ -183,21 +183,25 @@
 </ol></li>
 <li><code>pbcopy &lt; &lt;公開鍵へのパス&gt;</code>で公開鍵をクリップボードにコピー</li>
 <li><a href="https://github.com/settings/keys">SSH and GPG keys</a>の<code>New SSH key</code>に公開鍵をコピペ</li>
-<li><code>~/.ssh/config</code>に接続先を登録
-<code>
-Host &lt;nickname&gt;
+
+<li><p><code>~/.ssh/config</code>に接続先を登録</p>
+
+<pre><code>Host &lt;nickname&gt;
 HostName github.com
 IdentityFile &lt;秘密鍵へのパス&gt;
 User git
-</code></li>
-<li><code>ssh -T &lt;nickname&gt;</code>で接続確認
+</code></pre></li>
+
+<li><p><code>ssh -T &lt;nickname&gt;</code>で接続確認</p>
 
 <ul>
 <li><code>Hi XXX! You've successfully authenticated, but GitHub does not provide shell access.</code>と言われれば優勝</li>
 </ul></li>
-<li><code>rm &lt;公開鍵へのパス&gt;</code>で公開鍵を削除しておく</li>
+
+<li><p><code>rm &lt;公開鍵へのパス&gt;</code>で公開鍵を削除しておく</p></li>
 </ol></li>
-<li><code>git clone git@github.com:&lt;repository&gt;.git &lt;directory&gt;</code>
+
+<li><p><code>git clone git@github.com:&lt;repository&gt;.git &lt;directory&gt;</code></p>
 
 <ul>
 <li><code>&lt;directory&gt;</code> : ローカルリポジトリとしたいディレクトリへのパス</li>
@@ -1240,7 +1244,7 @@ A---B---C---D---H master
       <li><a href="https://yasakura.me//privacy/">Privacy Policy</a></li>
     </ul>
   </nav>
-  <span>&copy; 2021 yasakura</span>
+  <span>&copy; 2022 yasakura</span>
 </footer>
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
