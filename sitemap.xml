@@ -27,12 +27,6 @@
   </url>
   
   <url>
-    <loc>https://yasakura.me/tags/python/</loc>
-    <lastmod>2021-05-17T00:00:00+00:00</lastmod>
-    <priority>0</priority>
-  </url>
-  
-  <url>
     <loc>https://yasakura.me/post/foreign-function-interface-python/</loc>
     <lastmod>2021-05-17T00:00:00+00:00</lastmod>
   </url>
@@ -45,6 +39,12 @@
   
   <url>
     <loc>https://yasakura.me/tags/ctypes/</loc>
+    <lastmod>2021-05-17T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://yasakura.me/tags/python/</loc>
     <lastmod>2021-05-17T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
